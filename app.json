@@ -1,0 +1,51 @@
+{
+  "expo": {
+    "name": "BUKU LAGU POZOO",
+    "slug": "lagu_pozoo",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "jsEngine": "hermes",
+    "splash": {
+      "image": "./assets/images/splash-image.png",
+      "backgroundColor": "#1C3D23",
+      "resizeMode": "contain"
+    },
+    "assetBundlePatterns": [
+      "./assets/images/*.{png,jpg,webp}"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#1C3D23"
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "tsconfigPaths": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "e7ba5e9f-7429-4986-8ab7-a42245d0d561"
+      }
+    },
+    "owner": "tytusdl"
+  }
+}
