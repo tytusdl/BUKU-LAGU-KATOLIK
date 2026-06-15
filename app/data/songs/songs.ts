@@ -9,6 +9,8 @@ export interface Song {
   songNumber?: string;
 }
 
+import songsR from './songsR';
+
 export const songs: Song[] = [
   {
     id: 'A1',
@@ -37,7 +39,7 @@ Insan tadau daa
 Om kaamung zikoi no
 Id kaa-sa-na-ngan
 Doid surga togingo`,
-    songNumber: 'A1'
+    songNumber: 'A'
   },
   {
     id: 'A2',
@@ -430,7 +432,7 @@ Taakon ku id Ginavo Nu
 Ginavo ku nodii
 Tunduundu Nu oi Jesus ku,
 Puun do koginavaan
-Koizonon ku daa vagu
+Koizonon ku daa vague
 Om au nodii zadaan
 
 Sondii Ko nokoboos ingkaa
@@ -790,233 +792,50 @@ Ginovoon za soumu-umul`,
   },
   {
     id: 'A30',
-    title: 'MUNSIKOU OM ROMITO',
-    lyrics: `Habar Tosonong norongou tokou
-Jesus no ih ralan om koposion
-Isio no' i Tanak do Kinoingan
+    title: 'MUNSIKOU OM MAMARAYOU',
+    lyrics: `Ontok diti tadau Tobitua
+Rumikot yahai doid Tuhan
+Mamarayou gia ngaran Nu
+Ii osundu om nogi abantug.
 
-Kor: Kanou no sawi-awi tokou
-Munsikou om romito
-Ukabo no tokou ginawo
-Pogiroto no kotumbayaan
+Ukabo no ginawo dahai
+Kaanu yahai nodi koludukan
+Mokinongou Boros Tobitua
+Monorimo Oikaristia Tobitua.
 
-Poinlobi kopio koginawaan Dau
-Pinatahak oh koposion Dau
-Minamasi ngaawi do tokou
+Cho:Asanang ginawo dahai
+Rumikot ngaawi doid Tuhan
+Munsikou om mamarayou
+Kalansanan doid koposion dahai
 
-Sawi-awi Boros di Tuhan Jesus
-Monginwagu koposion tokou
-Mogigion doid kalansanan`,
-    author: 'Belia Toboh Tambunan',
+Iya noh karayahan dahai
+Ii karati do suang ginawo
+Om manahak gia koginawaan
+Tu Iya noh guas koposian.`,
+    author: 'Fr. Peter Abes',
     songNumber: 'A'
   },
   {
     id: 'A31',
-    title: 'FIRMANMU TUHAN PELITA HIDUP',
-    lyrics: `FirmanMu tuhan pelita hidup
-Menerangi seluruh kehidupan
-Terang bagi perjalanan ku
-
-Kor: Kuasanya tiada tandingan
-"Ia menyusuk amat dalam hidup
-Memisahkan jiwa dan roh"
-
-FirmanMu Tuhan menyembuhkan
-Semua akan pulih dan kembali
-Engkaulah harapan manusia
-
-FirmanMu Tuhan menyelamatkan
-Tiada seorang pun akan tersesat
-Dalam cintaMu akan s'lamat
-
-FirmanMu Tuhan menggembirakan
-Berbahagialah yang taat padaNya
-Kehidupan kekal pasti dapat`,
-    author: 'Belia Bundu Kuala Penyu',
+    title: 'MARI KITA BERSUKARIA',
+    lyrics: `Mari kita bersukaria
+Kerna ini hari bahagia
+Kita berkumpul jadi satu
+Puji Tuhan semesta itu
+Lupakanlah hati yang sedih
+Bukankah Yesus berkata,
+Damai yang dib'rikan kita,
+Mari kita bersukaria.`,
     songNumber: 'A'
   },
   {
     id: 'A32',
-    title: 'INDAHNYA SUNGGUH FIRMAN TUHAN',
-    lyrics: `Indahnya sungguh FimanMu oh Tuhan
-Daya penarik bagi hidup
-FirmanMu Tuhan membimbing
-Membawa kepadaMu
-
-**Korus:** FirmanMu hidup dan kuasa
-Memb'ri hidup pada umat
-KuasaMu sumber kekuatan
-Meneguhkan iman kami
-
-FirmanMu Tuhan penerang jiwa raga
-Pemb'ri harapan dalam hidup
-Dalam terangnya kami sedar
-Mengikut jalan benar
-
-Kami gembira menerima FimanMu
-Penuh hati menghayatinya
-Kami mohon agar diresap
-Berakar dalam hidup`,
-    author: 'Belia Beaufort',
-    songNumber: 'A'
-  },
-  {
-    id: 'A33',
-    title: 'OH TUHAN PIMPINLAH LANGKAHKU',
-    lyrics: `Oh Tuhan, pimpinlah langkahku
-Ku tak b'rani jalan sendiri
-SertaMu itulah doaku
-Ajarku merendahkan diri
-
-Menurut FimanMu setiap hari
-Jadikan pelita dalam g'lap
-Mencari domba yang sesat
-Itulah kerinduan jiwa ku`,
-    songNumber: 'A'
-  },
-  {
-    id: 'A34',
-    title: 'KOTOLUADAN OM KOUNSIKAAN',
-    lyrics: `Kotoluadan om kounsikaan Tuhan
-Habar koposion naataak Nu dahai
-
-Korus: 'Yoku no ih Ralan
-Katapatan, Koposion'
-Itti no Habar Tosonong Dau
-Kumaa dotokou
-
-Kababasan, kounsikaan kaanu
-Mantad Habar Tosonong do Tuhan
-
-Piginawaan, piunungan kaanu
-Mantad Habar Tosonong do Tuhan
-
-Tuhan, Tuhan Habar Nu Tosonong
-Poinsuni, poinggamut id ginawo ya
-
-Kotoluadan, kounsikaan Tuhan
-Notiitiu ralan koposion ya`,
-    author: 'Fr. C. Piong',
-    songNumber: 'A'
-  },
-  {
-    id: 'A35',
-    title: 'BOOS NU TAVASI OI TUHAN',
-    lyrics: `Songkuo vinasi ih boos nu
-Oi Tuhan
-Poposindak pogigizon za
-Boos nu oi Tuhan monitiu
-Mogovit kumaa id Diau
-
-**Korus:** Boos nu poimpasi om kikuasa
-Manaak do koposizon za
-Kuasa nu puun do kavakasan
-Papavakas kotumbazaan
-
-Boos nu oi Tuhan ponitiu
-ginavo za
-Manaak kaharapan poimpasi
-Doid ninavau nu, koiho zikoi
-Ngaavi sontob tavasi
-
-Ounsikou zikoi monoimo do boos nu
-Miampai do a-avi ginavo za
-Onuan no daa ngaavi izikoi
-Do koposizon s'lajul`,
-    songNumber: 'A'
-  },
-  {
-    id: 'A36',
-    title: 'BOOS DO TUHAN',
-    lyrics: `**Korus:** Ih boos do Tuhan
-Id daasom ginavo
-Ih boos do Tuhan
-Pinaajal nu dogo
-
-Ih au ku po ziau notoodo
-Noihaan ku kozo ziau
-Ziau no pinihi ku
-Kakaal ko po doid doos di-ina nu
-Hinoou ku no iziau
-Ponokotanda ku
-
-Koiho zou do omuhok ko
-Pavakason ku iziau
-Ponuon ku iziau do boos
-Ugad no doid nombo nopo
-Monuhuk do ponuuan ku
-Ih noongou nu
-
-Id nombo nombo ko nopo
-Pointanud hongon ku
-Zou ii ih koluang nu
-Songian id kohigaganan
-Doiho zou tomoimo
-Id doos nu`,
-    songNumber: 'A'
-  },
-  {
-    id: 'A37',
-    title: 'SUMAMBA DO MINAMANGUN',
-    lyrics: `Oi tobpinai kinongoho, ii boros
-do mamasi do pomogunan
-Ii kikuasa popoidu
-mantad do koimbayatan tangaraat
-
-Mokiampun gia do douso om miiso
-tokou id koginawaan dau
-Kanou ngaavi sumambayang pogiroton
-koginawaan di Tuhan
-
-Cho: Kanou no sumamba do Minamangun
-Poinsavato no longon om ginawo nu
-Torimo no ii Raja Minonobus
-
-Om kanou no do munsikou sabap
-Tuhan id suang ginawo nu
-Sumambayang miiso tokou tomposiyo ii
-Jesus id koposion nu`,
-    author: 'Belia Bingkor',
-    songNumber: 'A'
-  },
-  {
-    id: 'A38',
-    title: 'BOOS DO TUHAN',
-    lyrics: `Boos nu tobitua diti
-Posuangon za doid ginavo
-Miampai do lotion za
-Jesus onuai kotuhungan
-
-Chorus: Kotohuadan za doid diau
-Koposizon ih noongou za
-Mantad do Boos Nu tobitua
-Oh………..
-
-Jesus Boos nu di baino
-Kilati kozo montok dagai
-Sunudai zikoi oi Tuhan
-Sebap au zikoi koiho`,
-    songNumber: 'A'
-  },
-  {
-    id: 'A39',
-    title: 'YESUS BERTAKHTALAH',
-    lyrics: `Yesus bertakhtalah
-Tuhan Kaulah Raja
-Yang hadir di tengah kami
-Engkau kami sanjungi….
-
-Kami sembah bina takhtaMu
-Kami sembah bina takhtaMu
-Kami sembah bina takhtaMu
-Tuhan Yesus ambil tempatMu
-
-Siapakah melawan Tuhan                     )
-Dan melawan pujian umatNya           )2X
-Tinggikan panji, Allah kebenaran
-Dia datang 'tuk umatNya
-Tingggikan panji, Allah kebenaran
-Dia datang 'tuk baitNya`,
+    title: 'KITA BERTEMU',
+    lyrics: `Kita betemu 'tuk menyembah Tuhan
+Kita bertemu saling mengasihi
+Kita bertemu saling menyembuhkan
+Puji Dia……. puji halleluia
+Puji namaNya`,
     songNumber: 'A'
   },
   {
@@ -1394,7 +1213,7 @@ Daya penarik bagi hidup
 FirmanMu Tuhan membimbing
 Membawa kepadaMu
 
-**Korus:** FirmanMu hidup dan kuasa
+Korus:FirmanMu hidup dan kuasa
 Memb'ri hidup pada umat
 KuasaMu sumber kekuatan
 Meneguhkan iman kami
@@ -1584,13 +1403,13 @@ Oi tuhan
 
 Miampai ginavo potonudaon za
 Tanda do koginavan za Diau
-Toim oo oi Tuhan titahak diti
+Toimoo oi Tuhan titahak diti
 Pohubukon za mangazou Diau
 
 Sundung omungkang kumaa id Diau
 Zikoi humansan koginavaan Nu
 Pavakaso no ginavo dagai
-Kotumbazan za mai no poigoto`,
+Kotumbazan za mai no pogioto`,
     author: 'Fr. C. Piong',
     songNumber: 'C'
   },
@@ -1718,7 +1537,7 @@ Oviton dagai
 Tuva do k'laja, tikid tadau-
 Au mongimuot Diau
 Isai vokon za
-Id kotumbazaan, mi-iso zikou/
+Id kotumbazaan, mi-iso zikoi/
 
 Onsikou nokongou,
 ngaavi do Boos Nu,
@@ -1739,7 +1558,7 @@ Onuo no ngaavi 'ti
 K'laja om koimaan za
 Onuai kahansanan ginavo za
 Nunu notohiban, soovon no do migit
-Ih Tuhan kinoingan
+Ih Tuhan Kinoingan
 Kahansanaan`,
     songNumber: 'C'
   },
@@ -3139,13 +2958,13 @@ Ku sanjung kemuliaanMu`,
     id: 'D34',
     title: 'TUHAN MENGETUK HATIMU',
     lyrics: `Tuhan telah mengetuk hatimu
-Ia berkaa "Ikutlah Aku"
+Ia berkata "Ikutlah Aku"
 Tinggalkanlah semuanya itu
 Hidup kekal dijanjikan padamu
 
 Tuhan Yesus telah menunggu
 Orang yang berdosa
-Disucikan oleh darah Nya
+Disucikan oleh darahNya
 Yesus penebus yang mulia
 
 Korus: Janganlah kau menolak
@@ -3178,7 +2997,7 @@ Yesus datang padaku`,
   {
     id: 'D36',
     title: 'ORANG JEMPUTAN TUHAN',
-    lyrics: `Korus: O Tuban siapakah yang boleh 
+    lyrics: `Korus: O Tuhan siapakah yang boleh 
 menumpang dalam khemah Mu?
 Siapakah yang patut berdiam 
 di gunung suci Mu?
@@ -3504,11 +3323,11 @@ Papaazoui zou do Tuhan id nombo zou nopo`,
     id: 'E3',
     title: 'TUMANUD ZOU DIAU',
     lyrics: `Tumanud zou Diau, oi Tuhan Jesus
-Tumanud zou Diau, oi.Tuhan Jesus
+Tumanud zou Diau, oi Tuhan Jesus
 Tumanud zou Diau, oi Tuhan Jesus
 Tumanud zou Diau, tomoimo
 
-Zadaao ku ngaavi doun pomogunan (3x)
+Zadaan ku ngaavi doun pomogunan (3x)
 Tumanud zou Diau, tomoimo
 
 Au zou poduli sundung osusa (3x)
@@ -3653,7 +3472,7 @@ Dalam dunia yang gelap
 
 Mereka menantikan 'ku di surga t'rang
 Ku majulah terus dengan hati senang;
-Ku tau yang tangan ku Tuhantah yang pegang
+Ku tau yang tangan ku Tuhanlah yang pegang
 Dalam dunia yang gelap 'ku tak lagi senang
 
 Di neg'ri yang baka, di kanaan permai,
@@ -3692,7 +3511,7 @@ Ngaavi sontob kovosian Nu
 Muhi zioy id suhap papaazou Diau
 Onuai zioy grasia om balakat Nu
 
-Korus: Oi Tuban Kinoingan za
+Korus: Oi Tuhan Kinoingan za
 Kotohuadan doid Diau
 Gompizo om tungguvai zioy no
 Guminavo zioy Diau selajur
@@ -3831,7 +3650,7 @@ Kau serahkan diri untuk kami
 Bagi kami santapan kehidupan
 
 Syukur Tuhan bersatu denganMu
-Senanitiasa berserta kami
+Senantiasa berserta kami
 Ekaristi cinta kasihMu
 Santapan sepanjang hayat kami`,
     author: 'Fr. C. Piong',
@@ -4005,7 +3824,7 @@ Tumbozo zou mamantang om
 mangazou Diau,
 
 Nung 'tankangau zou toomod,
-orn adahaan susa,
+om adahaan susa,
 Om panavau do lahan,
 oi tombituon za
 Om hobi po hizab ku
@@ -4604,6 +4423,2153 @@ Nokoikot do monobus
 Au tokou daa kaansau. Nokoikot.....`,
     songNumber: 'I'
   },
+  {
+    id: 'I3',
+    title: 'NOSUSU NO OH TUHAN',
+    lyrics: `Nosusu no oh Tuhan
+Mooi daa izikoi samba,
+Tanak diti tonini
+Koikot mantad surga
+Oi Jesus totuzu
+Biio zikoi no ih
+Sumamba kaazaan Nu
+
+Profet Nu zi Mikias
+Kiboos pasal Diau
+Osusu iso Tanak,
+Id Bethlehem, ka dau
+Iti zi Manuel
+Momorinta maai ngaavi
+Tuhun do Israel
+
+Baino nopo oi Jesus
+Notuhuk ngaavi ii
+Kivaa dagai do raja
+Poinghuvi id laami
+Kaazaan Nu poinsurga
+Zinadaan Nu do kaanu
+Daa do ginavo za.`,
+    songNumber: 'I'
+  },
+  {
+    id: 'I4',
+    title: 'TANGA SODOP DO OTUVONG',
+    lyrics: `Tanga sodop do otuvong
+Do id tana kaazaan
+Do Tanak Kinoingan za
+Mokidadi tadi za
+
+Chorus: Ave Jesus, Raja za
+Ngaavi kou bumozou daa
+Doiho id Jerusalem
+Om vagu id Bethlehem
+
+Ih pamangun do tavan
+Doiti id susumadan
+Iti no huhuvizon
+Do Tuhan ih Vovozoon.
+
+Ziozu ih mintamong,
+Om gumompi do panon 
+Kanou no mongoi intong
+Do Tanak ih Vovozoon.
+
+Jesus Kristus Tuhan za
+Pohosuo ginavo za
+Ngaavi koginavo daa
+Doid Diau om Maria`,
+    songNumber: 'I'
+  },
+  {
+    id: 'I5',
+    title: 'KANOU TUNUN DO ABANAR',
+    lyrics: `Kanou tuhun do abanar
+Munsikou kou ngaavi
+Ongoi no, ongoi no doid Bethlehem
+Intangai ih nosusu
+Raja do Malaikat
+Kanou sumamba tokou (3x)
+Do Tuhan za
+
+Do mooi ponobus dagai
+Kinoingan om tuhun
+Poingizon id tinan di Maria
+Kinoingan ih nosusu
+Okonko vinangun
+Kanou sumamba tokou (3x)
+Do Tuhan za
+
+Diau Tuhan, sumamba zikoi
+Nosusu tadau diti
+Id Diau, oi Jesus kobontugan
+Kapantangan id savat kozo
+Kanou sumamba tokou (3x)
+Do Tuhan za`,
+    songNumber: 'I'
+  },
+  {
+    id: 'I6',
+    title: 'ZISAI MOTUU ANAK DITI',
+    lyrics: `Zisai motuu Anak diti
+Pinhuvi nopo id hami?
+Susumadan di hami?
+Do Kinohoingan Povozoon
+Do Kinohoingan Povozoon
+
+Zisai ih ondu d'osuau,
+Pinsingkotud do hiho no?
+Maria, ngaan zo kitua
+Inde do Kinohoingan za
+Inde do Kinohoingan za
+
+Zisai kusai mohoing no di,
+Ih mingkakat hiho nogi?
+Zi Joseph ih do abanar
+Uhun do otuhid banar
+Uhun do otuhid banar
+
+Nunu sabap do okilou,
+Susumadan, miad d'adau?
+Haho nogi kogumuan
+Malaikat ngaavi do Tuhan
+Malaikat ngaavi do Tuhan`,
+    songNumber: 'I'
+  },
+  {
+    id: 'I7',
+    title: 'TOHU RAJA IZIKOI',
+    lyrics: `Tohu Raja izikoi, mantad id kohisaon
+Tumakad do nuhu
+Tumanud do tombituon
+
+Korus: Ninavau do kohoiran
+Ninavau di doun Raja
+Ovito zikoi do id ninavau Nu
+Doid tosuau
+
+Nosusu ih Raja ku, mogovit izou amas
+Raja Ko selajur
+Momorinta doid dagai
+
+Kamazan pohubukon id kapantangan Diau
+Sambayang doid kamazan
+Sumamba doid savat`,
+    songNumber: 'I'
+  },
+  {
+    id: 'I8',
+    title: 'MOZOU-HOZOU OH MALAIKAT',
+    lyrics: `Mohou-hozou oh malaikat
+Abal Tavasi toomod
+Nokoongou ih gugumompi
+Hozou diti togingo
+Ka...pantangan id savat kozo
+Ka...pantangan id savat kozo
+
+Id somok tazam poinhuvi
+Ih Jesus kosuususu
+Aiso no do todopon Dau
+Sundung tu do Kinoingan
+
+Oi mimintamong kou ngaavi
+Nokuo tu angalamai
+Nokuo tu mooi saviavi
+Kumaa id susumandan?`,
+    songNumber: 'I'
+  },
+  {
+    id: 'I9',
+    title: 'OI TANAK JESUS',
+    lyrics: `Oi Tanak Jesus tobitua
+Tumaak zikoi doid Diau
+Miaga Diau, tu guminavo
+Do tuhun, ingkaa dan izikoi
+
+Korus: Iziau no Jesus, Raja za
+Do baino, om selajur so!
+Iziau no Jesus, Raja za,
+Do baino om selajar no!
+
+Diau no ngaavi k'laja za
+Om sontob kosusaan za
+Kasanangan om kounsikaan
+Pataakon za ngaavi Diau
+
+Balakatai zikoi, Jesus
+Om ngaavi ginovoon za
+Jesus, ih popibabas kozo
+Pataako dagai kavasian`,
+    songNumber: 'I'
+  },
+  {
+    id: 'I10',
+    title: 'ANAK YESUS DILAHIRKAN',
+    lyrics: `Dend: Anak Yesus dilahirkan
+Cuba gembala lekas bersuling!
+Anak Yesus dilahirkan
+Yang membawa perdamaian
+
+Di lembah dekat Bethlehem
+Sudah turun malaikat gilang,
+Yang di padang mendapati
+Kawal domba yang tercengang
+
+Jangan takut, bergirangiah
+Kamulah yang dipilih Allah
+Pergi pandang di kandangNya
+Yang menjadikan dunia`,
+    songNumber: 'I'
+  },
+  {
+    id: 'I11',
+    title: 'SAUDARA KEMARI DAN BERSUKACITA',
+    lyrics: `Saudara kemari dan bersukacita
+Berbangga berlari ke Bethlehem
+Lihatlah Anak, Raja isi surga
+
+Dend: Kemari sembah, sujud.
+Kemari sembah, sujud
+Kemart sembah, sujud Tuhanmu
+
+Meninggalkan domba larilah gembala
+Mendapatkan Yesus di kandangNya
+Jangan berlambat, Kita besertanya
+
+Seri dari Bapa akan kita puja
+Seri, tersembunyi di tubuhNya
+Putera Allah
+Dalam lampin papa`,
+    songNumber: 'I'
+  },
+  {
+    id: 'I12',
+    title: 'DENGARLAH DI PADANG SUNYI',
+    lyrics: `Dengarlah di padang sunyi
+Pujian riuh rendah,
+Gunung bukit balas bunyi
+Hutan, rimba bergema
+
+Dend: Pujian bagi Maha Tuhan
+Pujian bagi Maha Tuhan
+
+Bercahaya sinar surga
+Mundur malam yang gelap
+Ribu-ribu malaikat
+Nyanyi lagu yang sedap
+
+Terperanak dalam kandang
+Jurus'lamat dunia
+Hai gembala, mari pandang
+Serta bernyanyi pujian`,
+    songNumber: 'I'
+  },
+  {
+    id: 'I13',
+    title: 'MALAM TERANG, MALAM SENANG',
+    lyrics: `Malam terang, malam senang
+Diampun dan lengang
+Agar jangan terjaga kelak
+Putera Allah yang tidur nyenyak,
+Dalam sentosa benar
+Dalam sentosa benar
+
+Malam terang, malam senang
+Dengarlah nyanyian
+Lagu pujian Allah esa,
+Khabar tebusan bagi dunia
+Juruselamat ada, Juruselamat ada
+
+Malam terang, malam senang
+O Yesus di kandang
+Syukur ker'na pengasihanMu
+B'rikan kami anugerahMu
+Hidup sertaMu kekal,
+Hidup sertamu kekal.`,
+    songNumber: 'I'
+  },
+  {
+    id: 'I14',
+    title: 'DI PADANG GEMBALA',
+    lyrics: `Berdiam di padang gembala
+semalam-malaman gelap
+Mereka setia berkawal,
+dihitungnya domba genap
+Sekonyong berpancar cahaya
+Tampaklah malaikat gemilang
+Membawakan khabar senang
+
+Hai janganlah takut, gembala,
+Kubawa berita besar
+Yakni lahirlah Penebusmu di Beth'lem
+di kandang cemar
+Beribu malaikat memuji,
+Seraya bersorak merdu;
+Terpujilah Allah di tinggi
+Dan jadilah bumi teduh`,
+    songNumber: 'I'
+  },
+  {
+    id: 'J1',
+    title: 'TINGGAL SERTA KU',
+    lyrics: `Tinggal sertaku, datang keg'lapan,
+Hampirlah malam, sertaiku Tuhan
+Bila penolong yang lain berlalu,
+Silakan Yesus, tinggal sertaku
+
+Seg'ra kehidupan pendik lalu;
+Kesukaan dunia dan hormatku;
+Berubahlah, semuanya lalu;
+Tuhan yang tetap, tinggal sertaku
+
+S'lalu hadirat Tuhan ku perlu;
+Setanpun dikalahkan rahmatMu
+Siara sepertiMu, pemimpin ku?
+Senang dan susah, tinggal serta ku.
+
+Jika Tuhan ada, ku tak takut;
+Kesusahan dan air mata tak b'rat;
+Maut mana sangat kemenanganmu?
+Kumenang, jiwa Tuhan serta ku.`,
+    songNumber: 'J'
+  },
+  {
+    id: 'J2',
+    title: 'TUHAN ZIKOL POINTUUBUNG DIAU',
+    lyrics: `Tuhan zikoi pointuubung diau
+Miampai ginavo do tumongob
+Nokoiho ko do mungkang zikoi
+Asaasau koinsodu mantad Diau
+Ompunon zikoi daa Diau
+Ompunon zikoi daa Diau
+
+Id koposizon tikid tadau
+Asaasau zikoi kohiu Diau
+Avagatan do koimbazatan
+Kosi zikoi do au kata'an
+Onuai zikoi vinakas Nu
+Onuai zikoi vanakas Nu
+
+Itti no pokinsianan dagai
+Tomoimo daa poinsomok Diau
+Salip Nu oh kahantazan za
+Koginavaan Nu harapon za
+Jesus oi koposizon za
+Jesus oi koposizon za`,
+    songNumber: 'J'
+  },
+  {
+    id: 'J3',
+    title: 'JESUS KU, TUHAN KU',
+    lyrics: `Jesus ku, Tuhan ku
+Guminavo zikoi Diau
+Tuhungo zikoi doiti
+Tanak nu tosisian
+
+Tuhan ku Tuhan ku
+Tumanud zikoi Diau
+Ovito zikoi doino
+Tanak nu tosisian
+
+Ama ku Ama ku
+Onuai zikoi do titiu
+Nakansau dati zikoi
+Tanak nu tosisian
+
+Jesus ku Tuhan ku
+Guminavo zikoi Diau
+Oviton zikoi doino
+Tanak nu tosisian`,
+    songNumber: 'J'
+  },
+  {
+    id: 'J4',
+    title: 'JESUS TUHAN',
+    lyrics: `Josus, Tuhan, sabap do douso ku,
+Mongob-tongob banar ginavo ku
+
+Chorus: Ompuno ou, Jesus,
+Tu mokiampun zou,
+Amu nodii ou humavan
+Tuhan Diau
+
+Tuhan, mada zadaai ih anak nu,
+Tuhan hogo do ombiivo ku
+
+Humoub ou do mihad id hakod nu,
+Masam niman ni Magdalena nu`,
+    songNumber: 'J'
+  },
+  {
+    id: 'J5',
+    title: 'ONTOK DO IHUMON NU DAA',
+    lyrics: `Ontok do ihumon nu daa koinsasamadan,
+Nung tumongob ginavo nu,
+sabap navagatan
+
+Ontongo Jesus, Tuhan nu,
+hiho id salip zo,
+Doid diau nogi, uhun, noivang ginavo zo
+
+Koongou ko boos do osuau,
+mantad do kabang zo
+"Oi uhun ko, i kisusa, kano doid doho."
+
+Tentu do osuau banar,
+Jesus, pongopuhi,
+Tu Ama, ka, ompuno dad,
+douso nimaan diti,
+
+Oi Ginavo ni Jesus ku,
+Ziau koumohigan,
+Doid ngaavi i ki douso, Ziau kaharapan.
+
+Do Ha nu, i kitua, ponitingo no da,
+Ombivo ku i ayaat, mouhagang ou da.`,
+    songNumber: 'J'
+  },
+  {
+    id: 'J6',
+    title: 'SABAP DO KOSUSAAN NU',
+    lyrics: `Sabap do kosusaan nu id kabun,
+oi Tuhan
+Ajalo zou tumanud diau do kasagan
+Hinapos'ko, Ponobus, noindaman kuat,
+Poiduo no ginavo ku mantad do talaat.
+
+Jesus, tuminahan ko do siga om ugi;
+Poingkaa zikoi daa kataan do
+kosusaan nogi.
+Sinaan salip nu, Jesus, guno do anak nu,
+Sabap diau manaan daa zikoi do salip za
+
+Pinohubuk ko, Jesus, id nuhu Calvary;
+Padan poogi, oi Tuhan, Diau zikoi nogi
+Oi Maria, Tina ku, tikid-tikid tadau
+Intangai anganak nu i mamantang diau`,
+    songNumber: 'J'
+  },
+  {
+    id: 'J7',
+    title: 'OMPUNO TUHAN, OMBIIVO',
+    lyrics: `Ompuno Tuhan, ombiivo 
+Vinangun nu om otuzu
+Poimpusus, ki utang po
+Do douso nimangan hiti
+Moundoso po ombiivo
+Om sumaga id ginavo
+Songkuo buvai om mipadan
+Gisom yantai kotuhidan
+
+Sabap gumu kayayadan
+Mouhagang kopuiman,
+Diau do koundasaan
+Sabap do douso do uhun
+Kasangahan do mongindad
+Humarap id koundasan
+Om osikap do momuhas
+Siksa do douso om juong`,
+    songNumber: 'J'
+  },
+  {
+    id: 'J8',
+    title: 'JESUS, ZISAI GUMINAKUT',
+    lyrics: `Jesus, zisai guminakut Pingka do hongon nu?
+Zisai kobussu manapap,
+Tuhan do yupa nu?
+
+Doho do saha, Tuhan ku, Doho saha diti;
+Ompuno, Jesus, douso ku,
+Nimaan ku i ngaavi
+
+Pingkuo do nojuhan, Tuhan,
+Yupa nu d'asamba?
+Zisui, e minomohapos D'innan nu kitua?
+Doho do saha, Tuhan ku,....
+
+Zisai no pinoposiga Pingka do uhu nu?
+Do yugi, e ataom banar,
+Natanda siga nu:
+Doho do saha, Tuhan ku,.....
+
+Zisaino pinopoinum Diau do ompodu?
+Zisaino pinopohantak Diau id salip nu?
+Doho do saha,....
+
+Zisaino nokoponuhak Do undu undu nu.
+Poovion da Ha nu
+Mantad do Innan Nu?
+Doid do saha,.....
+
+Insiano ou, e anak nu, Maria, inde ku:
+Tu zouno, e minomatai
+Di Jesus, Tuhan ku,
+doho do saha, inde ku, Doho saha diti.
+Pokiompuno doho, inde,
+Id Jesus, anak nu.`,
+    songNumber: 'J'
+  },
+  {
+    id: 'J9',
+    title: 'POINSODU O MANTAD KOIMBAYATAN',
+    lyrics: `Oi Tuhan intangai ikoi
+Mihad-ihad id kosusaan;
+Sabap no do koimbayatan
+Ih popoinsodu mantad Dika.
+
+Longon Nu oh koruhang ya
+Ih kaanu manahak kasanangan;
+Poinsoduo mantad koimbayatan
+Om mantad karaja do rogon.
+
+Oi Tuhan sokodungo ikoi
+Soira do orikot timpu,
+Id surga iwangai daa,
+Om sanang nodi id dous Nu`,
+    songNumber: 'J',
+    author: 'Belia Toboh Tambunan'
+  },
+  {
+    id: 'J10',
+    title: 'TUROS NU DI TOLUNGGUI',
+    lyrics: `Oi Tuhan okito ku lo turos Nu
+Osusa olunggui tokito ku
+Nawagatan ko'd katangaban
+Poingkuro ku popounsikou Dia
+
+Kaandakan diti ginawo ku
+Tumanud oku Dia oi Tuhan
+Minsomok om mamarati
+Koinggoritan nopurimanan Nu
+
+Oi Tuhan noinggorit ko sabap doho
+Ginawo ku osodu mantad Dia
+Tulungo oku oi Tuhan
+Minsomok om guminawo Dia
+
+Oi Tuhan ompuno, torimoo oku
+Id sanganu oku Dia toririmo
+Poinsoduo mantad koimbayatan
+Ajaro oku do guminawo`,
+    songNumber: 'J',
+    author: 'Fr. C. Piong'
+  },
+  {
+    id: 'J11',
+    title: 'DENGARLAH DOA KU',
+    lyrics: `Tuhan harapan ku
+Dengarlah doa ku
+Jangan Tuhan lalui
+Dengarlah doa ku
+
+Ku ditimpa malang
+Jiwa ku terseksa
+Tangan mu ku pinta
+Dengarlah doa ku
+
+Godaan menimpa
+Membawa sengsara
+Kuatkanlah Iman ku
+Dengarlah doa ku
+
+Dengarlah....oh Tuhan
+Keluhan jiwa ku
+Berilah petunjuk mu
+Dengarlah doa ku`,
+    songNumber: 'J',
+    author: 'Belia Toboh Tambunan'
+  },
+  {
+    id: 'J12',
+    title: 'OI TUHAN OMPUNO OKU',
+    lyrics: `Oi Tuhan, kinoingan ku
+Mokiampun sabab douso ku
+Nakapakaus ngaawi ii dika
+Oi Tuhan ompuno oku
+
+Oi Tuhan tumongob oku
+Nokoinsodu oku dika
+Sabab okodou 'ti ginawo ku
+Oi Tuhan ompuno oku
+
+Oi Tuhan jumanji oku
+Au oku nodi momidouso
+Posonongon ku 'ti koposion ku
+Oi Tuhan ompuno oku
+
+Tumanud oku dika Tuhan
+Miampai poinwagu ginawo
+Gumirot oku do id dika
+Oi Tuhan ompuno oku.`,
+    songNumber: 'J',
+    author: 'Belia St. Theresa Tambunan'
+  },
+  {
+    id: 'J13',
+    title: 'PADA MU OH PENEBUS',
+    lyrics: `Doa dan keluhanku
+PadaMu ku serahkan senantiasa
+Jalan ku tanpa pedoman
+Beri pertolongan oh Yesus
+
+Oh Yesus kasihanilah
+Hidupkan dan kuatkanlah iman ku
+Jalan iman pasti tetap
+'Ku yakin Engkau menyertai
+
+Sepanjang jalan hidup ku
+SabdaMu yang membimbingkan
+Dengan iman ku perjuangkan
+Di pelusuk manapun kulaungkan
+
+Korus: PadaMu oh Penebus
+'Ku letakkan harapan
+Datanglah kepadaku
+'Kan ku buka pintu hati
+Tinggallah di dalam diriku
+Tinggallah di dalam diriku`,
+    songNumber: 'J',
+    author: 'Belia Bundu Kuala Penyu'
+  },
+  {
+    id: 'J14',
+    title: 'KAMI BERSERU PADAMU TUHAN',
+    lyrics: `Kami berseru padaMu Tuhan
+Dengarlah tangisan kami
+Kami memohon balas kasihMu
+Ampunilah kiranya.....dosa kami
+
+Korus: Bukalah pintu hati kami
+Untuk menerima karyaMu
+Bagi penebusan
+Umat kesayangan Mu
+
+Atas salib Dia dipakukan
+Dosa kami dihapuskan
+Ker'na cintaNya pada manusia
+DiriNya Dia telah ....serahkan
+
+CintaMu tak kami salami
+CintaMu tak terbatas
+Engkau sentiasa memanggil kami
+Bersatu denganMu....dalam cinta
+
+Syukur padaMu ya Tuhan Allah
+Atas karya penebusan
+Curahkan kami dengan rahmatMu
+Berilah permulaan....hidup baru`,
+    songNumber: 'J',
+    author: 'Belia Beaufort'
+  },
+  {
+    id: 'J15',
+    title: 'TUHAN SUMBER KEDAMAIAN',
+    lyrics: `Tuhan kami datang kepadaMu
+Ingin mendapat keampunan dariMu
+Kami terikat dengan noda dosa
+Kami merindu kedamaian di hati
+
+Tuhan dengarlah suara hati umatMu
+Yang dipenuhi dengan dosa dunia
+Kami inginkan kedamaian di hati
+Tuhan pandanglah dan bebaskanlah
+Kami
+
+Kor: Tuhan sinarilah
+hambaMu dengan wajahMu
+Kami ditimpah kesesakan dan kesusahan
+Teguhkanlah langkah, hidup kami Tuhan
+Dengan FirmanMu, kami dahaga kedamaian
+
+Tuhan Engkaulah terang dan sinar kami
+Engkau pembawa cahaya hidup kami
+Kami berpegang pada FirmanMu Tuhan
+Teguhkanlah damai dalam hati kami`,
+    songNumber: 'J',
+    author: 'Belia St. Peter Ranau'
+  },
+  {
+    id: 'J16',
+    title: 'OI TUHAN TULONGO YAHAI',
+    lyrics: `Oi Tuhan tumongob' iti ginawo ya
+Sabap no koimbayatan om douso
+Ih popoinsodu mantad Dika
+Papaansau mantad katapatan
+Oh.....Tuhan tulungo yahai daa
+
+Korus: Kosianai no dagai
+Om sokodungo
+Id komungkangaan
+Onuai ikoi kawakasan
+Do tumanud ralan katapatan
+
+Oi Tuhan id Dika rikoton ya
+Tu obinsianan om guminawo
+Lumansan ikoi doid Dika
+Tu mantad Dika konuan koposion
+Oh...Tuhan tulungo yahai daa
+
+Oi Tuhan id Dika ulion ya
+Ompuno om torimoo ikoi no
+Ginowoo om pawakaso ikoi
+Om gompio id kokuasaan Nu
+Oh...Tuhan tulungo yahai daa`,
+    songNumber: 'J'
+  },
+  {
+    id: 'J17',
+    title: 'BUKALAH PINTU KEPADA PENEBUS',
+    lyrics: `Yesus Penebus dan Juruselamatku
+Hanyalah padaMu ku menyembah
+Agung mulianya cintakasihMu
+Ku serahkan seluruhnya kepadaMu
+
+Korus: Yesus, Yesusku
+Ker'na. DarahMu puaslah dahaga ku
+Yesus, Yesus ku
+Ker'na TubuhMu kenyanglah jiwa ku
+
+Yesus sentiasa ku melayaniMu
+Dalam hidup ku penuh syukur
+Ker'na Engkaulah jalan hidup ku
+Kebenaran dan kebangkitan ku
+
+Percayalah kepada Penebus
+Supaya kamu beroleh terang
+Jalan hidupmu akan jadi cerah
+Menuju kebahagiaan kekal
+
+Bukalah pintu kepada Penebus
+Serahkan seluruh kepadaNya
+Dia akan mengasihi kita
+Jika kita taatkan FirmanNya`,
+    songNumber: 'J',
+    author: 'Belia St. Theresa Tambunan'
+  },
+  {
+    id: 'K1',
+    title: 'JESUS NOKOTUNGAG NO',
+    lyrics: `Jesus nokotungag no, aleluia
+Baino poimpasi vagu. aleluia
+Aiso nodii kadaan, aleluia
+Baino id kaazaan, aleluia
+Aleluia, aleluia, aleluia
+
+Kanou ngaavi munsikou, aleluia
+Papaazou Jesus nakamanang, aleluia
+Oi Jesus zikoi tuhungo, aleluia
+Ngaavi zikoi kamanang nogi, aleluia
+Aleluia, aleluia, aleluia
+
+Naampun douso du tuhun, alleluia
+Kababasan natahak luhun, alcluia
+Kristian ingato nodii, aleluia
+Uhi tomoimo id dandi, aleluia
+Alleluia, aleluia, aleluia`,
+    songNumber: 'K',
+    author: 'Fr. C. Piong'
+  },
+  {
+    id: 'K2',
+    title: 'HARI INILAH YESUS SUDAH BANGKIT, HALELUYAH',
+    lyrics: `Nyanyi hari inilah, Haleluyah
+Dari kubur naik Yesus, haleluyah
+Yang kena sengsara k'ras, haleluyah
+Dari maut sudah lepas, haleluyah
+
+Sengatmu di manakah, haleluyah
+Maut dan pintu neraka, haleluyah
+Pada kami oleh Nya, haleluyah
+Pintu surga terbuka, haleluyah
+
+Yang berdosa hai kamu, haleluyah
+Lihat tebusan itu, haleluyah
+T'rimalah perdamaian, haleluyah
+Olehmu dari Tuhan, haleluyah
+
+Sungguh Yesus b'ri s'lamat, haleluyah
+Carilah sampai dapat, halelayah
+Olehmu dari Tuhan, haleluyah
+Puji pada Mu Tuhan, haleluyah`,
+    songNumber: 'K',
+    songlabel: 'Christ the Lord Is Risen, today'
+  },
+  {
+    id: 'K3',
+    title: 'BAINO KRISTIAN',
+    lyrics: `Baino Kristian ounsikou
+Kristus mantad hobong Dau
+Nokotungag tadau diti,
+Bontugo tokou nodii
+Aiso hasa napatai
+Minomohiung dagai
+
+Korus: Kristus Tuhan id savat,
+Au nodii matai talaat
+
+Kristus, ganti do tuhun
+Minamasi di noukum
+Maso matai pointahib
+Tau tokou pinatahib
+Kristian, ingato nodii
+Uhi vagu id dandi
+
+Kristus napatai insan
+Aiso nodii kosusaan
+Naampun douso do tuhun
+Kristus, Tuhan, pinaazou
+Tabe Raja, indama
+Tabe, Tuhan om Tama`,
+    songNumber: 'K'
+  },
+  {
+    id: 'K4',
+    title: 'DO SAMBAYANG OM DO YOHOU',
+    lyrics: `Do sambayang om do yohou,
+Om poimpakai do opuak
+Mamalamai ngavi tokou
+Adau diti do gloria
+
+
+Cho: Ave, oi Raja do azou,
+Id sorga ovito no da
+Coy nogi, do yumohou;
+Alleluya, Alleluya
+
+Koginavaan na ayahom
+Oi Jesus, Tuhan Raja za
+Katama ko ngavi yogon
+Do salip nu, e kitua
+
+Om koyunduk ko id sahom
+Do Limbu d'uhun napatai
+E obuvai hinangadon
+Do koikotan nu d'alamai
+
+Ivangon nu e totombor
+Do izonon d'ombivo di
+Om angatan nu zossido
+Id kouhagangan nodi
+
+Ontok ko tohu no adau
+Muhi nodi ombivo nu
+Doid hobong, om do azou
+Innan nu tumungag vagu
+
+Ave Tuhan do gloria,
+E nokatama do yogon 
+Om mominasa do saha,
+Om manahak kopossizon`,
+    songNumber: 'K'
+  },
+  {
+    id: 'K5',
+    title: 'PONOBUS NOKOTUNGAG',
+    lyrics: `Ponobus nokotungag
+Kristian uhagang ko nou,
+Sambao no do popazou
+Id hakod do Ponobus.
+Napatai aiso saha,
+Sabap do douso do uhun;
+Ponobus nokotungag
+Om selajur apasi.
+
+Ponobus kohubukan
+Minongampun do uhun
+Napatai om napasi
+Naanang ngavi yogon
+Uhagango Kristian
+Id adau do moino,
+Ponobus nokotungag
+Om selajur apasi
+
+Tu do douso timpuni
+Nohodong Kinohoingan
+Katanangan natagak
+Sorga nogi tombohon
+Tuhan Jesus d'apatai
+Sorga vagu moivang
+Uhun ngavi kosuang
+Katanud do ponuhu.
+
+Ngavi tokou mouhagang
+Yumohou: Alleluya
+Ponobus nokotungag
+Alleluya d'idsavat
+Id koputusan do tana
+Tumungag po zi tokou
+Ombivo duvo d'innan
+Om id sorga do mizon`,
+    songNumber: 'K'
+  },
+  {
+    id: 'K6',
+    title: 'NOKOTUNGAG NO IH JESUS',
+    lyrics: `Munsikou tokou baino
+Jesus nokotungag no
+Poimpasi nodii baino
+Id karayahan do Tama
+Kotumbayaan nokogirot no
+
+Korus: Iti no kalansanan tokou
+Napasi tokou no di Jesus
+Pogiroto no ih kotumbayaan tokou
+Nokotungag no Ih Jesus
+
+Kuasa do Tuhan tokou
+Nokointalang no baino
+Douso do pomogunan
+Notobus no ngaawi Dau
+Poinlansan tokou di id koposiyon Dau
+
+Jesus nokotungag no
+Tumanud di janji Dau
+Tokou nga potungagon
+Nung migit no di Boros Dau
+Id koposiyon tokou tikid tadau`,
+    songNumber: 'K',
+    author: 'Belia St. Joseph Sunsuron Tambunan'
+  },
+  {
+    id: 'K7',
+    title: 'PUJIAN PASKA (EXULTET)',
+    lyrics: `Paderi: Ber-so-rak-lah, pa-ra,
+ma-lai-kat di sur-ga
+E-lu-kan-lah, Kris-tus Ra-ja di-ra-ja,
+Pu-ji-lah ke-me-na-ngan ja-ya,
+Ge-ma-kan-lah bu-nyi na-fi-ri
+
+Koir & umat: Te-puk tan-gan
+Nya-nyi-kan la-gu gem-bi-ra
+Ba-gi Kris-tus yang me-ne-bus ki-ta
+Ber-syu-kur-lah ke-pa-da Al-lah
+Ki-ta bang-kit ber-sa-ma Kris-tus
+
+
+Paderi: Ber-gi-rang-lah,
+umat se-lu-ruh du-nia,
+Ter-ha-lau-kan,
+ke-ge-la-pannya do-sa,
+Ber-si-nar ca-ha-ya I-la-hi,
+Ye-sus Kris-tus jun-ju-ngan ki-ta
+
+Koir & umat: Te-puk tan-gan
+Nya-nyi-kan la-gu gem-bi-ra
+Ba-gi Kris-tus yang me-ne-bus ki-ta
+Ber-syu-kur-lah ke-pa-da Al-lah
+Ki-ta bang-kit ber-sa-ma Kris-tus
+
+Paderi: Te-rang Kris-tus,
+mem-ba-ra-kan ha-ti ki-ta
+Dan si-nar-nya,
+ti-ada kun-jung pa-dam
+Hing-ga ki-ta ja-di ca-ha-ya
+Yang ber-kor-ban ba-gi se-sa-ma
+
+
+Koir & umat: Te-puk tan-gan
+Nya-nyi-kan la-gu gem-bi-ra
+Ba-gi Kris-tus yang me-ne-bus ki-ta
+Ber-syu-kur-lah ke-pa-da Al-lah
+Ki-ta bang-kit ber-sa-ma Kris-tus
+
+Paderi: Hor-mat syu-kur,
+ba-gi Kris-tus te-rang du-nia
+Hor-mat syu-kur,
+ba-gi Al-lah Ba-pa kita
+Mu-lia ber-sa-ma Roh Ku-dus
+Ki-ni dan se-la-ma - la-ma-nya
+
+Koir & umat: A-min, A-min, A-min`,
+    songNumber: 'K'
+  },
+  {
+    id: 'K8',
+    title: 'KAMANANGAN TAGAYO',
+    lyrics: `Kristus nokotungag noh (2x)
+Kamanangan tagayo
+Mantad do kapatayon.
+
+Kristus nokotungag noh (2x)
+Notobus tokou Dau
+Mantad kuasa do rogon
+
+Kristus nokotungag noh (2x)
+Apasi tokou nodii
+Miampai kikalansanan
+
+Kristus nokotungag noh (2x)
+Sundung id kosusaan
+Ih Jesus kalansanan
+
+Kristus nokotungag noh (2x)
+Kanou noh toinsanan
+Munsikou doid Tuhan`,
+    songNumber: 'K',
+    author: 'Fr. C. Piong'
+  },
+  {
+    id: 'L1',
+    title: 'TADAU KA\'AMATAN',
+    lyrics: `Tadau diti, ih notoodo do
+Tuhan Kinoingan
+Umunsikou tokou ngaavi
+Sabap do nitaak Dau
+Songintimung tokou tadau diti
+Id doos do Tuban Kinoingan
+
+Sumambayang zikoi ngaavi
+Ontok tadau baino
+Kotohuadan za doid Diau
+Oi Tuhan om Tama
+Mokituhung zikoi sabap tobpinai
+Tasampit om tosusa
+
+Tadau diti, Tadau Ka'amatan
+Kalamazan za
+Mongoi pokibalakat zikoi
+Diau do paai za
+Onuai zikoi no do asam om tadau
+Posunizo tatanom za`,
+    songNumber: 'L'
+  },
+  {
+    id: 'L2',
+    title: 'KANOU NGAAVI MUNSIKOU',
+    lyrics: `Toun wagu norikot nodii
+Ingkaa nogi tadau ka'amatan
+Tadau do koundarangan
+Kanou no pogi ngaawi munsikou
+
+Chorus: Kotobian om kounsikaan
+Tadau do ka'amatan
+Id somok toi ko id sodu
+Kanou no pogi ngaawi munsikou
+
+Kanou no moboros'kotoluadan'
+Kumaa id Kinoingan
+Sumambayang tokou d'oinsasanan
+Kanou no pogi ngaawi munsikou
+
+Apantang ko no daa oi Tuhan
+Doid pototongkop do vinoun
+Sabap baino notimung zikoi
+Paparayou do kuasa Nu
+
+Kanou no moboros 'kotoluadan'
+Kumaa id Kinoingan
+Sabap mantad do kuasa Dau
+Nakanu tokou kavasian`,
+    songNumber: 'L',
+    author: 'John Guasan'
+  },
+  {
+    id: 'L3',
+    title: 'TADAU KAAMATAN',
+    lyrics: `Tadau nopo gia diti
+Tadau do kounsikaan
+Munsikou tokou ngaavi
+Diti Tadau Kaamatan
+
+Ingga oh suai tujuan
+Paparayou noh do Tuhan
+Bambarayon do Parai
+Minamangun saviavi
+
+Munsikou tokou ngaavi
+Sabap nitahak Tuhan
+Kanou tobpinai ngaavi
+Monongkotoluod tokou
+
+Kanou noh sumambayang
+Mokianu kosukupan
+Wanadan tokou noh daa
+Id po-mo-ro-bu-atan
+
+Kanou ngaavi tobpinai
+Munsikou do-id Tuhan
+Kinoingan ih Tama lokou
+Bambarayon do Parai`,
+    songNumber: 'L',
+    author: 'Fr. C. Piong'
+  },
+  {
+    id: 'L4',
+    title: 'KANOU RAMAYO TOKOU',
+    lyrics: `Norikot no wagu tadau 
+Tadau tagayo do Ka'amatan
+Tadau do kababasan
+Kanou ramayo tokou (2x)
+
+Chorus: Tadau ka'amatan diti
+Tadau do koundarangan
+Nitahak do Kinoingan
+Kanou ramayo tokou
+Kanou ramayo takou
+
+Sontoun do minudipon
+Minomongo do karaja
+Id danau toi ko id kabun
+Kanou ramayo tokou (2x)
+
+Tikid tulun do munsikou
+Om nogi mogi-aa-am-pun
+Lih-wai kosusaan
+Kanou ramayo tokou (2x)
+
+Kotoluadan doid Kinoingan
+Sabap ngaawi do nitahak Dau
+Ih takanon om tinumon
+Kanou ramayo tokou (2)`,
+    songNumber: 'L',
+    author: 'John Guasah'
+  },
+  {
+    id: 'M1',
+    title: 'KOGINAVAAN TUHAN',
+    lyrics: `Koginavaan mantad Tuhan
+Minamasi doho
+Natagak zou mantad ralan
+Nokoguli baino
+
+Koginavan mantad Tuhan
+Minagangat doho
+Papatahak do kaharapan
+Ingga korosian
+
+Sundung alaid, sundung osusa
+Kotumbayan doho
+Kumaa id Tuhan Ih kikuasa
+Kanou no royoho`,
+    songNumber: 'M'
+  },
+  {
+    id: 'M2',
+    title: 'SURGA OM VINOUN MANGAZOU',
+    lyrics: `Chorus: Surga om vi-noun se-la-jul
+Ma-nga-zou Di-au
+
+A-pa-tut zi-koi no do ma-nga-zou Diau
+Tu Ki-noi-ngan ko do vo-vozon
+
+Ka-nou no mo-nong-ko-to-hu-od 
+do Tuhan
+Tu pi-napata-ak Dau li Jesus
+
+Ka-pan-ta-ngan do Ta-ma om di Ta-nak
+Om di Pi-gi-na-van di-o-ho`,
+    songNumber: 'M'
+  },
+  {
+    id: 'M3',
+    title: 'MIKOT ZIKOI DOID DIAU',
+    lyrics: `Man-tad ko-su-sa-an ginavo
+Mikot zikoi doid Diau Jesus
+Doid kounsikaan om kanavaon Nu
+Mikot zikoi doid Diau
+
+Mantad sakit, doid kohidasan
+Kosompitan doid kosukupan
+Mantad dogo kumaa doid Diau
+Mikot zikoi doid Diau
+
+Mantad ka-ta-nga-ban ginavo
+Mikot zikoi doid Diau Jesus
+Doid ki-na-ma-na-ngan Salip Nu
+Mikot zikoi diod Diau
+
+Mantad do ka-ka-saan doid tana
+Kumaa doid ka-sa-na-ngan doid Diau
+Miampai ginavo do otoonong
+Mikot zikoi doid Diau
+
+Man-tad ko-po-kia-zaan ginavo
+Mikot zikoi doid Diau Jesus
+Doid kohu-du-kan gi-na-vo Nu
+Mikot zikoi diod Diau
+
+Man-tad ko-son-dii-an ginavo
+Kumaa doid ko-gi-na-vaan Nu
+Mimang kaan-dak Nu mantad baino
+Mikot zikoi doid Diau`,
+    songNumber: 'M'
+  },
+  {
+    id: 'M4',
+    title: 'KAAZAAN DOID KINOINGAN',
+    lyrics: `Kaazaan doid Kinoingan Ih agazo kuasa
+Id upa Dau vinangun oh tuhun
+Pinoikot Ih Jesus Ih Mononobus
+Do minogivang koposizon s'lajul
+
+Chorus: Kaazaan, kaazaan
+Toinsanan paapazou
+Kaazaan, Kaazaan
+Munsikou ngaavi no
+Kanou moi doid Tama
+Mantad koobian
+Di Jesus Ih Tanak Dau
+Do iso no
+
+Id koginavaan Tuhan Kinoingan
+Toinsanan di ongotumbazaan
+Kotoimo diti koposizon s'lajul
+Mantad do di gulu do nakadandi
+
+Kinoingan Ih minama ngun saviavi
+Adahan om abantug kuasa Dau
+Ih minamasi do saviavi tuhun
+Miampai do Zaa di Jesus
+Ih Tanak Dau`,
+    songNumber: 'M'
+  },
+  {
+    id: 'M5',
+    title: 'KINOINGAN TAAZOU',
+    lyrics: `Kinoingan Ih tabantug
+Iziau Ih pantangon om ozoon dagai
+Kinoingan, Ih taa-zou
+Diau ngaavi izikoi
+
+Refrain: Tuhan do koposizon
+Gi-na-vo, koginavaan
+Tu-han, Ih ginovoon
+Patut do o-zo-on
+
+Kinoingan, Ih vo-voo-zon
+Kotohuadan ngaavi di grasia Nu
+Ih notoimo ngaavi da-gai
+Mantad koginavan Nu
+
+Kanou no mogi-a-ampot
+Mamung do Malaikat
+Om Sangti ngaavi
+Pa-a-pa-zou om papaban-tug
+Do kaazaan Kinoingan`,
+    songNumber: 'M'
+  },
+  {
+    id: 'M6',
+    title: 'PIBABASAN',
+    lyrics: `Pibabasan taako
+Doid songovian tuhun
+Taako kababasan
+Ih pointantu, pointatap
+
+Miampai do Kinoingan, Ih Tama tokou
+Kanou ngaavi miiso, doid kovosian
+
+Poguhuono zou
+Doid kobuuan diti
+Doid k'laja ku ngaavi
+Om nogi koimaan ku
+
+Mamadandi zou baino,
+mizon id kovosian s'lajul
+Pibabasan taako
+Ih pointantu, pointatap`,
+    songNumber: 'M'
+  },
+  {
+    id: 'M7',
+    title: 'OINSASANAN HUMOZOU',
+    lyrics: `Ant: Oinsasanan humozou kaandasan
+Doid Tuhan Minaamangun
+
+Unsikou no saviavi
+Papazou kaazaan Tuhan
+Miampai hozou mogi-ampot-ampot
+tokou:
+Kobontugan Diau id savat
+
+Unsikou no ngaavi tokou
+Kinoingan Ih minomohou
+Simbao no miampai kotumbazaan
+Koginavan om kahansanan
+
+Sambao no, pantango no
+Oh ngaan Tuhan Kinoingan
+K'laja Dau adahan id tanga tokou
+Savi-avi mo-nong-ko-to-huod
+
+Kobontugan, kapantangan
+Kotohuadan Diau Oi Ama
+Om di Tanak om di Spiritu Sangti
+Kobontugan Diau id savat`,
+    songNumber: 'M'
+  },
+  {
+    id: 'M8',
+    title: 'TUHUNGO TUMATAP ID DIAU',
+    lyrics: `Ih Mary iso tondu hahangai
+Id Nazareth nizonon dau
+Poingontizan iso Tanak
+Ih Jesus Ih Mononobus
+
+Refrain: Kristus Tuhan
+Tuhungo, tuhungo
+Zikoi ngaavi, tumatap id Diau
+
+Id Kampong Juda Kinosusuvon
+Id kadai Bethlehem iho
+Gugumompi tazam, malaikat
+Tohu raja noko-tombuhui
+
+Id Galilea pinangajalan
+Minamasi di napatai
+Minama-vasi di sontob
+Tuhun nakaanu do toluo
+
+Ih Kristus, songian noikot oh timpu
+Pahanato no hongon Dau
+Doiho id salip minatai
+Sabap tokou songovian
+
+Doid tokou songovian nakataak
+Koposizon do Kinoingan
+Sabap no do kinotungagan
+Mantad hobong kapatazon`,
+    songNumber: 'M'
+  },
+  {
+    id: 'M9',
+    title: 'OI MIONTONG',
+    lyrics: `Oi Miontong idoos dogo
+Avanus toomod ko
+Mantad ko surga di'd savat
+Do mintamong dogo
+
+Voos nu taalus om anavau
+Amu okito ku
+Adahaan osuau kabang
+Om aiso toongou ku
+
+Au kopiuman do hongon nu
+Monontuduk lahan
+Miaga do Tina haid mimang
+Do aiso kahasaan`,
+    songNumber: 'M'
+  },
+  {
+    id: 'M10',
+    title: 'MALAIKAT KU DO OSUAU',
+    lyrics: `Malaikat ku do osuau,
+Selajur tamangan nu ou
+Yahan d'avasi tuduko
+Id otuvong panavao.
+
+Ontok do omuhok po ou,
+Amu ou daa mooi iumahau
+Sakahi koiahau ou daa,
+Lekas poguhio ou daa.
+
+Nung ayaat ginavo ku
+Om pikilan amu tentu,
+Ajaho no, katama ou
+D'ombiivo ku do pangazou.
+
+Koinsomok ih jaam tohui
+Mantad do tana do midu
+Tuhungo ou, oi Malaikat,
+Om ovito doid Savat.`,
+    songNumber: 'M'
+  },
+  {
+    id: 'M11',
+    title: 'SANGTI JOZEF',
+    lyrics: `Sangti Jozef, tanak David
+Savo Tobitua Maria
+Tama do gumompi Jesus
+Ponobus do tuhun ngaavi
+
+Cho: Apantang, apantang, apantang ih Jozef (2x)
+
+Sinuu Ko no do Malaikat
+Do mongoi id kampong Bethlehem
+Om doiho no tanak Jesus,
+Do maria nosusu no.
+
+Tinuduk no do Malaikat
+Ogumu no tuhun miskin
+Om tohu no Raja nogi
+Sumamba do Tanak Jesus.
+
+Do id Egypt tanak Jesus
+No'ovit di Sangti Josef
+Pina'abar do Malaikat
+Patazon mai di Herodes.
+
+Om kapapatai Herodes
+Josef minuhi po vagu
+Katagak no tanak Jesus
+Nokito dioho id Gereja.`,
+    songNumber: 'M'
+  },
+  {
+    id: 'M12',
+    title: 'AVASI ADAT KATOLIK',
+    lyrics: `Avasi Adat Katolik
+Naajal do Kinoingan sondii
+Lahan kumaa id Disido
+Poingkuo tuhun miho sondii?
+
+Choros: Kristian mgaavi, kotumbazaai
+Kaajalan ada zadami
+Kaajalan ada zadaai
+
+Isai amu otumbazaan
+Oukum nogi do Kinoingan
+Koikot po Isido p'reksaan
+Boos om koimaan on nitungan
+
+Kristian misti otumbazaan
+Om tumunjuk nogi ponuu
+Amu ahaid tokou sanang
+Nung miaga nogi koimaan`,
+    songNumber: 'M'
+  },
+  {
+    id: 'M13',
+    title: 'KRISTIAN NGAAVI',
+    lyrics: `Kristian ngaavi, kanou kou
+Mooi tuubung do Raja zu
+Jesus, ih Tuhan tokou
+Momorinta diozu                          
+Dandian zu daa do baino          )
+Do tumanud Diau tomoimo       ) 2x
+
+Tuhan Ko om Raja za
+Jesus Tanak Kinoingan
+Moguhu Ko balis za
+Masa do pisangadan
+Dandian za nodii baino            )
+Tumunjuk Diau tomoimo          ) 2x
+
+
+Om oikot no jaam tokou
+Do monoimo tingadan
+Jesus om ih Sangti Dau
+Mooi panaak tokou kaazaan
+Ih tumanud diau do baino        )
+Munsikou doiho tomoimo        ) 2x`,
+    songNumber: 'M'
+  },
+  {
+    id: 'M14',
+    title: 'OI SURGA TINGADAN',
+    lyrics: `Oi Surga tingadan, tomoimo ondomon
+Kada hobi suka, barang pomogunan
+Tantu, tantu, oi surga tingadan
+Tantu, tantu, oi surga tingadan
+
+Om nung Ziau susa, pasavato mato
+Om tahan, halapo, surga tantu kaanu
+Tantu, tantu, oi surga tingadan
+Tantu, tantu, oi surga tingadan
+
+Kada tanud logon, do id ponginaman
+Sabap, nung tumanud, tagak ih tingadan
+Tantu, tantu, oi surga tingadan
+Tantu, tantu, oi surga tingadan`,
+    songNumber: 'M'
+  },
+  {
+    id: 'M15',
+    title: 'KINOINGAN, IH PUUN DO KOGINAVAN',
+    lyrics: `Vovozoon Kinoingan, Ih tavakas
+Humuzuk zikoi sumamba Diau
+K'laja Nu agazo zikoi mamabantug
+Ziau Ih Kinoingan do taazou
+
+Kinoingan Tama, tobinsianan,
+Kosianai ngaavi di tanak Nu
+Onuai zioho do grassia Nu
+Humavan ngaavi do koimbazatan
+
+Kinoingan, Ih puun do koginavan,
+Pavakaso no koginavan za
+B'lakatai ngaavi Ih sontob layat Nu
+Pomogunan om polinta ngaavi`,
+    songNumber: 'M'
+  },
+  {
+    id: 'M16',
+    title: 'BONTUGON TOKOU NGARAN DAU',
+    lyrics: `Kanou toinsanan mamarayou
+do Tuhan Kinoingan
+Kanou royoho, kanou royoho
+Royohon tokou Tuhan,
+miampai aawi ginawo
+Ouhi I-yau doid karaja ngaawi Dau
+Kapadan lyau do royohon tokou
+Bontugon tokou Ngaran Dau
+
+Kanou toinsanan mogihum
+do Tuhan Kinoingan
+Kanou sumambayang, kanou ihumo
+Mokinsian tokou do ko-om-punan Dau
+Mangampun lyau di douso tokou
+Monulung lyau lumawan do douso
+Bontugon tokou Ngaran Dau
+
+Kanou toinsanan sumurupu
+do Tuhan Kinoingan
+Kanou sumurupu, kanou mogobi-obi
+Id pogii-giyon popointalang
+do kawasian Dau
+Kristus Tuhan Ih ninawau
+do pomogunan
+Kanou sumurupu miampai winakas
+Bontugon tokou Ngaran Dau`,
+    songNumber: 'M',
+    author: 'Fr. W. Poilis/Justin Lus'
+  },
+  {
+    id: 'M17',
+    title: 'KRISTUSLAH SUMBER KEHIDUPAN',
+    lyrics: `Kristuslah penyelamat hidup ku
+Serahkan beban hidup padaNya
+Susah dan senang 'kan dipimpinNya
+Kristuslah sumber kehidupan
+
+Hidup yang sesat dis'lamatkanNya
+Didalam kegelapan dosa
+Hidup dalam penuh percobaan
+Tuhan s'lalu berjalan bersama Ku
+
+Kesusahan tiada dapat menolong
+Hanya Yesus kekäsih sejati
+KasihNya s'lalu melimpah hidup ku
+Kristuslah sumber kehidupan`,
+    songNumber: 'M',
+    author: 'Belia Toboh Tambunan'
+  },
+  {
+    id: 'M18',
+    title: 'YESUS MEMBERI HARAPAN',
+    lyrics: `Suatu kenyataan di dalam hidupku
+Yesus selalu memberi pertolongan
+Ku telah terlepas dari beban dosa
+Hanya Yesus perlu kemurahan
+
+Apa lagi yang kita cari
+Didalam dunia kehancuran
+Jika tiada kesedaran manusia
+Dosa tiada dapat dihapuskan
+
+Oh...oh Yesus, Memberi harapan selalu
+Oh...oh Yesus,
+Selalu menunggu yang berdoa.
+Oh...oh Yesus, Kuasa yang mulia.`,
+    songNumber: 'M'
+  },
+  {
+    id: 'M19',
+    title: 'OH HATI YESUS TERLUKA',
+    lyrics: `Oh Hati Yesus terluka
+Hati Yesus berdarah
+Mengalirlah darah merah
+
+Oh Hati Yesus menjerit
+Hati Yesus memohon
+Supaya kami bertobat
+
+Oh Hati Yesus menangis
+Hati Yesus sangat duka
+Meminta la dikasihi
+
+Oh Hati Yesus Mulia
+Hati Yesus sungguh suci
+Bagaikan embun yang putih`,
+    songNumber: 'M'
+  },
+  {
+    id: 'M20',
+    title: 'SAYA MAU IRING YESUS',
+    lyrics: `Korus: Saya mau iring Yesus
+Saya mau iring Yesus
+Sampai selama-lamanya
+
+Walaupun saya susah
+Menderita dalam dunia
+Saya mau iring Yesus
+Sampai selama-lamanya
+
+Walaupun saya buta
+Tak pernah lihat dunia
+Saya mau iring Yesus
+Sampai selama-lamanya`,
+    songNumber: 'M'
+  },
+  {
+    id: 'M21',
+    title: 'DENGARLAH DOAKU',
+    lyrics: `Yesus Tuhan Penebus ku
+Dengar doa ku
+Janganlah Tuhan lalui
+Bri'lah berkatMu
+
+Korus: Yesus, Yesus, dengar doa ku
+Janganlah Tuhan lalui
+Bri'lah berkatMu
+
+Engkau Tuhan Pengasihan
+Sla'matkan daku
+Kuatkan hamba dalam iman
+Aku milikMu
+
+Ku berharap kepadaMu
+Bri' anugeraMu
+Sembuhkan hati yang hancur
+Sucikan daku
+
+Yesus pohon Kesukaan
+Kesenangan Ku
+Dari harta sekalian
+Engkau Raja ku`,
+    songNumber: 'M'
+  },
+  {
+    id: 'M22(a)',
+    title: 'BERITAKAN',
+    lyrics: `Mari kawan-kawan kita pergi bersama
+Ke s'luruh dunia menyampaikan berita
+Bahwa Allah mengasihi
+Seluruh dunia dan menyediakan kita
+Kehidupan kekal
+
+Sambutlah temanku damai
+yang t'lah ku t'rima
+Harap pada Tuhan,
+di mana pun kau ada
+Kuserukan dalam dunia,
+ku mau orang tahu
+Tuhan datang di hatiku,
+ingin ku sampaikan`,
+    songNumber: 'M'
+  },
+  {
+    id: 'M22(b)',
+    title: 'YESUS TUHANKU',
+    lyrics: `Yesus Tuhan ku, Yesus Tuhan ku,
+Yesus Tuhan ku, tomoimo
+Yesus Tuhan ku, Yesus Tuhan ku
+Yesus Tuhan ku, tomoimo
+
+Papaazou zou Diau......
+
+Yesus Raja ku………..`,
+    songNumber: 'M'
+  },
+  {
+    id: 'M23',
+    title: 'TURUNLAH KHALIK ROH KUDUS',
+    lyrics: `Turunlah Khalik Roh Kudus
+Batin rakyatMu kunjungi
+Penuhi jiwa makhlukMu
+Dengan nikmat yang surgawi
+
+Penghibur gelarMu benar
+Kurnia Bapa terbesar
+Pancurlah api dan kasih
+Dan pengurapan ilahi
+
+Terangkan pancaind'raku
+Curahi hati kasihMu
+Tubuh yang enggan dan lemah
+Sudilah langsung kuatkan
+
+Kenalkan Bapa yang esa
+Dan kebesaran AnakNya
+DiriMu pun kenalkanlah,
+Yang Rohul 'kudus Allah sah`,
+    songNumber: 'M'
+  },
+  {
+    id: 'M24',
+    title: 'MAHA TUHAN YANG ESA',
+    lyrics: `Maha Tuhan yang esa
+MilikMulah semuanya
+Allah kuat dan benar
+Khalik lagi Pelenggara
+Tiada permulaanNya
+Pun tak ada akhirNya
+
+Langit, bumi, darat, laut
+Matahari, bulan, bintang
+Sama puji namaMu
+Berseruhkan kodrat Allah
+Rakyat pun permulia
+RuhimMu tak hingganya
+
+Dalam surga Serafim
+Ucap kudus, kudus, kudus
+Dan segala Kerubim
+Turut nyanyi tak terputus
+Orang kudus sambungkan
+Selamanya pujian`,
+    songNumber: 'M'
+  },
+  {
+    id: 'M25',
+    title: 'KEPADA HATI YESUS',
+    lyrics: `Kepada Hati Yesus
+Menyanyi jiwaku
+Ke langit yang tertinggi
+Jiwaku berseru:
+
+Dend: Segala manusia
+Kasibi Allahku
+Kepada Hati Yesus
+Berilah hatimu
+Kepada Hati Yesus
+Berilah hatimu!
+
+Tiada satu hati
+Yang berkemurahan
+Sebagai Hati Yesus
+Pohon pengasihan
+
+Ya Hati yang terbuka
+Hendaklah jiwaku
+Terlindung dari jahat
+Di dalam lakuMu`,
+    songNumber: 'M'
+  },
+  {
+    id: 'M26',
+    title: 'OI PARADAIS',
+    lyrics: `Oi Paradais, oi Paradais
+Isai amu nouzan
+Isai amu gumaab mongoi
+Masuk koundangan
+
+Cho: Avasi daa doiho
+Avanus, asanang
+Poimpasi tomoimo
+Idoos do Kinoingan
+
+Oi Paradais, oi Paradais
+Songian koikot tadau
+Nookuo tu oosizan matai
+Mongoi intong Diau
+
+Oi Paradais, oi Paradais
+Maahan doiti izou
+Hangadon zou do Jesus ku
+Doiho zou ounsikou`,
+    songNumber: 'M'
+  },
+  {
+    id: 'M27',
+    title: 'KOMUHAKAN HAHANSANON DO KOHOMINAN OM POGUN',
+    lyrics: `Miad-miad ginavo tokou
+Songian tokou koongou
+Ogumu kozo komuhakan
+Ih nakalavong no do baino
+
+Komuhakan id nombo nopo
+Kanou no gia momusoou
+Zotokou no hahansanon
+Doid kohominan om pogun tokou
+
+Kor: Guhi kou no oi komuhakan
+Do tumanud id lahan totopot
+Pinataak di ama ina
+Ih giminavo do tokou tomoimo
+
+Komuhakan kanou no ngaavi
+Momusoou gia do baino
+Guhi no doid Kinoingan
+Om zadaai ih kotuvangan`,
+    songNumber: 'M',
+    author: 'Fr. Peter Abas'
+  },
+  {
+    id: 'M28',
+    title: 'OI TUHAN TOBINSIANAN',
+    lyrics: `Oi Tuhan ih tobinsianan
+Kinongoho noh iti sambayang ku
+Polomhuson miampai kalansanan
+Toinsanan ti suang ginawo ku
+Tulungo ku monoguang koposion ku
+
+Kor: "Yoku ralan, katapatan, koposion"
+Boros nu di koinsasamod doho
+Manahak komoyon ti koposion ku
+
+Sodop tadau opurimanan ku
+Kosusaan rumikot id doho
+Aiso suai ralan monoguang
+Nga la noh ih ralan koposion
+Tulungo ku miampai winakas nu
+
+Nokuro tu katangaban nopo
+Purimonon tikid tadau sodop?
+Kada oku pologoso oi Tuhan
+Oimbayat tumanud kahandak ku
+Tu la noh katapatan koposion`,
+    songNumber: 'M',
+    author: 'Fr. C. Piong'
+  },
+  {
+    id: 'M29',
+    title: 'TUHAN NO RALAN KATAPATAN OM KOPOSION',
+    lyrics: `Oi Tuhan dii tobinsianan
+Igitai iti longon ku
+Kotuwongon mogimbayat doho
+Ralan ku noponu korugian
+
+Mamanau au ku kapanau
+Kada oku pologoso Tuhan
+Kagasan do kuasa pomogunan
+Otumbayaan oku Dia Tuhan
+
+Kor: lya no ralan, katapatan
+Koposion selajur om sogiigisom
+Kada oku tolikudai
+li guminawo Dia tikid tadau
+
+Oi Tuhan intangai oku
+Poimpasi hiti pomogunan
+Au koilo hombo pakayaan
+Sokodungo oku Dia Tuhan`,
+    songNumber: 'M',
+    author: 'Fr. Peter Abas'
+  },
+  {
+    id: 'M30',
+    title: 'TAMA DO KOSIANAN',
+    lyrics: `Oi Tuhan Kinoingan
+Tama do kosianan
+Tama do koginavaan
+
+Soira id pogumbalan
+Soira kosusaan
+Doid dika kalansanan
+
+Kor: Oi Tuhan hiti oku
+Sumingkotud om sumambayang
+Monongkotoluod dika
+tu nosianan ko doho
+
+Nombo oku do baino
+Nung okon noh kho la
+Tama do koginavaan
+
+Hiti id pomogunan
+Maso monompogunan
+Ogumu katangkangau
+
+Otumbayaan oku
+Poinsomok kho id doho
+Manud-tanud kho doho`,
+    songNumber: 'M',
+    author: 'Fr. C. Piong'
+  },
+  {
+    id: 'M31',
+    title: 'ALLAH ITU ADALAH KASIH',
+    lyrics: `Allah itu adalah kasih
+Namun kasihNya dikhianati oleh dosa
+Tetapi kasihNya setia dan abadi
+Manusia hidup kembali dalam Nya
+
+Kasih Allah ternyata dalam kita
+DiutusNya Kristus ke dunia
+Menyelamatkan kita dari dosa
+Sumber perdamaian dan kehidupan
+
+Kor: Percayalah hai domba-domba
+Allah gembala yang maha baik
+Kita diiring ke padang kehijauan
+Ke arah kehidupan kekal
+
+Kasih Allah kita kenali
+Didalam cinta kasih sesama
+Rohnya sentiasa bersama kita
+Membina hidup yang harmoni
+
+Saudara seiman dalam Kristus
+Tanpa kasih hidup tak bererti
+Usahakanlah hidup penuh kasih
+Agar kerajaan Allah teguh selamaNya`,
+    songNumber: 'M'
+  },
+  {
+    id: 'M32',
+    title: 'KITA SATU DALAM TUHAN',
+    lyrics: `Kita satu dalam Tuhan
+Kita satu dalam Tuhan
+Kita disatukan didalam Roh Tuhan
+Kita satu dalam Tuhan
+
+Kor: Mari kita bernyanyi
+Rasakan kasih Tuhan
+Mari berpegang tangan
+Supaya dunia tau
+Kita satu dalam Tuhan
+
+Kita satu dalam iman
+Kita satu dalam iman
+Kita disatukan didalam iman
+Kita satu dalam iman`,
+    songNumber: 'M'
+  },
+  {
+    id: 'M33',
+    title: 'BERSAMA MALAIKAT DI SYURGA',
+    lyrics: `Bersama malaikat di syurga
+Nyanyikan kidung pujian
+Bermazmur bagiMu muliakan namaMu
+Yesus aku memujiMu
+
+Tanganku kuangkat padaMu
+Masuk dalam hadiratMu
+Rasakan kasihMu
+Kujadi milikMu
+Yesus aku menyembahMu
+
+Hossana, Hossana
+Aku memujiMu,
+Halleluia, Halleluia 
+Aku menyembahMu`,
+    songNumber: 'M'
+  },
+  {
+    id: 'N1',
+    title: 'MIGINAVO DOID TUHAN',
+    lyrics: `Tadau baino tadau kounsikaan
+Notuhuk noh ngaavi dandi toh
+Suming-kotud toh om sumambah'to
+Doid Tuhan, ih ginvoon'to
+
+Oi Maria ginovoon ku iziau
+Dumandi zou kuma doid Tuhan
+Gompizon ku iziau do soumul-umul
+Osusa ko toi sumakit ko
+
+Oi Tuhan za
+Blakatai zikoi
+Mohoing om tobpinai ngaavi
+Humansan diau zikoi ngoduvo
+Au daa kansau Tanak nu doiti`,
+    songNumber: 'N'
+  },
+  {
+    id: 'N2',
+    title: 'TADAU PISASAVAAN',
+    lyrics: `Kotohuadan doid diau
+Oi Ama doid surga
+Nonuan zikoi do timpu
+Tanda piandad-andad za
+
+Tadau no dii baino
+Pisasavaan za
+Sumingkotud izikoi
+Balakatai zikoi no
+
+Dumandi zikoi diau
+Tumanud ka'jalan nu
+Do au zikoi miada
+Gisom soumul-umul
+
+Kotohuadan doid diau
+Oi Ama doid surga
+Ounsikou ginavo za
+Do tumanud diau`,
+    songNumber: 'N',
+    author: 'Paul Kadau'
+  },
+  {
+    id: 'N3',
+    title: 'LUNCING PISASAVAAN',
+    lyrics: `Monguni noh iho luncing
+Luncing Pisasavaan zu
+Ogumu Tuhun sumaksi
+Mohoing om Tompinai ngaavi
+
+Oi Ama ku doiho surga
+Doiti zioho noh ngoduvo
+Dumandi ma zioho id diau
+Miginavo do soumul-umul
+
+Tumanud zou nogi do munsikou
+Tu notuhuk nodi dandi diozu
+Atatamis kou noh da ngoduvo
+Pisasavaan zu do soumul-umul`,
+    songNumber: 'N',
+    author: 'Paul Kadau'
+  },
+  {
+    id: 'N4',
+    title: 'PIGOGOMPI KOU NO',
+    lyrics: `Norikot nodii moti
+Iti timpu dikoyu
+Do miolon do dandi
+Dandi do totopot
+Doid toguwang do Kinorohingan
+
+Chorus: Doid kusai toi doid tondu
+Piigit kou no dino longon
+Ino no tanda do piginawaan
+Pigoo-gompi kou no do tiso om tiso
+
+Timpu nopo diti
+Nga timpu poo-sing-ko-tud kou
+Doid Panambayangan
+Mokiisian barakat
+Doid toguwang do Altar di Jesus
+
+Baino nopo diti
+Nga timpu tuuminpuun kou
+Do miginawo
+Piginawaan totopot
+Gisom do soumul-umul
+Gisom do soumul-umul`,
+    songNumber: 'N',
+    author: 'Maurice Awit'
+  },
+  {
+    id: 'O1',
+    title: 'NOKOTUNGAG MANTAD HOBONG',
+    lyrics: `Nokotungag mantad hobong
+Om Tumakad no e Tuhan
+E nokatama do yogon
+Nazau nodii miad padan
+
+Zisai e Raja om Tuhan
+E tumakad doid sorga
+Id gloria om kazahan?
+Jesus no, ngan zo kitua
+
+Havun do avan kleta zo
+E kumi lou miad d'amas;
+Om iumohou malaikat zo
+Duvo d'ombivo pinhapas
+
+Zisai e Raja om Tuhan
+E tumakad doid sorga
+Id gloria om kazahan?
+Jesus no, ngan zo kitua
+
+Pingka no sumuang Kristus
+Id karajaan do gloria
+Do hiho id diau, Jesus
+Zioi nogi foimon nu da
+
+Zisai e Raja om Tuhan
+E tumakad doid surga
+Id gloria om kazahan?
+Jesus no, ngan zo kitua`,
+    songNumber: 'O'
+  },
+  {
+    id: 'P1',
+    title: 'KINOHOINGAN POVOZON',
+    lyrics: `Kinohoingan Povozon
+Minamangun Ko do ngaavi
+Sorga, tana om uhun
+Om nogi malaikat ngaavi
+E navangun Nu Tuhan
+Sumujut miad padan
+
+Ngan Nu om kavasa Nu
+Pantangon za da toimoimo
+Do yohou om sambayang
+Id tohui miad do moino
+Sanctus, sanctus, sanctus, ka
+Do yohou selajor da
+
+Sanctus Ama Povozon
+Sanctus Anak om Tuhan za
+Sauctus nogi Spiritu
+Kointohuvan kitua
+Kazahan om gloria
+Doid Kinohoingan za`,
+    songNumber: 'P'
+  },
+  {
+    id: 'P2',
+    title: 'NGAVI NGAVI UHUN KRISTIAN',
+    lyrics: `Ngavi ngaavi uhun Kristian
+Padan miho om pisaya
+Nung uhun amu pisaya
+Kinohoingan momogo
+
+Kiiso no Kinohoingan
+Tohu Persona id sahom
+Kinohoingan Ama, Anak
+Hagi Sante Spiritu
+
+Ama d'ino Kinohoingan
+Miamung do Anak zo
+Spiritu sante, Kinohoingan
+Doid sorga izonon
+
+Sakahi tohu no Persona
+Iso no Kinohoingan
+Miiad tatap om tuo
+Amiso tinimpunon
+
+Napataio nohobongo
+Tumungag adau Pascha
+Minopung id pomogunan
+Sampai adau Ascensio
+
+Do kavassa nissido no
+Doid sorga katakad,
+Pentecosten Spir'tu sante
+Id Apostei tumuhun
+
+Id koputusan do tanna
+Ponobus koikot vagu
+Momohukum uhun ngaavi
+E suhuor opossizan
+
+Doid sorga poposuang maai
+Do uhun do avassi
+Om doid apui naraka
+Do uhun e ayaat`,
+    songNumber: 'P'
+  },
+  {
+    id: 'P3',
+    title: 'VOOVOZOON KINOINGAN ZA',
+    lyrics: `Voovozoon Kinoingan za
+Minamangun saviavi
+Diau Surga om tana
+Malaikat om Sangti ngaavi
+Adahaan do kuasa Nu
+Abantug nogi Ngaan Nu
+
+Sangtus Tama om Jesus
+Tuan za om Mononobus
+Sangtus nogi Spiritus
+Mantad duvo nakahabus
+Osundu tohu iso
+Om kabantugan oizo`,
+    songNumber: 'P'
+  },
+  {
+    id: 'P4',
+    title: 'OI KINOINGAN, OI VOVOZOON',
+    lyrics: `Oi Kinoinga, Oi Vovozoon
+Onuai zikoi do balakat Nu
+Pohiongo zikoi mantad douso za
+Tambai zikoi humavan kalaatan
+
+Korus: Otumbazaan zou kivaa Kinoingan
+Tama Vovozoon, Ib Tanak
+Om Spiritu Sangti, Amen
+
+Oi Kinoingan, Oi Vovozoon
+Mantad do baino om soumul-umul
+Ondomon, opion za timpu diti
+Timpu koponongkotohuadan Diau`,
+    songNumber: 'P'
+  },
+
+  ...songsR
 ]
 
 export default songs;

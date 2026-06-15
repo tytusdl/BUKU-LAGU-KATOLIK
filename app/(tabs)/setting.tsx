@@ -1,151 +1,235 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Switch, ScrollView, TouchableOpacity, Modal } from 'react-native';
+import { useFocusEffect } from 'expo-router';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, StyleSheet, Switch, ScrollView, TouchableOpacity, Modal, Alert, Linking } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { ChevronRight, Bell, Moon, Globe, Lock, HelpCircle, Info, Check } from 'lucide-react-native';
+import { ChevronRight, Bell, Moon, Globe, Lock, HelpCircle, Info, Check, Palette, Heart, ChevronUp, Sparkles, Mail } from 'lucide-react-native';
 import { useFonts, Inter_400Regular, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme, colorThemes, darkColorThemes } from '../context/ThemeContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from 'expo-constants';
+import { changelogData } from '../data/changelog';
+import { contributorsData } from '../data/contributors';
+import packages from '../../package.json'; // trigger fast refresh
 
-// Objek terjemahan
-const translations = {
-  'Melayu': {
-    settings: 'Tetapan',
-    account: 'Akaun',
-    language: 'Bahasa',
-    display: 'Paparan',
-    darkMode: 'Mod Gelap',
-    help: 'Bantuan',
-    helpCenter: 'Pusat Bantuan',
-    aboutApp: 'Tentang Aplikasi',
-    chooseLang: 'Pilih Bahasa',
-    close: 'Tutup',
-    privacyPolicy: 'Dasar Privasi',
-    privacyHeader: 'Aplikasi ini menghormati privasi pengguna. Kami bertujuan untuk menjelaskan amalan privasi kami dengan jelas:',
-    noDataCollection: '1. Tiada Pengumpulan Data',
-    noDataCollectionDesc: 'Aplikasi tidak mengumpul, menyimpan, atau berkongsi sebarang data peribadi atau maklumat pengguna, termasuk tetapi tidak terhad kepada:',
-    noDataCollectionBullet1: '• Nama, alamat e-mel, atau maklumat pengenalan lain.',
-    noDataCollectionBullet2: '• Lokasi, sejarah carian, atau aktiviti peranti.',
-    noDataCollectionBullet3: '• Data penggunaan atau statistik dalam Aplikasi.',
-    noDataCollectionBullet4: '• Fail atau dokumen pada peranti anda.',
-    noDeviceAccess: '2. Tiada Akses kepada Peranti atau Akaun',
-    noDeviceAccessDesc: 'Aplikasi tidak meminta atau mengakses:',
-    noDeviceAccessBullet1: '• Kamera peranti, mikrofon, galeri, atau sensor.',
-    noDeviceAccessBullet2: '• Akaun media sosial, kenalan, atau data sistem.',
-    noCookies: '3. Tiada Penggunaan Kuki atau Penjejakan',
-    noCookiesDesc: 'Aplikasi tidak menggunakan teknologi penjejakan seperti kuki, alat analitik, atau penjejak pihak ketiga.',
-    noDataSharing: '4. Tiada Perkongsian Data dengan Pihak Ketiga',
-    noDataSharingDesc: 'Oleh kerana tiada data dikumpul, tiada maklumat pengguna akan dijual, dipindahkan, atau didedahkan kepada pihak ketiga.',
-    security: '5. Keselamatan',
-    securityDesc: 'Walaupun Aplikasi tidak mengumpul data, kami komited untuk mengekalkan integriti dan keselamatannya untuk melindungi pengguna daripada risiko teknikal.',
-    changes: '6. Perubahan pada Dasar Privasi',
-    changesDesc: 'Sekiranya dasar ini dikemaskini pada masa hadapan, pengguna akan dimaklumkan melalui kemaskini dalam Aplikasi atau platform rasmi.'
-  },
-  'English': {
-    settings: 'Settings',
-    account: 'Account',
-    language: 'Language',
-    display: 'Display',
-    darkMode: 'Dark Mode',
-    help: 'Help',
-    helpCenter: 'Help Center',
-    aboutApp: 'About App',
-    chooseLang: 'Choose Language',
-    close: 'Close',
-    privacyPolicy: 'Privacy Policy',
-    privacyHeader: 'This application respects user privacy. We aim to clearly outline our privacy practices:',
-    noDataCollection: '1. No Data Collection',
-    noDataCollectionDesc: 'The App does not collect, store, or share any personal data or user information, including but not limited to:',
-    noDataCollectionBullet1: '• Names, email addresses, or other identifying details.',
-    noDataCollectionBullet2: '• Location, search history, or device activity.',
-    noDataCollectionBullet3: '• Usage data or in-App statistics.',
-    noDataCollectionBullet4: '• Files or documents on your device.',
-    noDeviceAccess: '2. No Access to Device or Accounts',
-    noDeviceAccessDesc: 'The App does not request or access:',
-    noDeviceAccessBullet1: '• Device cameras, microphones, galleries, or sensors.',
-    noDeviceAccessBullet2: '• Social media accounts, contacts, or system data.',
-    noCookies: '3. No Use of Cookies or Tracking',
-    noCookiesDesc: 'The App does not employ tracking technologies such as cookies, analytics tools, or third-party trackers.',
-    noDataSharing: '4. No Data Sharing with Third Parties',
-    noDataSharingDesc: 'Since no data is collected, no user information will be sold, transferred, or disclosed to third parties.',
-    security: '5. Security',
-    securityDesc: 'While the App does not collect data, we are committed to maintaining its integrity and security to protect users from technical risks.',
-    changes: '6. Changes to Privacy Policy',
-    changesDesc: 'If this policy is updated in the future, users will be notified via in-App updates or official platforms.'
-  }
-};
+import { useLanguage } from '../context/LanguageContext';
+import { translations } from '../../src/translations';
 
 export default function SettingScreen() {
-  const { isDarkMode, toggleTheme } = useTheme();
+  const { isDarkMode, toggleTheme, currentColorTheme, colorThemeId, setColorTheme } = useTheme();
+  const { currentLanguage, setLanguage, t } = useLanguage();
   const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(true);
-  const [currentLanguage, setCurrentLanguage] = useState('Melayu');
   const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const [showColorThemeModal, setShowColorThemeModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [showAboutModal, setShowAboutModal] = useState(false);
+  const [showContributorsModal, setShowContributorsModal] = useState(false);
+  const [showHelpModal, setShowHelpModal] = useState(false);
+  const [isChangelogExpanded, setIsChangelogExpanded] = useState(false);
+  const [expandedOldVersions, setExpandedOldVersions] = useState<string[]>([]);
+  const [appVersion] = useState(packages.version);
   const [fontsLoaded] = useFonts({
     'Inter-Regular': Inter_400Regular,
     'Inter-SemiBold': Inter_600SemiBold,
     'Inter-Bold': Inter_700Bold,
   });
 
-  const languages = ['Melayu', 'English'];
-  
-  // Dapatkan bahasa yang disimpan ketika komponen dimuat
-  useEffect(() => {
-    const getStoredLanguage = async () => {
-      try {
-        const storedLanguage = await AsyncStorage.getItem('app-language');
-        if (storedLanguage) {
-          setCurrentLanguage(storedLanguage);
-        }
-      } catch (error) {
-        console.error('Error retrieving language from storage:', error);
-      }
-    };
-    
-    getStoredLanguage();
-  }, []);
+  // Auto-collapse changelog when leaving the screen
+  useFocusEffect(
+    useCallback(() => {
+      // When the screen is focused (nothing to do here)
 
-  // Fungsi untuk mendapatkan terjemahan berdasarkan bahasa semasa
-  const t = (key: keyof typeof translations['Melayu']) => {
-    return translations[currentLanguage as keyof typeof translations][key];
-  };
+      return () => {
+        // When the screen loses focus
+        setIsChangelogExpanded(false);
+        setExpandedOldVersions([]);
+      };
+    }, [])
+  );
+
+  const languages = ['Melayu', 'English'];
+
+  // Debug effect to track theme changes
+  useEffect(() => {
+    console.log('Settings: Current color theme changed:', currentColorTheme.name, 'Primary:', currentColorTheme.primary);
+    console.log('Settings: Color theme ID:', colorThemeId);
+    console.log('Settings: Dark mode status:', isDarkMode);
+    console.log('Settings: Current theme background:', currentColorTheme.background);
+    console.log('Settings: Current theme text:', currentColorTheme.text);
+  }, [currentColorTheme, colorThemeId, isDarkMode]);
+
 
   const toggleLanguageModal = () => {
     setShowLanguageModal(!showLanguageModal);
+  };
+
+  const toggleColorThemeModal = () => {
+    setShowColorThemeModal(!showColorThemeModal);
   };
 
   const togglePrivacyModal = () => {
     setShowPrivacyModal(!showPrivacyModal);
   };
 
+  const toggleAboutModal = () => {
+    setShowAboutModal(!showAboutModal);
+  };
+
+  const toggleHelpModal = () => {
+    setShowHelpModal(!showHelpModal);
+  };
+
+  const toggleContributorsModal = () => {
+    setShowContributorsModal(!showContributorsModal);
+  };
+
+
+
   const selectLanguage = async (language: string) => {
-    setCurrentLanguage(language);
+    await setLanguage(language as 'Melayu' | 'English');
     setShowLanguageModal(false);
-    
-    // Simpan pilihan bahasa ke AsyncStorage
-    try {
-      await AsyncStorage.setItem('app-language', language);
-    } catch (error) {
-      console.error('Error saving language to storage:', error);
+  };
+
+  const selectColorTheme = async (themeId: string) => {
+    console.log('Selecting color theme:', themeId);
+    console.log('Current theme before change:', colorThemeId);
+    await setColorTheme(themeId);
+    console.log('Theme selection completed');
+    // Modal will stay open so user can see changes and make multiple selections
+  };
+
+  const getColorThemeName = (themeId: string) => {
+    console.log('Getting color theme name for:', themeId);
+    const translatedName = t(themeId);
+    console.log('Translated name:', translatedName);
+
+    // Fallback for pink theme if translation fails
+    if (themeId === 'pink' && (!translatedName || translatedName === themeId)) {
+      console.log('Using fallback for pink theme');
+      return currentLanguage === 'Melayu' ? 'Merah Jambu' : 'Pink';
     }
+
+    return translatedName;
   };
 
   if (!fontsLoaded) {
     return null;
   }
-  
+
   return (
-    <SafeAreaView style={[styles.container, isDarkMode && styles.darkContainer]}>
+    <SafeAreaView
+      edges={['top', 'left', 'right']}
+      style={[
+        styles.container,
+        isDarkMode && styles.darkContainer,
+        { backgroundColor: currentColorTheme.background }
+      ]}>
       <StatusBar style={isDarkMode ? "light" : "dark"} />
-      
-      <View style={[styles.header, isDarkMode && styles.darkHeader]}>
-        <Text style={[styles.title, isDarkMode && styles.darkText]}>{t('settings')}</Text>
+
+      <View style={[
+        styles.header,
+        isDarkMode && styles.darkHeader,
+        { backgroundColor: currentColorTheme.background }
+      ]}>
+        <Text
+          style={[
+            styles.title,
+            isDarkMode && styles.darkText
+          ]}
+          adjustsFontSizeToFit={true}
+          numberOfLines={1}
+        >{t('settings')}</Text>
       </View>
 
       <ScrollView style={styles.scrollView}>
-        <View style={[styles.section, isDarkMode && styles.darkSection]}>
-          <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>{t('account')}</Text>
-          
+
+        {/* New Update Section */}
+        <View style={[
+          styles.section,
+          isDarkMode && styles.darkSection,
+          { backgroundColor: currentColorTheme.surface }
+        ]}>
+          <TouchableOpacity
+            style={[styles.row, isDarkMode && styles.darkRow, { borderTopWidth: 0 }]}
+            onPress={() => setIsChangelogExpanded(!isChangelogExpanded)}
+          >
+            <View style={styles.rowContent}>
+              <Sparkles size={24} color={isDarkMode ? "#fff" : "#333"} />
+              <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('newUpdate')}</Text>
+            </View>
+            {isChangelogExpanded ? (
+              <ChevronUp size={20} color={isDarkMode ? "#999" : "#999"} />
+            ) : (
+              <ChevronRight size={20} color={isDarkMode ? "#999" : "#999"} />
+            )}
+          </TouchableOpacity>
+
+          {isChangelogExpanded && (
+            <View style={{ paddingHorizontal: 16, paddingBottom: 16 }}>
+              {changelogData.map((versionData, vIndex) => {
+                const isLatest = vIndex === 0;
+                const isExpanded = isLatest || expandedOldVersions.includes(versionData.version);
+
+                return (
+                  <View key={versionData.version} style={{ marginTop: isLatest ? 0 : 16 }}>
+                    {isLatest ? (
+                      <Text style={[styles.versionText, isDarkMode && styles.darkText, { fontSize: 14, marginBottom: 8, fontWeight: 'bold' }]}>
+                        {t('versionLabel')} {versionData.version}
+                      </Text>
+                    ) : (
+                      <TouchableOpacity
+                        onPress={() => {
+                          setExpandedOldVersions(prev =>
+                            prev.includes(versionData.version)
+                              ? prev.filter(v => v !== versionData.version)
+                              : [...prev, versionData.version]
+                          );
+                        }}
+                        style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: isExpanded ? 8 : 0, paddingVertical: 4 }}
+                      >
+                        <Text style={[styles.versionText, isDarkMode && styles.darkText, { fontSize: 14, fontWeight: 'bold' }]}>
+                          {t('versionLabel')} {versionData.version}
+                        </Text>
+                        {isExpanded ? (
+                          <ChevronUp size={18} color={isDarkMode ? "#999" : "#666"} />
+                        ) : (
+                          <ChevronRight size={18} color={isDarkMode ? "#999" : "#666"} />
+                        )}
+                      </TouchableOpacity>
+                    )}
+
+                    {isExpanded && versionData.changes.map((change, index) => {
+                      const lang = currentLanguage as 'Melayu' | 'English';
+                      const text = change.text[lang];
+                      const note = change.note ? change.note[lang] : null;
+
+                      return (
+                        <View key={index} style={{ flexDirection: 'row', marginBottom: 6 }}>
+                          <Text style={[isDarkMode && styles.darkText, { marginRight: 6 }]}>•</Text>
+                          <Text style={[isDarkMode && styles.darkText, { flex: 1, lineHeight: 20 }]}>
+                            {text}
+                            {note && (
+                              <Text style={{ fontStyle: 'italic', fontSize: 12, opacity: 0.8 }}>
+                                {'\n'}({note})
+                              </Text>
+                            )}
+                          </Text>
+                        </View>
+                      );
+                    })}
+                  </View>
+                );
+              })}
+            </View>
+          )}
+        </View>
+        <View style={[
+          styles.section,
+          isDarkMode && styles.darkSection,
+          { backgroundColor: currentColorTheme.surface }
+        ]}>
+          <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>{t('languageSection')}</Text>
+
           <TouchableOpacity style={[styles.row, isDarkMode && styles.darkRow]} onPress={toggleLanguageModal}>
             <View style={styles.rowContent}>
               <Globe size={24} color={isDarkMode ? "#fff" : "#333"} />
@@ -158,27 +242,54 @@ export default function SettingScreen() {
           </TouchableOpacity>
         </View>
 
-        <View style={[styles.section, isDarkMode && styles.darkSection]}>
-          <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>{t('display')}</Text>
-          
+        <View style={[
+          styles.section,
+          isDarkMode && styles.darkSection,
+          { backgroundColor: currentColorTheme.surface }
+        ]}>
+          <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>{t('themeSettings')}</Text>
+
           <View style={[styles.row, isDarkMode && styles.darkRow]}>
             <View style={styles.rowContent}>
               <Moon size={24} color={isDarkMode ? "#fff" : "#333"} />
               <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('darkMode')}</Text>
             </View>
-            <Switch
-              value={isDarkMode}
-              onValueChange={toggleTheme}
-              trackColor={{ false: "#D1D1D6", true: "#81b0ff" }}
-              thumbColor={isDarkMode ? "#4872F4" : "#f4f3f4"}
-            />
+            <View style={styles.rowRight}>
+              <Switch
+                value={isDarkMode}
+                onValueChange={toggleTheme}
+                trackColor={{ false: "#D1D1D6", true: currentColorTheme.secondary }}
+                thumbColor={isDarkMode ? currentColorTheme.primary : "#f4f3f4"}
+              />
+            </View>
           </View>
+
+          <TouchableOpacity style={[styles.row, isDarkMode && styles.darkRow]} onPress={toggleColorThemeModal}>
+            <View style={styles.rowContent}>
+              <Palette size={24} color={isDarkMode ? "#fff" : "#333"} />
+              <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('colorTheme')}</Text>
+            </View>
+            <View style={styles.rowRight}>
+              <View style={[
+                styles.colorPreview,
+                { backgroundColor: currentColorTheme.primary }
+              ]} />
+              <Text style={[styles.selectedOption, isDarkMode && styles.darkText]}>{getColorThemeName(colorThemeId)}</Text>
+              <ChevronRight size={20} color={isDarkMode ? "#999" : "#999"} />
+            </View>
+          </TouchableOpacity>
         </View>
 
-        <View style={[styles.section, isDarkMode && styles.darkSection]}>
+        <View style={[
+          styles.section,
+          isDarkMode && styles.darkSection,
+          { backgroundColor: currentColorTheme.surface }
+        ]}>
           <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>{t('help')}</Text>
-          
-          <TouchableOpacity style={[styles.row, isDarkMode && styles.darkRow]}>
+
+
+
+          <TouchableOpacity style={[styles.row, isDarkMode && styles.darkRow]} onPress={toggleHelpModal}>
             <View style={styles.rowContent}>
               <HelpCircle size={24} color={isDarkMode ? "#fff" : "#333"} />
               <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('helpCenter')}</Text>
@@ -194,13 +305,41 @@ export default function SettingScreen() {
             <ChevronRight size={20} color={isDarkMode ? "#999" : "#999"} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.row, isDarkMode && styles.darkRow]}>
+          <TouchableOpacity style={[styles.row, isDarkMode && styles.darkRow]} onPress={toggleAboutModal}>
             <View style={styles.rowContent}>
               <Info size={24} color={isDarkMode ? "#fff" : "#333"} />
               <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('aboutApp')}</Text>
             </View>
             <ChevronRight size={20} color={isDarkMode ? "#999" : "#999"} />
           </TouchableOpacity>
+
+          <TouchableOpacity style={[styles.row, isDarkMode && styles.darkRow]} onPress={toggleContributorsModal}>
+            <View style={styles.rowContent}>
+              <Heart size={24} color={isDarkMode ? "#fff" : "#333"} />
+              <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('contributors')}</Text>
+            </View>
+            <ChevronRight size={20} color={isDarkMode ? "#999" : "#999"} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.row, isDarkMode && styles.darkRow]}
+            onPress={() => Linking.openURL('mailto:tytusdl@gmail.com')}
+          >
+            <View style={styles.rowContent}>
+              <Mail size={24} color={isDarkMode ? "#fff" : "#333"} />
+              <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('helpContact')}</Text>
+            </View>
+            <ChevronRight size={20} color={isDarkMode ? "#999" : "#999"} />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.versionContainer}>
+          <Text style={[styles.versionText, isDarkMode && styles.darkText]}>{t('version')}: {appVersion}</Text>
+        </View>
+
+        <View style={styles.creditContainer}>
+          <Text style={[styles.creditText, isDarkMode && styles.darkText]}>{t('creditTo')}</Text>
+          <Text style={[styles.creditText, isDarkMode && styles.darkText, { marginTop: 4 }]}>{t('freeApp')}</Text>
         </View>
       </ScrollView>
 
@@ -211,25 +350,125 @@ export default function SettingScreen() {
         onRequestClose={toggleLanguageModal}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, isDarkMode && styles.darkModalContent]}>
+          <View style={[styles.modalContent, isDarkMode && styles.darkModalContent, { paddingVertical: 20 }]}>
             <Text style={[styles.modalTitle, isDarkMode && styles.darkText]}>{t('chooseLang')}</Text>
-            
-            {languages.map(language => (
-              <TouchableOpacity 
-                key={language} 
-                style={[styles.languageOption, isDarkMode && styles.darkLanguageOption]}
-                onPress={() => selectLanguage(language)}
-              >
-                <Text style={[styles.languageText, isDarkMode && styles.darkText]}>{language}</Text>
-                {currentLanguage === language && (
-                  <Check size={20} color="#4872F4" />
-                )}
-              </TouchableOpacity>
-            ))}
-            
-            <TouchableOpacity 
-              style={styles.closeButton}
+
+            {languages.map(language => {
+              const isSelected = currentLanguage === language;
+              return (
+                <TouchableOpacity
+                  key={language}
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    paddingVertical: 14,
+                    paddingHorizontal: 20,
+                    marginVertical: 4,
+                    backgroundColor: isSelected ? (isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)') : 'transparent',
+                    width: '100%',
+                    borderRadius: 12,
+                    borderWidth: 1,
+                    borderColor: isSelected ? (isDarkMode ? '#555' : '#e0e0e0') : 'transparent',
+                  }}
+                  onPress={() => selectLanguage(language)}
+                >
+                  <Text style={[styles.languageText, isDarkMode && styles.darkText, { fontWeight: isSelected ? 'bold' : 'normal' }]}>{language}</Text>
+                  {isSelected && <Check size={20} color={isDarkMode ? "#fff" : "#000"} />}
+                </TouchableOpacity>
+              )
+            })}
+
+            <TouchableOpacity
+              style={[
+                styles.closeButton,
+                {
+                  position: 'relative',
+                  bottom: 0,
+                  marginTop: 20,
+                  backgroundColor: isDarkMode ? '#444' : currentColorTheme.primary
+                }
+              ]}
               onPress={toggleLanguageModal}
+            >
+              <Text style={styles.closeButtonText}>{t('close')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={showColorThemeModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={toggleColorThemeModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, isDarkMode && styles.darkModalContent, { paddingVertical: 20 }]}>
+            <Text style={[styles.modalTitle, isDarkMode && styles.darkText]}>{t('chooseColorTheme')}</Text>
+
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', paddingTop: 15, paddingBottom: 5 }}>
+              {colorThemes.map((theme, index) => {
+                const isSelected = colorThemeId === theme.id;
+                return (
+                  <TouchableOpacity
+                    key={theme.id}
+                    style={{
+                      alignItems: 'center',
+                      justifyContent: 'flex-start',
+                      marginHorizontal: 10,
+                      marginBottom: 20,
+                      width: 70,
+                    }}
+                    onPress={() => selectColorTheme(theme.id)}
+                  >
+                    <View style={{
+                      width: 56,
+                      height: 56,
+                      borderRadius: 28,
+                      backgroundColor: theme.id === 'white' ? theme.background : theme.primary,
+                      borderWidth: isSelected ? 3 : 1,
+                      borderColor: isSelected ? (isDarkMode ? '#ffffff' : '#1a1a1a') : (isDarkMode ? '#444444' : '#e0e0e0'),
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginBottom: 8,
+                      shadowColor: theme.id === 'white' && !isDarkMode ? '#000000' : theme.primary,
+                      shadowOffset: { width: 0, height: isSelected ? 4 : 2 },
+                      shadowOpacity: isSelected ? 0.4 : 0.1,
+                      shadowRadius: isSelected ? 6 : 3,
+                      elevation: isSelected ? 6 : 2,
+                    }}>
+                      {isSelected && <Check size={26} color={theme.id === 'white' ? (isDarkMode ? '#000000' : '#1A1A1A') : '#ffffff'} />}
+                    </View>
+                    <Text style={[
+                      styles.languageText,
+                      {
+                        fontSize: 12,
+                        fontWeight: isSelected ? 'bold' : '600',
+                        color: isDarkMode ? (isSelected ? '#ffffff' : '#999999') : (isSelected ? '#000000' : '#666666'),
+                        textAlign: 'center'
+                      }
+                    ]}
+                      numberOfLines={1}
+                    >
+                      {getColorThemeName(theme.id)}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            <TouchableOpacity
+              style={[
+                styles.closeButton,
+                {
+                  position: 'relative',
+                  bottom: 0,
+                  marginTop: 20,
+                  backgroundColor: currentColorTheme.primary === '#ffffff' ? '#B8B8B8' : currentColorTheme.primary
+                }
+              ]}
+              onPress={toggleColorThemeModal}
             >
               <Text style={styles.closeButtonText}>{t('close')}</Text>
             </TouchableOpacity>
@@ -246,51 +485,21 @@ export default function SettingScreen() {
         <View style={styles.modalOverlay}>
           <View style={[styles.privacyModalContent, isDarkMode && styles.darkModalContent]}>
             <Text style={[styles.modalTitle, isDarkMode && styles.darkText]}>{t('privacyPolicy')}</Text>
-            
+
             <ScrollView style={styles.privacyScrollView}>
               <Text style={[styles.privacyHeader, isDarkMode && styles.darkText]}>
                 {t('privacyHeader')}
               </Text>
-              
-              <Text style={[styles.privacySubHeader, isDarkMode && styles.darkText]}>{t('noDataCollection')}</Text>
               <Text style={[styles.privacyText, isDarkMode && styles.darkText]}>
-                {t('noDataCollectionDesc')}
-              </Text>
-              <Text style={[styles.privacyBullet, isDarkMode && styles.darkText]}>{t('noDataCollectionBullet1')}</Text>
-              <Text style={[styles.privacyBullet, isDarkMode && styles.darkText]}>{t('noDataCollectionBullet2')}</Text>
-              <Text style={[styles.privacyBullet, isDarkMode && styles.darkText]}>{t('noDataCollectionBullet3')}</Text>
-              <Text style={[styles.privacyBullet, isDarkMode && styles.darkText]}>{t('noDataCollectionBullet4')}</Text>
-              
-              <Text style={[styles.privacySubHeader, isDarkMode && styles.darkText]}>{t('noDeviceAccess')}</Text>
-              <Text style={[styles.privacyText, isDarkMode && styles.darkText]}>
-                {t('noDeviceAccessDesc')}
-              </Text>
-              <Text style={[styles.privacyBullet, isDarkMode && styles.darkText]}>{t('noDeviceAccessBullet1')}</Text>
-              <Text style={[styles.privacyBullet, isDarkMode && styles.darkText]}>{t('noDeviceAccessBullet2')}</Text>
-              
-              <Text style={[styles.privacySubHeader, isDarkMode && styles.darkText]}>{t('noCookies')}</Text>
-              <Text style={[styles.privacyText, isDarkMode && styles.darkText]}>
-                {t('noCookiesDesc')}
-              </Text>
-              
-              <Text style={[styles.privacySubHeader, isDarkMode && styles.darkText]}>{t('noDataSharing')}</Text>
-              <Text style={[styles.privacyText, isDarkMode && styles.darkText]}>
-                {t('noDataSharingDesc')}
-              </Text>
-              
-              <Text style={[styles.privacySubHeader, isDarkMode && styles.darkText]}>{t('security')}</Text>
-              <Text style={[styles.privacyText, isDarkMode && styles.darkText]}>
-                {t('securityDesc')}
-              </Text>
-              
-              <Text style={[styles.privacySubHeader, isDarkMode && styles.darkText]}>{t('changes')}</Text>
-              <Text style={[styles.privacyText, isDarkMode && styles.darkText]}>
-                {t('changesDesc')}
+                {t('privacyCoreStatement')}
               </Text>
             </ScrollView>
-            
-            <TouchableOpacity 
-              style={styles.closeButton}
+
+            <TouchableOpacity
+              style={[
+                styles.closeButton,
+                { backgroundColor: currentColorTheme.primary === '#ffffff' ? '#B8B8B8' : currentColorTheme.primary }
+              ]}
               onPress={togglePrivacyModal}
             >
               <Text style={styles.closeButtonText}>{t('close')}</Text>
@@ -298,6 +507,170 @@ export default function SettingScreen() {
           </View>
         </View>
       </Modal>
+
+      <Modal
+        visible={showAboutModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={toggleAboutModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.aboutModalContent, isDarkMode && styles.darkModalContent]}>
+            <Text style={[styles.modalTitle, isDarkMode && styles.darkText]}>{t('appIntro')}</Text>
+
+            <ScrollView style={styles.aboutScrollView}>
+              <Text style={[styles.aboutText, isDarkMode && styles.darkText, { marginBottom: 15 }]}>
+                {t('appIntroText')}
+              </Text>
+
+              <Text style={[styles.aboutHeader, isDarkMode && styles.darkText]}>
+                {t('appFeatures')}
+              </Text>
+              <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appFeature1')}</Text>
+              <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appFeature2')}</Text>
+              <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appFeature3')}</Text>
+              <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appFeature4')}</Text>
+              <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appFeature5')}</Text>
+
+              <Text style={[styles.aboutHeader, isDarkMode && styles.darkText]}>
+                {t('appStructure')}
+              </Text>
+              <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appStructure1')}</Text>
+              <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appStructure2')}</Text>
+              <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appStructure3')}</Text>
+              <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appStructure4')}</Text>
+
+              <Text style={[styles.aboutHeader, isDarkMode && styles.darkText]}>
+                {t('appContact')}
+              </Text>
+              <Text style={[styles.aboutText, isDarkMode && styles.darkText]}>
+                {t('appContactText')}
+              </Text>
+            </ScrollView>
+
+            <TouchableOpacity
+              style={[
+                styles.closeButton,
+                { backgroundColor: currentColorTheme.primary === '#ffffff' ? '#B8B8B8' : currentColorTheme.primary }
+              ]}
+              onPress={toggleAboutModal}
+            >
+              <Text style={styles.closeButtonText}>{t('close')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={showHelpModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={toggleHelpModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.helpModalContent, isDarkMode && styles.darkModalContent]}>
+            <Text style={[styles.modalTitle, isDarkMode && styles.darkText]}>{t('helpCenterTitle')}</Text>
+
+            <ScrollView style={styles.helpScrollView}>
+              <Text style={[styles.helpHeader, isDarkMode && styles.darkText]}>
+                {t('helpCenterIntro')}
+              </Text>
+
+              <Text style={[styles.helpQuestion, isDarkMode && styles.darkText, { fontWeight: 'bold', marginTop: 0 }]}>{t('howToUse')}</Text>
+
+              <Text style={[styles.helpQuestion, isDarkMode && styles.darkText]}>{t('helpQuestion1')}</Text>
+              <Text style={[styles.helpAnswer, isDarkMode && styles.darkText]}>{t('helpAnswer1')}</Text>
+
+              <Text style={[styles.helpQuestion, isDarkMode && styles.darkText]}>{t('helpQuestion2')}</Text>
+              <Text style={[styles.helpAnswer, isDarkMode && styles.darkText]}>{t('helpAnswer2')}</Text>
+
+              <Text style={[styles.helpQuestion, isDarkMode && styles.darkText]}>{t('helpQuestion3')}</Text>
+              <Text style={[styles.helpAnswer, isDarkMode && styles.darkText]}>{t('helpAnswer3')}</Text>
+
+              <Text style={[styles.helpQuestion, isDarkMode && styles.darkText]}>{t('helpQuestion4')}</Text>
+              <Text style={[styles.helpAnswer, isDarkMode && styles.darkText]}>{t('helpAnswer4')}</Text>
+            </ScrollView>
+
+            <TouchableOpacity
+              style={[
+                styles.closeButton,
+                { backgroundColor: currentColorTheme.primary === '#ffffff' ? '#B8B8B8' : currentColorTheme.primary }
+              ]}
+              onPress={toggleHelpModal}
+            >
+              <Text style={styles.closeButtonText}>{t('close')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+
+      <Modal
+        visible={showContributorsModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={toggleContributorsModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.aboutModalContent, isDarkMode && styles.darkModalContent]}>
+            <Text style={[styles.modalTitle, isDarkMode && styles.darkText]}>{t('contributorsList')}</Text>
+
+            <ScrollView style={styles.aboutScrollView}>
+              <Text style={[styles.aboutText, isDarkMode && styles.darkText, { marginBottom: 15 }]}>
+                {t('contributorsIntro')}
+              </Text>
+
+              <View style={{
+                backgroundColor: isDarkMode ? '#1c1c1e' : '#f2f2f7',
+                borderRadius: 16,
+                overflow: 'hidden',
+                borderWidth: 1,
+                borderColor: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+              }}>
+                {contributorsData.map((contributor, index) => (
+                  <View key={index} style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    paddingVertical: 14,
+                    paddingHorizontal: 16,
+                    borderBottomWidth: index === contributorsData.length - 1 ? 0 : 1,
+                    borderBottomColor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)',
+                  }}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={[{ color: isDarkMode ? '#fff' : '#000', fontWeight: '600', fontSize: 16, marginBottom: 2 }]}>
+                        {contributor.name}
+                      </Text>
+                      {contributor.description && (
+                        <Text style={[{ color: isDarkMode ? '#999' : '#888', fontSize: 13, lineHeight: 18 }]}>
+                          {contributor.description}
+                        </Text>
+                      )}
+                    </View>
+                    <View style={{
+                      backgroundColor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
+                      padding: 6,
+                      borderRadius: 10
+                    }}>
+                      <Heart size={16} color={currentColorTheme.primary === '#ffffff' ? (isDarkMode ? '#ffffff' : '#4872F4') : currentColorTheme.primary} />
+                    </View>
+                  </View>
+                ))}
+              </View>
+            </ScrollView>
+
+            <TouchableOpacity
+              style={[
+                styles.closeButton,
+                { backgroundColor: currentColorTheme.primary === '#ffffff' ? '#B8B8B8' : currentColorTheme.primary }
+              ]}
+              onPress={toggleContributorsModal}
+            >
+              <Text style={styles.closeButtonText}>{t('close')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
     </SafeAreaView>
   );
 }
@@ -313,18 +686,21 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 16,
     paddingTop: 16,
-    paddingBottom: 8,
-    marginBottom: 0,
+    paddingBottom: 12,
+    marginBottom: 4,
     backgroundColor: '#fff',
+    minHeight: 70,
+    justifyContent: 'center',
   },
   darkHeader: {
     backgroundColor: '#1a1a1a',
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontFamily: 'Inter-Bold',
     color: '#000',
     marginBottom: 0,
+    flexShrink: 1,
   },
   darkText: {
     color: '#fff',
@@ -333,37 +709,43 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   section: {
-    marginVertical: 12,
+    marginVertical: 10,
     backgroundColor: 'white',
-    borderRadius: 12,
-    overflow: 'hidden',
+    borderRadius: 20,
     marginHorizontal: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.06)',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 3,
   },
   darkSection: {
-    backgroundColor: '#2a2a2a',
+    backgroundColor: '#1C1C1E',
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#666',
-    padding: 16,
-    paddingBottom: 8,
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#8E8E93',
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 10,
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
+    paddingVertical: 18,
+    paddingHorizontal: 20,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    borderTopColor: 'rgba(0,0,0,0.04)',
   },
   darkRow: {
-    borderTopColor: '#3a3a3a',
+    borderTopColor: 'rgba(255,255,255,0.04)',
   },
   rowContent: {
     flexDirection: 'row',
@@ -371,8 +753,9 @@ const styles = StyleSheet.create({
   },
   rowText: {
     fontSize: 16,
-    marginLeft: 12,
+    marginLeft: 16,
     color: '#333',
+    fontWeight: '500',
   },
   rowRight: {
     flexDirection: 'row',
@@ -390,15 +773,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    width: '80%',
+    width: '85%',
     backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
+    borderRadius: 20,
+    padding: 24,
+    alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowRadius: 15,
+    elevation: 8,
   },
   darkModalContent: {
     backgroundColor: '#2a2a2a',
@@ -408,72 +792,214 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
-  },
-  languageOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  darkLanguageOption: {
-    borderBottomColor: '#3a3a3a',
+    color: '#000',
   },
   languageText: {
     fontSize: 16,
+    color: '#333',
   },
   closeButton: {
-    marginTop: 20,
+    marginTop: 25,
+    width: 160,
+    alignSelf: 'center',
     backgroundColor: '#4872F4',
-    padding: 12,
-    borderRadius: 8,
+    paddingVertical: 14,
+    borderRadius: 14,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 4,
   },
   closeButtonText: {
-    color: 'white',
+    color: '#fff',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  colorPreview: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  colorPreviewLarge: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
   privacyModalContent: {
-    width: '90%',
-    maxHeight: '80%',
+    width: '85%',
+    maxHeight: '60%',
     backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
+    borderRadius: 20,
+    padding: 24,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowRadius: 15,
+    elevation: 8,
   },
   privacyScrollView: {
-    maxHeight: 450,
-    marginBottom: 20,
+    marginBottom: 10,
   },
   privacyHeader: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 12,
-  },
-  privacySubHeader: {
     fontSize: 15,
     fontWeight: 'bold',
-    marginTop: 16,
     marginBottom: 8,
+    color: '#000',
   },
   privacyText: {
     fontSize: 14,
     color: '#333',
-    marginBottom: 8,
-    lineHeight: 20,
-  },
-  privacyBullet: {
-    fontSize: 14,
-    color: '#333',
-    marginLeft: 15,
     marginBottom: 5,
     lineHeight: 20,
   },
+  aboutModalContent: {
+    width: '85%',
+    maxHeight: '75%',
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.25,
+    shadowRadius: 15,
+    elevation: 8,
+  },
+  aboutScrollView: {
+    marginBottom: 10,
+  },
+  aboutHeader: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    marginTop: 12,
+    marginBottom: 6,
+    color: '#000',
+  },
+  aboutText: {
+    fontSize: 14,
+    color: '#333',
+    lineHeight: 20,
+    marginBottom: 8,
+  },
+  aboutBullet: {
+    fontSize: 14,
+    color: '#333',
+    lineHeight: 20,
+    marginBottom: 4,
+  },
+  helpModalContent: {
+    width: '90%',
+    maxHeight: '85%',
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.25,
+    shadowRadius: 15,
+    elevation: 8,
+  },
+  helpScrollView: {
+    maxHeight: '80%',
+    marginBottom: 10,
+    paddingRight: 5,
+  },
+  helpHeader: {
+    fontSize: 15,
+    marginBottom: 10,
+    color: '#333',
+    lineHeight: 21,
+  },
+  helpQuestion: {
+    fontSize: 14,
+    fontWeight: '500',
+    marginTop: 8,
+    marginBottom: 2,
+    color: '#333',
+  },
+  helpAnswer: {
+    fontSize: 14,
+    color: '#333',
+    marginBottom: 6,
+    lineHeight: 19,
+  },
+  versionContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    marginTop: 15,
+    paddingBottom: 2,
+  },
+  versionText: {
+    fontSize: 14,
+    color: '#888',
+    textAlign: 'center',
+  },
+  creditContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 5,
+    paddingBottom: 30,
+  },
+  creditText: {
+    fontSize: 12,
+    color: '#999',
+    textAlign: 'center',
+    fontStyle: 'italic',
+  },
+  darkModeToggleContainer: {
+    width: '100%',
+    marginBottom: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    borderRadius: 8,
+  },
+  darkModeToggleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  darkModeToggleText: {
+    fontSize: 16,
+    fontWeight: '500',
+    marginLeft: 12,
+    flex: 1,
+    color: '#333',
+  },
+  darkModeSwitch: {
+    marginLeft: 'auto',
+  },
+  modalSeparator: {
+    height: 1,
+    width: '100%',
+    marginVertical: 16,
+  },
+  colorOptionsTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 12,
+    textAlign: 'center',
+    color: '#333',
+  },
+  donationButton: {
+    flex: 1,
+    backgroundColor: '#9ddc9f',
+    paddingVertical: 15,
+    borderRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  donationButtonText: {
+    color: '#1a1a1a', // Dark text for contrast against light green
+    fontWeight: 'bold',
+    fontSize: 14,
+  }
 }); 

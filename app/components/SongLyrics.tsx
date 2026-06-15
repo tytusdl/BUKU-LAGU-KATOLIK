@@ -17,7 +17,7 @@ const SongLyrics: React.FC<SongLyricsProps> = ({ song }) => {
       const line = lines[i];
       
       // Kesan permulaan korus
-      if (line.match(/^(\*\*)??(Chorus|Cho|Kor|Ref|Korus|Choros):\s??(\*\*)?/)) {
+      if (line.match(/^(\*\*)??(Chorus|Cho|Kor|Ref|Refain|Korus|Choros|Ant|Dend):\s??(\*\*)?/)) {
         inChorus = true;
         formattedLines.push(
           <div key={i} style={{ fontWeight: 'bold' }}>

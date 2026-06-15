@@ -1,33 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity, Image, BackHandler, Platform, Alert } from 'react-native';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { View, Text, StyleSheet, ScrollView, TextInput, FlatList, TouchableOpacity, Image, BackHandler, Platform, Alert, Modal, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Bell, Search, Settings, Heart, CheckCircle, ArrowLeft } from 'lucide-react-native';
-import { useFonts, Inter_400Regular, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
-import { router, useFocusEffect } from 'expo-router';
+import { Bell, Search, Heart, CheckCircle, ArrowLeft } from 'lucide-react-native';
+import { router, useFocusEffect, useNavigation } from 'expo-router';
 import { songs as allSongs } from '../data/songs';
 import { useTheme } from '../context/ThemeContext';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Updates from 'expo-updates';
+import { useFonts, Inter_400Regular, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
+import { translations } from '../../src/translations'; // Updated import path
+import { useFavorites } from '../context/FavoritesContext';
+import { useLanguage } from '../context/LanguageContext';
 
-// Objek terjemahan
-const translations = {
-  'Melayu': {
-    searchPlaceholder: 'Cari lagu mengikut tajuk atau nombor',
-    searchResults: 'Hasil Carian',
-    noSongsFound: 'Tiada lagu dijumpai'
-  },
-  'English': {
-    searchPlaceholder: 'Search songs by title or number',
-    searchResults: 'Search Results',
-    noSongsFound: 'No songs found'
-  }
-};
+import ChangelogModal from '../components/ChangelogModal'; // Import ChangelogModal
+import packages from '../../package.json'; // Import package.json to get version
 
 // Tambah pengisytiharan jenis untuk kategori lagu
 interface SongCategory {
   id: string;
-  title: string;
+  titleKey: string;
   songNumber: string;
+  songNumberKey?: keyof typeof translations['Melayu'];
   image: any;
   verified: boolean;
 }
@@ -42,124 +36,132 @@ interface Song {
 
 const songCategories: SongCategory[] = [
   {
+    id: 'lagusaya',
+    titleKey: 'mySongsCategoryTitle',
+    songNumber: '',
+    songNumberKey: 'mySongsCategoryNumber',
+    image: require('../../assets/images/categories-webp/category_s.webp'),
+    verified: true
+  },
+  {
     id: 'a',
-    title: 'HOZOU KOSUANGAN',
+    titleKey: 'HOZOU KOSUANGAN',
     songNumber: 'A1-A32',
-    image: require('../../assets/images/categories/category_a.png'),  
+    image: require('../../assets/images/categories-webp/category_a.webp'),
     verified: true
   },
   {
     id: 'b',
-    title: 'HOZOU DI KOSIMABAAN',
+    titleKey: 'HOZOU DI KOSIMABAAN',
     songNumber: 'B1-B23',
-    image: require('../../assets/images/categories/category_b.png'),
+    image: require('../../assets/images/categories-webp/category_b.webp'),
     verified: true
   },
   {
     id: 'c',
-    title: 'HOZOU DO KAPATAKAN',
+    titleKey: 'HOZOU DO KAPATAKAN',
     songNumber: 'C1-C24',
-    image: require('../../assets/images/categories/category_c.png'),
+    image: require('../../assets/images/categories-webp/category_c.webp'),
     verified: true
   },
   {
     id: 'd',
-    title: 'HOZOU DO KOSOMBUTAN / KOPONONGKOTOHUADAN',
+    titleKey: 'HOZOU DO KOSOMBUTAN / KOPONONGKOTOHUADAN',
     songNumber: 'D1-D46',
-    image: require('../../assets/images/categories/category_d.png'),
+    image: require('../../assets/images/categories-webp/category_d.webp'),
     verified: true
   },
   {
     id: 'e',
-    title: 'HOZOU DO KOOVIAN / KOPONONGKOTOHUADANAN',
+    titleKey: 'HOZOU DO KOOVIAN / KOPONONGKOTOHUADANAN',
     songNumber: 'E1-E18',
-    image: require('../../assets/images/categories/category_e.png'),
+    image: require('../../assets/images/categories-webp/category_e.webp'),
     verified: true
   },
   {
     id: 'f',
-    title: 'HOZOU ID KAPANTANGAN DI SANGTI MARIA',
+    titleKey: 'HOZOU ID KAPANTANGAN DI SANGTI MARIA',
     songNumber: 'F1-F11',
-    image: require('../../assets/images/categories/category_f.png'),
+    image: require('../../assets/images/categories-webp/category_f.webp'),
     verified: true
   },
   {
     id: 'g',
-    title: 'HOZOU ID KAPANTANGAN DI SPIRITU SANGTI',
+    titleKey: 'HOZOU ID KAPANTANGAN DI SPIRITU SANGTI',
     songNumber: 'G1-G9',
-    image: require('../../assets/images/categories/category_g.png'),
+    image: require('../../assets/images/categories-webp/category_g.webp'),
     verified: true
   },
   {
     id: 'h',
-    title: 'HOZOU ONTOK KAPAGANDADAN',
+    titleKey: 'HOZOU ONTOK KAPAGANDADAN',
     songNumber: 'H1-H4',
-    image: require('../../assets/images/categories/category_h.png'),
+    image: require('../../assets/images/categories-webp/category_h.webp'),
     verified: true
   },
   {
     id: 'i',
-    title: 'HOZOU DO KRISMAS',
+    titleKey: 'HOZOU DO KRISMAS',
     songNumber: 'I1-I14',
-    image: require('../../assets/images/categories/category_i.png'),
+    image: require('../../assets/images/categories-webp/category_i.webp'),
     verified: true
   },
   {
     id: 'j',
-    title: 'HOZOU DO KOPONOGITAN',
+    titleKey: 'HOZOU DO KOPONOGITAN',
     songNumber: 'J1-J17',
-    image: require('../../assets/images/categories/category_j.png'),
+    image: require('../../assets/images/categories-webp/category_j.webp'),
     verified: true
   },
   {
     id: 'k',
-    title: 'HOZOU DO PASKA',
+    titleKey: 'HOZOU DO PASKA',
     songNumber: 'K1-K8',
-    image: require('../../assets/images/categories/category_k.png'),
+    image: require('../../assets/images/categories-webp/category_k.webp'),
     verified: true
   },
   {
     id: 'l',
-    title: 'HOZOU DO KAAMATAN',
+    titleKey: 'HOZOU DO KAAMATAN',
     songNumber: 'L1-L4',
-    image: require('../../assets/images/categories/category_l.png'),
+    image: require('../../assets/images/categories-webp/category_l.webp'),
     verified: true
   },
   {
     id: 'm',
-    title: 'HOZOU NGAAVI DO SUUSUVAI',
+    titleKey: 'HOZOU NGAAVI DO SUUSUVAI',
     songNumber: 'M1-M33',
-    image: require('../../assets/images/categories/category_m.png'),
+    image: require('../../assets/images/categories-webp/category_m.webp'),
     verified: true
   },
   {
     id: 'n',
-    title: 'HOZOU DO PISASAVAAN',
+    titleKey: 'HOZOU DO PISASAVAAN',
     songNumber: 'N1-N4',
-    image: require('../../assets/images/categories/category_n.png'),
+    image: require('../../assets/images/categories-webp/category_n.webp'),
     verified: true
   },
   {
     id: 'o',
-    title: 'YOHOU DO ASCENSIO',
+    titleKey: 'YOHOU DO ASCENSIO',
     songNumber: 'O1',
-    image: require('../../assets/images/categories/category_o.png'),
+    image: require('../../assets/images/categories-webp/category_o.webp'),
     verified: true
   },
   {
     id: 'p',
-    title: 'DOID SANTA TRINITAS',
+    titleKey: 'DOID SANTA TRINITAS',
     songNumber: 'P1-P4',
-    image: require('../../assets/images/categories/category_p.png'),
+    image: require('../../assets/images/categories-webp/category_p.webp'),
     verified: true
   },
   {
     id: 'r',
-    title: 'LAGU R',
+    titleKey: 'LAGU R',
     songNumber: 'R001-R471',
-    image: require('../../assets/images/categories/category_r.png'),
+    image: require('../../assets/images/categories-webp/category_r.webp'),
     verified: true
-  }
+  },
 ];
 
 // Define the orderList to include all song numbers
@@ -176,7 +178,7 @@ const orderList = [
   'J1', 'J2', 'J3', 'J4', 'J5', 'J6', 'J7', 'J8', 'J9', 'J10', 'J11', 'J12', 'J13', 'J14', 'J15', 'J16', 'J17',
   'K1', 'K2', 'K3', 'K4', 'K5', 'K6', 'K7', 'K8',
   'L1', 'L2', 'L3', 'L4',
-  'M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8', 'M9', 'M10', 'M11', 'M12', 'M13', 'M14', 'M15', 'M16', 'M17', 'M18', 'M19', 'M20', 'M21', 'M22', 'M23', 'M24', 'M25', 'M26', 'M27', 'M28', 'M29', 'M30', 'M31', 'M32', 'M33',
+  'M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8', 'M9', 'M10', 'M11', 'M12', 'M13', 'M14', 'M15', 'M16', 'M17', 'M18', 'M19', 'M20', 'M21', 'M22', 'M22(a)', 'M22(b)', 'M23', 'M24', 'M25', 'M26', 'M27', 'M28', 'M29', 'M30', 'M31', 'M32', 'M33',
   'N1', 'N2', 'N3', 'N4',
   'O1',
   'P1', 'P2', 'P3', 'P4',
@@ -230,154 +232,279 @@ const orderList = [
   'R471'
 ];
 
+// Tambah fungsi untuk menutup aplikasi
+const exitApp = () => {
+  if (Platform.OS === 'android') {
+    BackHandler.exitApp();
+  } else {
+    // Untuk iOS, kita perlu menggunakan Updates.reloadAsync() untuk menutup aplikasi
+    Updates.reloadAsync();
+  }
+};
+
 export default function HomeScreen() {
-  const { isDarkMode } = useTheme();
+  // HOOKS SECTION - Semua hooks mesti di bahagian atas
+  const { isDarkMode, currentColorTheme } = useTheme();
   const [fontsLoaded] = useFonts({
     'Inter-Regular': Inter_400Regular,
     'Inter-SemiBold': Inter_600SemiBold,
     'Inter-Bold': Inter_700Bold,
   });
-  
-  // Tambah state untuk carian
+
+  // Semua state hooks disusun berturutan
+  const { currentLanguage, t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
-  const [currentLanguage, setCurrentLanguage] = useState('Melayu');
-  
-  // Fungsi untuk mendapatkan terjemahan berdasarkan bahasa semasa
-  const t = (key: keyof typeof translations['Melayu']) => {
-    return translations[currentLanguage as keyof typeof translations][key];
-  };
-  
-  // Ambil bahasa dari AsyncStorage ketika komponen dimuat pertama kali
-  useEffect(() => {
-    const getLanguage = async () => {
-      try {
-        const storedLanguage = await AsyncStorage.getItem('app-language');
-        if (storedLanguage) {
-          setCurrentLanguage(storedLanguage);
-        }
-      } catch (error) {
-        console.error('Error getting language:', error);
-      }
-    };
-    
-    getLanguage();
-  }, []);
-  
-  // Periksa bahasa semasa ketika skrin fokus dan kendalikan tombol back
+  const [filteredSongs, setFilteredSongs] = useState<Song[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isFocused, setIsFocused] = useState(true);
+  const [showExitModal, setShowExitModal] = useState(false);
+  const flatListRef = useRef<FlatList<SongCategory>>(null);
+  const scrollPositionRef = useRef(0);
+  const navigation = useNavigation();
+  const navigatedWithinTabRef = useRef(false);
+
+  const justFocusedRef = useRef(true);
+
+  // State for Changelog Modal
+  const [showChangelogModal, setShowChangelogModal] = useState(false);
+  const APP_VERSION = packages.version; // Get version from package.json
+
+  // Use focus effect untuk pengendalian tombol kembali dan pengurusan fokus
   useFocusEffect(
     React.useCallback(() => {
-      // Periksa bahasa semasa
-      const checkLanguage = async () => {
+      // Tandakan skrin sebagai fokus dan baru difokuskan
+      setIsFocused(true);
+      justFocusedRef.current = true;
+
+      // Tetapkan timeout untuk menukar justFocusedRef kepada false selepas kelewatan
+      const focusTimeout = setTimeout(() => {
+        justFocusedRef.current = false;
+      }, 300); // Tingkatkan kelewatan kepada 300ms
+
+      // Check for App Update (Changelog)
+      const checkChangelog = async () => {
         try {
-          const storedLanguage = await AsyncStorage.getItem('app-language');
-          if (storedLanguage && storedLanguage !== currentLanguage) {
-            setCurrentLanguage(storedLanguage);
+          const lastSeenVersion = await AsyncStorage.getItem('last_seen_version');
+          if (lastSeenVersion !== APP_VERSION) {
+            // Version changed or first time run
+            // Wait a bit to ensure fonts loaded and UI ready
+            setTimeout(() => {
+              setShowChangelogModal(true);
+            }, 1000);
           }
         } catch (error) {
-          console.error('Error checking language:', error);
+          console.error('[Changelog] Error checking version:', error);
         }
       };
-      
-      checkLanguage();
-      
-      // Tambah penangan back button hanya ketika skrin ini fokus (halaman utama)
+
+      // Only check changelog if just focused and not navigating back from tab
+      if (justFocusedRef.current && !navigatedWithinTabRef.current) {
+        checkChangelog();
+      }
+
+      // Tambah penangan back button
       const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+        // Jangan tunjukkan modal jika skrin baru sahaja mendapat fokus
+        if (justFocusedRef.current) {
+          return true; // Tangani tekanan kembali tetapi jangan buat apa-apa
+        }
+
         if (searchQuery.trim() !== '') {
           setSearchQuery('');
           return true; // Cegah keluar dari aplikasi jika ada pencarian aktif
         }
-        
-        // Tetapkan dialog konfirmasi keluar hanya pada halaman utama
-        Alert.alert(
-          currentLanguage === 'Melayu' ? 'Keluar Aplikasi' : 'Exit Application',
-          currentLanguage === 'Melayu' ? 'Adakah anda pasti mahu keluar dari aplikasi?' : 'Are you sure you want to exit the application?',
-          [
-            {
-              text: currentLanguage === 'Melayu' ? 'Batal' : 'Cancel',
-              onPress: () => null,
-              style: 'cancel',
-            },
-            {
-              text: currentLanguage === 'Melayu' ? 'Keluar' : 'Exit',
-              onPress: () => BackHandler.exitApp(),
-            },
-          ],
-          { cancelable: false }
-        );
+
+        // Tunjukkan modal konfirmasi keluar
+        setShowExitModal(true);
         return true; // Cegah keluar dari aplikasi sehingga pengguna mengesahkan
       });
 
       // Cleanup ketika skrin tidak lagi difokuskan
       return () => {
+        setIsFocused(false); // Tandakan skrin tidak fokus
         backHandler.remove();
+        clearTimeout(focusTimeout); // Bersihkan timeout
       };
-    }, [currentLanguage, searchQuery])
+    }, [currentLanguage, searchQuery, setShowExitModal, APP_VERSION]) // Kebergantungan kekal sama
   );
-  
-  // Fungsi untuk mencari lagu berdasarkan kata kunci
-  const searchResults = searchQuery.trim() !== '' 
-    ? allSongs.filter(song => {
-        const query = searchQuery.toLowerCase().trim();
-        return (
-          song.title.toLowerCase().includes(query) || 
-          song.id.toLowerCase().includes(query) || 
-          (song.lyrics && song.lyrics.toLowerCase().includes(query))
-        );
-      })
-    : [];
-  
-  // Tentukan sama ada untuk menunjukkan hasil carian atau kategori
+
+  // useFocusEffect untuk menguruskan scroll semasa fokus
+  useFocusEffect(
+    useCallback(() => {
+
+
+      if (navigatedWithinTabRef.current) {
+        // Kembali dari skrin dalam tab yang sama (Kategori/Lagu Saya)
+
+        const timerId = setTimeout(() => {
+          if (flatListRef.current && scrollPositionRef.current > 0) {
+
+            try {
+              flatListRef.current.scrollToOffset({
+                offset: scrollPositionRef.current,
+                animated: false,
+              });
+            } catch (error) {
+              console.error('[FocusEffect] Error restoring scroll:', error);
+            }
+          }
+        }, 150);
+        // Reset penanda selepas cuba pulihkan scroll
+        navigatedWithinTabRef.current = false;
+        return () => clearTimeout(timerId);
+
+      } else {
+        // Kembali dari tab lain atau muatan awal
+
+        const timerId = setTimeout(() => {
+          // Scroll ke atas
+          if (flatListRef.current) {
+            try {
+              flatListRef.current.scrollToOffset({ offset: 0, animated: false });
+            } catch (error) {
+              console.error('[FocusEffect] Error scrolling to top:', error);
+            }
+          }
+          // Reset juga ref posisi scroll (jika ada nilai sebelumnya)
+          scrollPositionRef.current = 0;
+        }, 50); // Boleh guna timeout lebih pendek untuk scroll ke atas
+        return () => clearTimeout(timerId);
+      }
+    }, []) // Dependencies kekal kosong
+  );
+
+  // Dapatkan hasil carian
+  const searchResults = useMemo(() => {
+    if (searchQuery.trim() === '') return [];
+
+    return allSongs.filter(song => {
+      const query = searchQuery.toLowerCase().trim();
+      return (
+        song.title.toLowerCase().includes(query) ||
+        song.id.toLowerCase().includes(query) ||
+        (song.lyrics && song.lyrics.toLowerCase().includes(query))
+      );
+    });
+  }, [searchQuery]);
+
+  // Tentukan sama ada untuk menunjukkan hasil carian
   const isSearchActive = searchQuery.trim() !== '';
 
-  if (!fontsLoaded) {
-    return null;
+  // Conditional render untuk loading state
+  if (!fontsLoaded || !isFocused) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: isDarkMode ? '#1a1a1a' : '#fff' }]}>
+        <StatusBar style={isDarkMode ? "light" : "dark"} />
+      </SafeAreaView>
+    );
   }
 
   // Rendering untuk item kategori
   const renderCategoryItem = ({ item, index }: { item: SongCategory; index: number }) => (
-    <TouchableOpacity 
-      key={item.id} 
+    <TouchableOpacity
+      key={item.id}
       style={[
         styles.songCard,
         { marginLeft: index % 2 === 0 ? 0 : '4%' },
         isDarkMode && { backgroundColor: '#2a2a2a' },
-        Platform.OS === 'ios' && { 
+        { backgroundColor: currentColorTheme.surface },
+        {
+          borderWidth: 1,
+          borderColor: currentColorTheme.border
+        },
+        Platform.OS === 'ios' && {
           shadowColor: '#000',
-          shadowOffset: { width: 0, height: 3 },
-          shadowOpacity: 0.3,
-          shadowRadius: 6,
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
         }
       ]}
-      onPress={() => router.push(`/song/category/${item.id}`)}
+      onPress={() => {
+        // Tetapkan penanda SEBELUM navigasi
+        navigatedWithinTabRef.current = true;
+
+        if (item.id === 'lagusaya') {
+          router.push('/my-songs');
+        } else {
+          router.push(`/song/category/${item.id}`);
+        }
+      }}
     >
       <View style={styles.imageContainer}>
         {item.image ? (
-          <Image 
-            source={item.image} 
-            style={styles.songImage} 
-            resizeMode="cover"
-          />
+          <>
+            <Image
+              source={item.image}
+              style={styles.songImage}
+              resizeMode="cover"
+            />
+            <View style={[
+              styles.songNumberLabel,
+              {
+                backgroundColor: isDarkMode ? (currentColorTheme.id === 'white' ? '#333333' : currentColorTheme.primary) : (currentColorTheme.id === 'white' ? 'rgba(242, 242, 242, 0.9)' : currentColorTheme.primary),
+                borderColor: isDarkMode ? (currentColorTheme.id === 'white' ? '#333333' : currentColorTheme.primary) : (currentColorTheme.id === 'white' ? '#e0e0e0' : currentColorTheme.primary),
+                borderWidth: (!isDarkMode && currentColorTheme.id === 'white') ? 1 : 0
+              }
+            ]}>
+              <Text style={[
+                styles.songNumberText,
+                { color: isDarkMode ? '#fff' : (currentColorTheme.id === 'white' ? '#333' : '#000') }
+              ]}>{item.id.toUpperCase()}</Text>
+            </View>
+          </>
         ) : (
           <View style={[
-            styles.songImage, 
-            styles.placeholderImage, 
-            { 
+            styles.songImage,
+            styles.placeholderImage,
+            {
               backgroundColor: isDarkMode ? '#3a3a3a' :
-                        item.id === 'a' ? '#f0f0f0' : 
-                        item.id === 'c' ? '#e8f4f8' : 
-                        item.id === 'd' ? '#f8e8e8' : '#f0f0f0' 
+                item.id === 'a' ? '#f0f0f0' :
+                  item.id === 'c' ? '#e8f4f8' :
+                    item.id === 'd' ? '#f8e8e8' : '#f0f0f0'
             }
           ]}>
+            <View style={[
+              styles.songNumberLabel,
+              {
+                backgroundColor: isDarkMode ? (currentColorTheme.id === 'white' ? '#333333' : currentColorTheme.primary) : (currentColorTheme.id === 'white' ? 'rgba(242, 242, 242, 0.9)' : currentColorTheme.primary),
+                borderColor: isDarkMode ? (currentColorTheme.id === 'white' ? '#333333' : currentColorTheme.primary) : (currentColorTheme.id === 'white' ? '#e0e0e0' : currentColorTheme.primary),
+                borderWidth: (!isDarkMode && currentColorTheme.id === 'white') ? 1 : 0
+              }
+            ]}>
+              <Text style={[
+                styles.songNumberText,
+                { color: isDarkMode ? '#fff' : (currentColorTheme.id === 'white' ? '#333' : '#000') }
+              ]}>{item.id.toUpperCase()}</Text>
+            </View>
           </View>
         )}
       </View>
       <View style={styles.songInfo}>
-        <Text style={[styles.songTitle, isDarkMode && { color: '#fff' }]} numberOfLines={2}>{item.title}</Text>
-        {item.songNumber && (
+        <View style={styles.songTitleContainer}>
+          <Text
+            style={[
+              styles.songTitleText,
+              isDarkMode && styles.darkText
+            ]}
+            numberOfLines={2}
+            ellipsizeMode="tail"
+          >
+            {t(item.titleKey as keyof typeof translations['Melayu'])}
+          </Text>
+        </View>
+        {(item.songNumber || item.songNumberKey) && (
           <View style={styles.artistContainer}>
-            <Text style={[styles.songArtist, isDarkMode && { color: '#aaa' }]}>{item.songNumber}</Text>
+            <Text style={[
+              styles.songArtist,
+              { color: isDarkMode ? currentColorTheme.textSecondary : currentColorTheme.textSecondary, fontWeight: 'bold' }
+            ]}>
+              {item.songNumberKey ? t(item.songNumberKey) : item.songNumber}
+            </Text>
             {item.verified && (
-              <CheckCircle size={14} color="#1DA1F2" style={styles.verifiedIcon} />
+              <CheckCircle size={14} color={isDarkMode ? (currentColorTheme.id === 'white' ? '#0A84FF' : currentColorTheme.primary) : (currentColorTheme.id === 'white' ? '#3498db' : currentColorTheme.accent)} style={styles.verifiedIcon} />
             )}
           </View>
         )}
@@ -387,50 +514,92 @@ export default function HomeScreen() {
 
   // Rendering untuk item lagu dalam hasil carian
   const renderSongResultItem = ({ item }: { item: Song }) => (
-    <TouchableOpacity 
-      style={[styles.songResultItem, isDarkMode && { backgroundColor: '#2a2a2a' }]}
+    <TouchableOpacity
+      style={[
+        styles.songResultItem,
+        isDarkMode && { backgroundColor: '#2a2a2a' },
+        { backgroundColor: currentColorTheme.surface }
+      ]}
       onPress={() => router.push({
         pathname: "/song/[id]",
         params: { id: item.id }
       })}
     >
       <View style={styles.songResultContent}>
-        <Text style={[styles.songResultId, isDarkMode && { color: '#4872F4' }]}>{item.id}</Text>
-        <Text style={[styles.songResultTitle, isDarkMode && { color: '#fff' }]} numberOfLines={1}>{item.title}</Text>
+        <Text style={[
+          styles.songResultId,
+          { color: isDarkMode ? currentColorTheme.primary : currentColorTheme.accent, fontWeight: 'bold' }
+        ]}>{item.id}</Text>
+        <Text style={[
+          styles.songResultTitle,
+          isDarkMode && { color: '#fff' },
+          { color: isDarkMode ? '#fff' : '#333' }
+        ]} numberOfLines={1}>{item.title}</Text>
       </View>
     </TouchableOpacity>
   );
 
+  // Main render
   return (
-    <SafeAreaView style={[styles.container, isDarkMode && { backgroundColor: '#1a1a1a' }]}>
+    <SafeAreaView
+      edges={['top', 'left', 'right']}
+      style={[
+        styles.container,
+        isDarkMode && { backgroundColor: '#1a1a1a' },
+        { backgroundColor: currentColorTheme.background }
+      ]}>
       <StatusBar style={isDarkMode ? "light" : "dark"} />
-      
-      <View style={[styles.header, isDarkMode && { backgroundColor: '#1a1a1a' }]}>
+
+      <View style={[
+        styles.header,
+        isDarkMode && { backgroundColor: '#1a1a1a' },
+        { backgroundColor: currentColorTheme.background }
+      ]}>
         <View style={styles.logoContainer}>
-          <Image 
+          <Image
             source={require('../../assets/images/icon.png')}
             style={styles.logo}
           />
           <View>
-            <Text style={[styles.title, isDarkMode && { color: '#fff' }]}>BUKU LAGU KATOLIK</Text>
-            <Text style={[styles.subtitle, isDarkMode && { color: '#fff' }]}>Pozoo No Kinoingan</Text>
+            <Text style={[
+              styles.title,
+              isDarkMode && { color: '#fff' }
+            ]}>BUKU LAGU KATOLIK</Text>
+            <Text style={[
+              styles.subtitle,
+              isDarkMode && { color: '#fff' }
+            ]}>Pozoo No Kinoingan</Text>
           </View>
         </View>
       </View>
 
       <View style={styles.searchContainer}>
-        <View style={[styles.searchBar, isDarkMode && { backgroundColor: '#2a2a2a' }]}>
+        <View style={[
+          styles.searchBar,
+          isDarkMode && { backgroundColor: '#3a3a3a' },
+          !isDarkMode && {
+            backgroundColor: currentColorTheme.id === 'white' ? '#f2f2f2' : currentColorTheme.surface,
+            borderWidth: currentColorTheme.id === 'white' ? 1 : 0,
+            borderColor: '#e8e8e8'
+          }
+        ]}>
           {isSearchActive ? (
             <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.backButton}>
-              <ArrowLeft size={20} color={isDarkMode ? "#999" : "#666"} />
+              <ArrowLeft size={20} color={currentColorTheme.textSecondary} />
             </TouchableOpacity>
           ) : (
-            <Search size={22} color={isDarkMode ? "#999" : "#666"} />
+            <Search size={22} color={currentColorTheme.textSecondary} />
           )}
           <TextInput
-            style={[styles.searchInput, isDarkMode && { color: '#fff' }]}
+            style={[
+              styles.searchInput,
+              isDarkMode && { color: '#fff' },
+              !isDarkMode && {
+                color: currentColorTheme.primary === '#ffffff' ? '#333' : currentColorTheme.text
+              }
+            ]}
             placeholder={t('searchPlaceholder')}
-            placeholderTextColor={isDarkMode ? "#999" : "#666"}
+            placeholderTextColor={isDarkMode ? '#bbb' : (currentColorTheme.primary === '#ffffff' ? '#666' : currentColorTheme.textSecondary)}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -440,16 +609,16 @@ export default function HomeScreen() {
             </TouchableOpacity>
           )}
         </View>
-        <TouchableOpacity onPress={() => router.push('/(tabs)/setting')}>
-          <Settings size={24} color={isDarkMode ? "#fff" : "#333"} />
-        </TouchableOpacity>
       </View>
-      
+
       {isSearchActive ? (
         <View style={styles.searchResultsContainer}>
-          <Text style={[styles.searchResultsTitle, isDarkMode && { color: '#fff' }]}>
-            {searchResults.length > 0 
-              ? `${t('searchResults')} (${searchResults.length})` 
+          <Text style={[
+            styles.searchResultsTitle,
+            isDarkMode && { color: '#fff' }
+          ]}>
+            {searchResults.length > 0
+              ? `${t('searchResults')} (${searchResults.length})`
               : t('noSongsFound')}
           </Text>
           <FlatList
@@ -461,12 +630,13 @@ export default function HomeScreen() {
         </View>
       ) : (
         <FlatList
+          ref={flatListRef}
           data={songCategories}
           renderItem={renderCategoryItem}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.songsContent}
           numColumns={2}
-          removeClippedSubviews={true}
+          removeClippedSubviews={false}
           initialNumToRender={8}
           maxToRenderPerBatch={10}
           windowSize={5}
@@ -475,8 +645,87 @@ export default function HomeScreen() {
             offset: 180 * Math.floor(index / 2),
             index,
           })}
+          onScroll={(event) => {
+            const currentOffset = event.nativeEvent.contentOffset.y;
+            scrollPositionRef.current = currentOffset;
+          }}
+          scrollEventThrottle={16}
         />
       )}
+
+      {/* Modal Konfirmasi Keluar */}
+      <Modal
+        visible={showExitModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowExitModal(false)}
+        statusBarTranslucent={true}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[
+            styles.exitModalContainer,
+            isDarkMode && { backgroundColor: '#2a2a2a' },
+            { backgroundColor: currentColorTheme.surface }
+          ]}>
+            <View style={styles.exitModalHeader}>
+              <Text style={[
+                styles.exitModalTitle,
+                isDarkMode && { color: '#fff' }
+              ]}>
+                {t('exitAppTitle')}
+              </Text>
+            </View>
+
+            <View style={styles.exitModalBody}>
+              <Text style={[
+                styles.exitModalMessage,
+                isDarkMode && { color: '#ddd' },
+                { color: currentColorTheme.textSecondary }
+              ]}>
+                {t('exitAppMessage')}
+              </Text>
+            </View>
+
+            <View style={styles.exitModalFooter}>
+              <TouchableOpacity
+                style={[styles.exitModalButton, styles.cancelButton]}
+                onPress={() => setShowExitModal(false)}
+              >
+                <Text style={styles.cancelButtonText}>
+                  {t('cancel')}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.exitModalButton, styles.exitButton]}
+                onPress={() => {
+                  setShowExitModal(false);
+                  exitApp();
+                }}
+              >
+                <Text style={styles.exitButtonText}>
+                  {t('exit')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+
+      </Modal>
+
+      {/* Changelog Modal */}
+      <ChangelogModal
+        visible={showChangelogModal}
+        onClose={async () => {
+          setShowChangelogModal(false);
+          try {
+            await AsyncStorage.setItem('last_seen_version', APP_VERSION);
+
+          } catch (e) {
+            console.error('[Changelog] Failed to save version', e);
+          }
+        }}
+      />
     </SafeAreaView>
   );
 }
@@ -526,7 +775,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
     borderRadius: 12,
     paddingHorizontal: 12,
-    marginRight: 12,
     height: 44,
   },
   searchInput: {
@@ -585,17 +833,47 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
   },
+  songNumberLabel: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: 'rgba(238, 238, 238, 0.5)',
+  },
+  songNumberText: {
+    color: '#333',
+    fontSize: 12,
+    fontFamily: 'Inter-SemiBold',
+    textAlign: 'center',
+  },
   placeholderImage: {
     backgroundColor: '#F5F5F5',
   },
   songInfo: {
     padding: 12,
   },
-  songTitle: {
+  songTitleContainer: {
+    marginBottom: 4,
+  },
+  songTitleText: {
     fontSize: 14,
     fontFamily: 'Inter-SemiBold',
     color: '#000',
-    marginBottom: 4,
+  },
+  darkText: {
+    color: '#fff',
   },
   artistContainer: {
     flexDirection: 'row',
@@ -640,7 +918,7 @@ const styles = StyleSheet.create({
   songResultId: {
     fontFamily: 'Inter-SemiBold',
     fontSize: 14,
-    color: '#1DA1F2',
+    color: '#666',
     width: 60,
   },
   songResultTitle: {
@@ -650,7 +928,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   searchInputActive: {
-    borderColor: '#1DA1F2',
+    borderColor: '#666',
     borderWidth: 1,
   },
   backButton: {
@@ -736,5 +1014,74 @@ const styles = StyleSheet.create({
   categoryList: {
     paddingHorizontal: 16,
     paddingBottom: 16,
+  },
+  // Gaya untuk modal konfirmasi keluar
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  exitModalContainer: {
+    width: '80%',
+    backgroundColor: 'white',
+    borderRadius: 16,
+    overflow: 'hidden',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  exitModalHeader: {
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  exitModalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
+  },
+  exitModalBody: {
+    paddingVertical: 24,
+    paddingHorizontal: 20,
+  },
+  exitModalMessage: {
+    fontSize: 16,
+    color: '#555',
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  exitModalFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 16,
+  },
+  exitModalButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 8,
+  },
+  cancelButton: {
+    backgroundColor: '#f0f0f0',
+  },
+  cancelButtonText: {
+    color: '#333',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  exitButton: {
+    backgroundColor: 'red',
+  },
+  exitButtonText: {
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 16,
   },
 });

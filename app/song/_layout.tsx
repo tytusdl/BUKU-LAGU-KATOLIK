@@ -2,19 +2,24 @@ import { Stack } from 'expo-router';
 
 export default function SongLayout() {
   return (
-    <Stack>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        presentation: 'card',
+        gestureEnabled: true,
+        gestureDirection: 'horizontal',
+        animation: 'slide_from_right',
+        contentStyle: {
+          backgroundColor: 'transparent',
+        }
+      }}
+    >
       <Stack.Screen
-        name="[id]/index"
-        options={{
-          headerShown: false,
-        }}
+        name="[id]"
       />
       <Stack.Screen
         name="category/[id]"
-        options={{
-          headerShown: false,
-        }}
       />
     </Stack>
   );
-} 
+}

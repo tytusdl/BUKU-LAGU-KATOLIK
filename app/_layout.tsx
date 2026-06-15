@@ -1,16 +1,30 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { enableScreens } from 'react-native-screens';
-import { LogBox, View, Text, StyleSheet, Image } from 'react-native';
-import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
+import { LogBox, View, Text, StyleSheet, Image, Appearance, Alert, Linking, Platform } from 'react-native';
 import { FavoritesProvider } from './context/FavoritesContext';
-import { ThemeProvider, useTheme } from './context/ThemeContext';
-import { AnimatedSplashScreen } from '../components/AnimatedSplashScreen';
-import * as SplashScreen from 'expo-splash-screen';
+import ThemeProvider, { useTheme } from './context/ThemeContext';
+import { MySongsProvider, useMySongs, UserSong } from './context/MySongsContext';
+import { MassProvider } from './context/MassContext';
 import { router } from 'expo-router';
 import { Asset } from 'expo-asset';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import * as SystemUI from 'expo-system-ui';
+import * as Clipboard from 'expo-clipboard';
+import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
+import * as SplashScreen from 'expo-splash-screen';
+import AnimatedSplash from '../components/AnimatedSplash';
+import { LanguageProvider, useLanguage } from './context/LanguageContext';
+import * as Updates from 'expo-updates';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import UpdateModal, { UpdateMetadata } from './components/UpdateModal';
+import packages from '../package.json';
+
+
+// Prevent the splash screen from auto-hiding before asset loading is complete.
+SplashScreen.preventAutoHideAsync();
+
 
 // Aktifkan optimisasi skrin untuk prestasi yang lebih baik
 enableScreens();
@@ -21,113 +35,491 @@ LogBox.ignoreLogs([
   'ColorPropType will be removed',
 ]);
 
-// Memastikan splash screen natif tetap tampil sehingga kita siap
-SplashScreen.preventAutoHideAsync().catch(() => {
-  console.log('Gagal menetapkan preventAutoHideAsync');
-});
-
 // Objek banner untuk preload
 const bannerImages = {
-  a: require('../assets/images/banners/banner_a.png'),
-  b: require('../assets/images/banners/banner_b.png'),
-  c: require('../assets/images/banners/banner_c.png'),
-  d: require('../assets/images/banners/banner_d.png'),
-  e: require('../assets/images/banners/banner_e.png'),
-  f: require('../assets/images/banners/banner_f.png'),
-  g: require('../assets/images/banners/banner_g.png'),
-  h: require('../assets/images/banners/banner_h.png'),
-  i: require('../assets/images/banners/banner_i.png'),
-  j: require('../assets/images/banners/banner_j.png'),
-  k: require('../assets/images/banners/banner_k.png'),
-  l: require('../assets/images/banners/banner_l.png'),
-  m: require('../assets/images/banners/banner_m.png'),
-  n: require('../assets/images/banners/banner_n.png'),
-  o: require('../assets/images/banners/banner_o.png'),
-  p: require('../assets/images/banners/banner_p.png'),
-  r: require('../assets/images/banners/banner_r.png'),
+  a: require('../assets/images/banners-webp/banner_a.webp'),
+  b: require('../assets/images/banners-webp/banner_b.webp'),
+  c: require('../assets/images/banners-webp/banner_c.webp'),
+  d: require('../assets/images/banners-webp/banner_d.webp'),
+  e: require('../assets/images/banners-webp/banner_e.webp'),
+  f: require('../assets/images/banners-webp/banner_f.webp'),
+  g: require('../assets/images/banners-webp/banner_g.webp'),
+  h: require('../assets/images/banners-webp/banner_h.webp'),
+  i: require('../assets/images/banners-webp/banner_i.webp'),
+  j: require('../assets/images/banners-webp/banner_j.webp'),
+  k: require('../assets/images/banners-webp/banner_k.webp'),
+  l: require('../assets/images/banners-webp/banner_l.webp'),
+  m: require('../assets/images/banners-webp/banner_m.webp'),
+  n: require('../assets/images/banners-webp/banner_n.webp'),
+  o: require('../assets/images/banners-webp/banner_o.webp'),
+  p: require('../assets/images/banners-webp/banner_p.webp'),
+  r: require('../assets/images/banners-webp/banner_r.webp'),
+  s: require('../assets/images/banners-webp/banner_s.webp'),
 };
+
+// Cache untuk menyimpan banner yang telah dimuat
+const preCachedBanners: Record<string, boolean> = {};
+
+// Resolve asset sources terlebih dahulu
+Object.keys(bannerImages).forEach(key => {
+  const image = bannerImages[key as keyof typeof bannerImages];
+  try {
+    if (Image && typeof Image.resolveAssetSource === 'function') {
+      Image.resolveAssetSource(image);
+    } else {
+      console.warn('resolveAssetSource tidak tersedia atau bukan fungsi');
+    }
+    preCachedBanners[key] = false;
+  } catch (error) {
+    console.warn(`Ralat resolving imej ${key}:`, error);
+  }
+});
 
 // Fungsi untuk pra-memuatkan aset imej - kurangkan jumlah pratambahan
 async function cacheImages(images: Array<string | number>): Promise<any[]> {
-  return Promise.all(images.map(image => {
-    if (typeof image === 'string') {
-      return Image.prefetch(image);
-    } else {
-      return Asset.fromModule(image).downloadAsync();
-    }
-  }));
+  // Jika tiada imej, tidak perlu diproses
+  if (images.length === 0) return [];
+
+  try {
+    // Prioritaskan asynchronous timeout dengan timeout yang pendek sahaja
+    const loadPromise = Promise.all(images.map(image => {
+      if (typeof image === 'string') {
+        if (Image && typeof Image.prefetch === 'function') {
+          return Image.prefetch(image);
+        }
+        return Promise.resolve();
+      } else {
+        // Tandakan imej sebagai telah dicache
+        const key = Object.keys(bannerImages).find(
+          k => bannerImages[k as keyof typeof bannerImages] === image
+        );
+        if (key) preCachedBanners[key] = true;
+
+        return Asset.fromModule(image).downloadAsync();
+      }
+    }));
+
+    // Tetapkan timeout yang pendek untuk mempercepat pemulaan
+    const timeoutPromise = new Promise(resolve => setTimeout(resolve, 300));
+
+    // Gunakan Promise.race untuk menetapkan batas masa
+    return await Promise.race([loadPromise, timeoutPromise]) as any[];
+  } catch (error) {
+    console.warn('Ralat memuatkan imej:', error);
+    return [];
+  }
 }
 
-// Komponen untuk navigasi utama dengan akses kepada tema
-function RootLayoutNav() {
-  const { isDarkMode } = useTheme();
-  
-  // Gunakan useMemo untuk mengelakkan pengiraan semula pada setiap rendering
-  const screenOptions = useMemo<NativeStackNavigationOptions>(() => ({
+let hasCheckedForUpdates = false;
+
+function isNewerVersion(remote: string, local: string): boolean {
+  const parse = (v: string) => v.split('.').map(x => parseInt(x, 10) || 0);
+  const rArr = parse(remote);
+  const lArr = parse(local);
+  for (let i = 0; i < Math.max(rArr.length, lArr.length); i++) {
+    const rVal = rArr[i] || 0;
+    const lVal = lArr[i] || 0;
+    if (rVal > lVal) return true;
+    if (rVal < lVal) return false;
+  }
+  return false;
+}
+
+// Komponen baru untuk membungkus Stack dan menetapkan latar belakang akar
+function ThemedApp() {
+  const { isDarkMode, currentColorTheme } = useTheme();
+  const { currentLanguage } = useLanguage();
+
+  const [updateVisible, setUpdateVisible] = useState(false);
+  const [updateMetadata, setUpdateMetadata] = useState<UpdateMetadata | null>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  useEffect(() => {
+    activateKeepAwakeAsync('themed-app-lock').catch(error => {
+      console.warn('Unable to activate keep awake:', error);
+    });
+    return () => {
+      deactivateKeepAwake('themed-app-lock').catch(() => {});
+    };
+  }, []);
+
+  useEffect(() => {
+    const color = isDarkMode ? '#1a1a1a' : '#fff';
+    SystemUI.setBackgroundColorAsync(color).catch(error => {
+      console.warn(`Failed to set root background color: ${error}`);
+    });
+  }, [isDarkMode]);
+
+  useEffect(() => {
+    let active = true;
+
+    const checkForUpdates = async () => {
+      // SET TO true TO PREVIEW THE UPDATE MODAL IMMEDIATELY:
+      const DEBUG_FORCE_SHOW_UPDATE = true;
+
+      if (DEBUG_FORCE_SHOW_UPDATE) {
+        if (active) {
+          setUpdateMetadata({
+            version: '1.7.2',
+            releaseNotes: {
+              Melayu: [
+                'Sistem Navigasi Android: Memperbaiki isu tab menu bertindih dengan butang navigasi sistem Android pada sesetengah peranti.',
+                'Kestabilan Aplikasi: Memperbaiki ralat \'Unable to activate keep awake\' yang menyebabkan aplikasi tergendala semasa dimulakan.'
+              ],
+              English: [
+                'Android Navigation System: Fixed overlapping issue between the bottom tab bar and Android system navigation buttons.',
+                'App Stability: Fixed \'Unable to activate keep awake\' error that caused app crashes on startup.'
+              ]
+            },
+            url: 'https://play.google.com/store/apps/details?id=com.tytusdl.lagu_pozoo',
+            iosUrl: 'https://apps.apple.com/app/buku-lagu-katolik/id6479187123',
+            forceUpdate: false
+          });
+          setUpdateVisible(true);
+        }
+        return;
+      }
+
+      if (hasCheckedForUpdates) return;
+      hasCheckedForUpdates = true;
+
+      try {
+        const localVersion = packages.version;
+        // Fetch remote version config
+        const response = await fetch('https://raw.githubusercontent.com/tytusdl/project/master/version.json');
+        if (response.ok) {
+          const remoteConfig = (await response.json()) as UpdateMetadata;
+          if (isNewerVersion(remoteConfig.version, localVersion)) {
+            const ignoredVersion = await AsyncStorage.getItem('ignored_version');
+            if (ignoredVersion !== remoteConfig.version || remoteConfig.forceUpdate) {
+              if (active) {
+                setUpdateMetadata(remoteConfig);
+                setUpdateVisible(true);
+              }
+              return; // If there is a store update, bypass OTA check
+            }
+          }
+        }
+      } catch (error) {
+        console.log('[UpdateCheck] Store version check skipped or failed:', error);
+      }
+
+      // Check for OTA Updates
+      try {
+        if (!__DEV__) {
+          const update = await Updates.checkForUpdateAsync();
+          if (update.isAvailable && active) {
+            setUpdateMetadata({
+              version: `OTA-${update.manifest?.id?.substring(0, 8) || 'New'}`,
+              isOtaUpdate: true,
+              releaseNotes: {
+                Melayu: ['Penambahbaikan prestasi dan pembetulan pepijat pantas.'],
+                English: ['Performance improvements and quick bug fixes.']
+              }
+            });
+            setUpdateVisible(true);
+          }
+        }
+      } catch (error) {
+        console.log('[UpdateCheck] OTA check skipped or failed:', error);
+      }
+    };
+
+    const timer = setTimeout(() => {
+      checkForUpdates();
+    }, 2000);
+
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
+  }, []);
+
+  const handleIgnoreUpdate = async () => {
+    if (updateMetadata) {
+      try {
+        await AsyncStorage.setItem('ignored_version', updateMetadata.version);
+      } catch (error) {
+        console.warn('Failed to save ignored version:', error);
+      }
+    }
+    setUpdateVisible(false);
+  };
+
+  const handleUpdateNow = async () => {
+    if (!updateMetadata) return;
+
+    if (updateMetadata.isOtaUpdate) {
+      setIsDownloading(true);
+      try {
+        await Updates.fetchUpdateAsync();
+        Alert.alert(
+          currentLanguage === 'Melayu' ? 'Berjaya' : 'Success',
+          currentLanguage === 'Melayu'
+            ? 'Kemaskini berjaya dimuat turun! Aplikasi akan memuat semula sekarang.'
+            : 'Update downloaded successfully! The app will reload now.',
+          [
+            {
+              text: 'OK',
+              onPress: async () => {
+                await Updates.reloadAsync();
+              }
+            }
+          ]
+        );
+      } catch (error) {
+        console.error('Failed to fetch OTA update:', error);
+        Alert.alert(
+          currentLanguage === 'Melayu' ? 'Ralat' : 'Error',
+          currentLanguage === 'Melayu'
+            ? 'Gagal memuat turun kemaskini. Sila cuba lagi.'
+            : 'Failed to download update. Please try again.'
+        );
+      } finally {
+        setIsDownloading(false);
+      }
+    } else {
+      const url = Platform.OS === 'ios'
+        ? (updateMetadata.iosUrl || updateMetadata.url)
+        : updateMetadata.url;
+
+      if (url) {
+        try {
+          const supported = await Linking.canOpenURL(url);
+          if (supported) {
+            await Linking.openURL(url);
+          } else {
+            await Linking.openURL(url);
+          }
+        } catch (error) {
+          console.error('Failed to open store URL:', error);
+        }
+      }
+      if (!updateMetadata.forceUpdate) {
+        setUpdateVisible(false);
+      }
+    }
+  };
+
+  // Gunakan useMemo untuk screenOptions di sini
+  const screenOptions = useMemo(() => ({
     headerShown: false,
-    animation: 'none', // Gunakan 'none' untuk matikan animasi
-    contentStyle: { backgroundColor: isDarkMode ? '#1a1a1a' : 'white' },
-    gestureEnabled: true, // Aktifkan gesture untuk back button
-    gestureDirection: 'horizontal',
-    fullScreenGestureEnabled: true, // Membolehkan swipe back dari mana-mana tempat pada skrin
+    animation: 'none' as const,
+    contentStyle: {
+      backgroundColor: isDarkMode ? '#1a1a1a' : '#fff', // Selaraskan backgroundColor di sini juga
+    },
   }), [isDarkMode]);
 
   return (
     <>
       <Stack screenOptions={screenOptions}>
+        {/* Letakkan semua skrin Stack di sini */}
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
+        {/* Tambah laluan eksplisit jika perlu */}
+        <Stack.Screen name="song/category/[id]" />
+        <Stack.Screen name="song/[id]/index" />
+        <Stack.Screen name="edit-song/[id]" />
+        <Stack.Screen name="my-songs" />
       </Stack>
       <StatusBar style={isDarkMode ? "light" : "dark"} />
+      <UpdateModal
+        visible={updateVisible}
+        metadata={updateMetadata}
+        currentVersion={packages.version}
+        isDownloading={isDownloading}
+        onIgnore={handleIgnoreUpdate}
+        onUpdateNow={handleUpdateNow}
+      />
     </>
   );
 }
 
 export default function RootLayout() {
   const [appIsReady, setAppIsReady] = useState(false);
-  const [splashAnimationComplete, setSplashAnimationComplete] = useState(false);
-  
+  const [splashAnimationFinished, setSplashAnimationFinished] = useState(false);
+  const { addMySongWithId } = useMySongs();
+
+  const [isProcessingLink, setIsProcessingLink] = useState(false);
+
+  useEffect(() => {
+    // Platform-specific API keys or other initializations can go here
+  }, []);
+
+  // Fungsi untuk memproses deeplink - dipindah ke sini
+  const processDeepLink = async (url: string | null) => {
+    if (!url || isProcessingLink) {
+      if (!url) return;
+      if (isProcessingLink) return;
+      return false;
+    }
+
+    setIsProcessingLink(true);
+
+    try {
+      // Periksa skema URL
+      if (url.startsWith('lagu-pozoo://savesong')) {
+
+
+        // Ekstrak parameter pertanyaan 'data'
+        const urlParts = url.split('?');
+        let encodedData = null;
+        if (urlParts.length > 1) {
+          const params = new URLSearchParams(urlParts[1]);
+          encodedData = params.get('data');
+        }
+
+        if (!encodedData) {
+          console.error('processDeepLink: Parameter "data" tidak ditemui dalam URL.');
+          Alert.alert('Ralat', 'Pautan tidak mengandungi data lagu yang sah.');
+          return false;
+        }
+
+
+
+        try {
+          const songData: UserSong = JSON.parse(decodeURIComponent(encodedData));
+
+
+          if (songData && songData.id && songData.title && songData.lyrics) {
+
+            const result = await addMySongWithId(songData);
+
+            if (result.success) {
+
+              Alert.alert(
+                'Lagu Disimpan!',
+                `"${songData.title}" telah disimpan ke dalam koleksi Lagu Saya.`,
+                [
+                  {
+                    text: 'Lihat Koleksi Lagu Saya',
+                    onPress: () => router.navigate('/my-songs')
+                  },
+                  { text: 'OK' }
+                ]
+              );
+              return true;
+            } else {
+
+              Alert.alert('Gagal Menyimpan', result.message);
+              return false;
+            }
+          } else {
+            console.error('processDeepLink: Data lagu tidak lengkap atau tidak sah.', songData);
+            Alert.alert('Ralat', 'Data lagu yang diterima tidak lengkap.');
+          }
+        } catch (error) {
+          console.error('processDeepLink: Ralat semasa memproses data lagu:', error);
+          Alert.alert('Ralat', 'Format data lagu tidak sah.');
+        }
+      } else {
+
+      }
+    } catch (error) {
+      console.error('processDeepLink: Ralat luar jangkaan:', error);
+    } finally {
+      setIsProcessingLink(false);
+    }
+    return false;
+  };
+
   useEffect(() => {
     async function prepare() {
       try {
+
         // Tidak perlu pratambahkan semua banner - aset akan dimuat bila diperlukan
-        console.log('Menyediakan aplikasi...');
-        
-        // Tunda lebih singkat
-        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Muat sebelum hanya banner utama a sahaja untuk prestasi
+        const mainBanners = [
+          bannerImages.a
+        ];
+
+        // Pratambah secara asinkronus tanpa menunggu
+        cacheImages(mainBanners)
+          .catch(e => console.warn('Ralat pratambahan:', e));
+
+        // Masa tunggu pendek sahaja untuk setup awal
+        await new Promise(resolve => setTimeout(resolve, 100));
       } catch (e) {
         console.warn(e);
       } finally {
         // Aplikasi telah siap dimuatkan
+
         setAppIsReady(true);
+        await SplashScreen.hideAsync();
       }
     }
 
     prepare();
   }, []);
 
-  const onAnimationComplete = () => {
-    console.log('Animasi splash selesai');
-    setSplashAnimationComplete(true);
-    // Pastikan splash screen natif disembunyikan
-    SplashScreen.hideAsync().catch(e => console.log('Gagal menyembunyikan splash screen:', e));
-  };
+  // useEffect untuk mengendalikan Linking dan Clipboard HANYA SEKALI apabila appIsReady
+  useEffect(() => {
+    if (appIsReady) {
 
-  // Jika aplikasi belum siap, pertahankan layar splash natif
-  if (!appIsReady) {
-    return null;
+
+      // 1. Proses Initial URL
+      Linking.getInitialURL()
+        .then(url => {
+
+          if (url) {
+            processDeepLink(url);
+          }
+        })
+        .catch(err => console.error('Initial URL check: Ralat mendapatkan URL awal', err));
+
+      // 2. Tambah Listener untuk URL seterusnya
+      const handleOpenURL = (event: { url: string }) => {
+
+        processDeepLink(event.url);
+      };
+
+      const subscription = Linking.addEventListener('url', handleOpenURL);
+
+      // 3. Periksa dan Kosongkan Clipboard sekali - TIDAK DIPERLUKAN LAGI
+      /*
+      const checkClipboard = async () => {
+        try {
+          const clipboardText = await Clipboard.getStringAsync();
+          if (clipboardText && clipboardText.includes('lagu-pozoo://savesong/')) {
+
+            await Clipboard.setStringAsync(''); 
+          }
+        } catch (error) {
+          console.error('Clipboard check: Ralat menyemak clipboard:', error);
+        }
+      };
+      checkClipboard();
+      */
+
+      // Fungsi cleanup untuk mengalih keluar listener apabila komponen unmount
+      return () => {
+
+        subscription.remove();
+      };
+    }
+  }, [appIsReady, addMySongWithId]); // Jalankan semula jika appIsReady atau addMySongWithId berubah
+
+  // Aplikasi siap, balut ThemedApp dengan Provider
+  if (!splashAnimationFinished) {
+    return (
+      <AnimatedSplash onAnimationFinish={() => setSplashAnimationFinished(true)} />
+    );
   }
 
-  // Jika aplikasi siap tetapi animasi splash belum selesai, tampilkan custom splash
-  if (!splashAnimationComplete) {
-    return <AnimatedSplashScreen onAnimationComplete={onAnimationComplete} />;
-  }
-
-  // Aplikasi siap dan animasi splash telah selesai
   return (
-    <ThemeProvider>
-      <FavoritesProvider>
-        <RootLayoutNav />
-      </FavoritesProvider>
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <LanguageProvider>
+        <ThemeProvider>
+          <FavoritesProvider>
+            <MySongsProvider>
+              <MassProvider>
+                <ThemedApp />
+              </MassProvider>
+            </MySongsProvider>
+          </FavoritesProvider>
+        </ThemeProvider>
+      </LanguageProvider>
+    </SafeAreaProvider>
   );
 }

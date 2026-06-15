@@ -14,6 +14,8 @@ expo-env.d.ts
 *.p12
 *.key
 *.mobileprovision
+/android
+/ios
 
 # metro
 .metro-health-check*
@@ -32,3 +34,8 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# temp files
+con
+doctor.log
+tsc_output.txt

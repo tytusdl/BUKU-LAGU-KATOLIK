@@ -1,39 +1,24 @@
 {
   "expo": {
-    "name": "BUKU LAGU POZOO",
+    "name": "Buku Lagu Katolik",
     "slug": "lagu_pozoo",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "version": "1.7.1",
     "jsEngine": "hermes",
+    "scheme": "lagu-pozoo",
+    "icon": "./assets/images/icon-new-fixed.png",
     "splash": {
-      "image": "./assets/images/splash-image.png",
-      "backgroundColor": "#1C3D23",
-      "resizeMode": "contain"
+      "image": "./assets/images/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#2B5937"
     },
     "assetBundlePatterns": [
       "./assets/images/*.{png,jpg,webp}"
     ],
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/icon.png",
-        "backgroundColor": "#1C3D23"
-      }
-    },
     "web": {
       "bundler": "metro",
       "output": "single",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/icon.png"
     },
-    "plugins": [
-      "expo-router"
-    ],
     "experiments": {
       "typedRoutes": true,
       "tsconfigPaths": true
@@ -44,8 +29,85 @@
       },
       "eas": {
         "projectId": "e7ba5e9f-7429-4986-8ab7-a42245d0d561"
+      },
+      "fonts": {
+        "inter": {
+          "subset": [
+            "latin"
+          ],
+          "weights": [
+            400,
+            500,
+            600,
+            700
+          ]
+        }
       }
     },
-    "owner": "tytusdl"
+    "owner": "tytusdl",
+    "android": {
+      "package": "com.tytusdl.lagu_pozoo",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#2B5937"
+      },
+      "blockedPermissions": [
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "lagu-pozoo"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "updates": {
+      "fallbackToCacheTimeout": 0,
+      "checkAutomatically": "NEVER",
+      "url": "https://u.expo.dev/e7ba5e9f-7429-4986-8ab7-a42245d0d561"
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
+    "ios": {
+      "name": "Buku Lagu Katolik",
+      "supportsTablet": true,
+      "bundleIdentifier": "com.tytusdl.lagu-pozoo",
+      "buildNumber": "1.7.1",
+      "jsEngine": "hermes",
+      "infoPlist": {
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": [
+              "lagu-pozoo"
+            ]
+          },
+          {
+            "CFBundleURLSchemes": [
+              "lagu-pozoo"
+            ]
+          }
+        ],
+        "CFBundleDisplayName": "Buku Lagu Katolik",
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSPhotoLibraryUsageDescription": "The app needs access to your photos to save song lyrics and prayers.",
+        "NSPhotoLibraryAddUsageDescription": "The app needs access to your photos to save song lyrics and prayers."
+      }
+    }
   }
 }
