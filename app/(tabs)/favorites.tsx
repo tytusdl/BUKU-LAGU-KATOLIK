@@ -4,13 +4,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFavorites } from '../context/FavoritesContext';
 import { useTheme } from '../context/ThemeContext';
 import { useMySongs, UserSong } from '../context/MySongsContext';
-import { songs, Song } from '../data/songs';
+import { songIndex, SongIndex } from '../data/songs/songIndex';
 
-type FavoriteSongItem = (Song | UserSong) & { isUserSong: boolean };
+type FavoriteSongItem = (SongIndex | UserSong) & { isUserSong: boolean };
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFonts, Inter_400Regular, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 
 import { useLanguage } from '../context/LanguageContext';
 
@@ -19,11 +18,6 @@ export default function FavoritesScreen() {
   const { isDarkMode, currentColorTheme } = useTheme();
   const { mySongs } = useMySongs();
   const { currentLanguage, t } = useLanguage();
-  const [fontsLoaded] = useFonts({
-    'Inter-Regular': Inter_400Regular,
-    'Inter-SemiBold': Inter_600SemiBold,
-    'Inter-Bold': Inter_700Bold,
-  });
 
   const favoriteSongs = useMemo(() => {
     const allFavoriteSongs = favorites.map((id: string) => {
@@ -31,7 +25,7 @@ export default function FavoritesScreen() {
       if (userSong) {
         return { ...userSong, isUserSong: true };
       }
-      const defaultSong = songs.find((song: Song) => song.id === id);
+      const defaultSong = songIndex.find((song: SongIndex) => song.id === id);
       if (defaultSong) {
         return { ...defaultSong, isUserSong: false };
       }
@@ -39,7 +33,7 @@ export default function FavoritesScreen() {
     }).filter(Boolean) as FavoriteSongItem[];
 
     return allFavoriteSongs;
-  }, [favorites, mySongs, songs]);
+  }, [favorites, mySongs, songIndex]);
 
   const renderSongItem = ({ item }: { item: FavoriteSongItem }) => (
     <TouchableOpacity
@@ -73,14 +67,6 @@ export default function FavoritesScreen() {
       </View>
     </TouchableOpacity>
   );
-
-  if (!fontsLoaded) {
-    return (
-      <SafeAreaView style={[styles.container, isDarkMode && styles.darkContainer]}>
-        <StatusBar style={isDarkMode ? "light" : "dark"} />
-      </SafeAreaView>
-    );
-  }
 
   return (
     <SafeAreaView

@@ -1,1 +1,0 @@
-import SettingPage from './setting'; 

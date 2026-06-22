@@ -12,7 +12,6 @@ import { useTheme } from '../../context/ThemeContext';
 import { useMySongs, UserSong } from '../../context/MySongsContext';
 import { useMass } from '../../context/MassContext';
 import { StatusBar } from 'expo-status-bar';
-import { useFonts, Inter_400Regular, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import * as Clipboard from 'expo-clipboard';
 import * as Sharing from 'expo-sharing';
 import * as MediaLibrary from 'expo-media-library';

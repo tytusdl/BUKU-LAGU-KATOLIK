@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Modal,
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { useMass, MassSelection, MassSongSelection } from '../context/MassContext';
-import { songs as allSongs } from '../data/songs';
+import { songIndex } from '../data/songs/songIndex';
 import { Music, Search, X, Trash2, ChevronRight, Save, Info, Music2, Share as ShareIcon, PlayCircle, ChevronUp, ChevronDown, MessageSquare, Image as ImageIcon } from 'lucide-react-native';
 import { useLanguage } from '../context/LanguageContext';
 import { useMySongs } from '../context/MySongsContext';
@@ -42,7 +42,7 @@ export default function MisaScreen() {
     ];
 
     const filteredSongs = useMemo(() => {
-        const combined = [...allSongs, ...mySongs];
+        const combined = [...songIndex, ...mySongs];
         if (searchQuery.trim() === '') return combined;
         return combined.filter(song =>
             song.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -65,7 +65,7 @@ export default function MisaScreen() {
     };
 
     const getSongById = (id: string) => {
-        const combined = [...allSongs, ...mySongs];
+        const combined = [...songIndex, ...mySongs];
         return combined.find(s => s.id === id);
     };
 

@@ -2,8 +2,7 @@ import { useFocusEffect } from 'expo-router';
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, Switch, ScrollView, TouchableOpacity, Modal, Alert, Linking } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { ChevronRight, Bell, Moon, Globe, Lock, HelpCircle, Info, Check, Palette, Heart, ChevronUp, Sparkles, Mail } from 'lucide-react-native';
-import { useFonts, Inter_400Regular, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
+import { ChevronRight, Moon, Globe, HelpCircle, Check, Palette, Heart, ChevronUp, Sparkles, Mail, Coffee } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme, colorThemes, darkColorThemes } from '../context/ThemeContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -11,6 +10,7 @@ import Constants from 'expo-constants';
 import { changelogData } from '../data/changelog';
 import { contributorsData } from '../data/contributors';
 import packages from '../../package.json'; // trigger fast refresh
+import * as WebBrowser from 'expo-web-browser';
 
 import { useLanguage } from '../context/LanguageContext';
 import { translations } from '../../src/translations';
@@ -21,18 +21,12 @@ export default function SettingScreen() {
   const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(true);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showColorThemeModal, setShowColorThemeModal] = useState(false);
-  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
-  const [showAboutModal, setShowAboutModal] = useState(false);
   const [showContributorsModal, setShowContributorsModal] = useState(false);
-  const [showHelpModal, setShowHelpModal] = useState(false);
+  const [showInfoModal, setShowInfoModal] = useState(false);
+  const [activeInfoTab, setActiveInfoTab] = useState<'help' | 'privacy' | 'about'>('help');
   const [isChangelogExpanded, setIsChangelogExpanded] = useState(false);
   const [expandedOldVersions, setExpandedOldVersions] = useState<string[]>([]);
   const [appVersion] = useState(packages.version);
-  const [fontsLoaded] = useFonts({
-    'Inter-Regular': Inter_400Regular,
-    'Inter-SemiBold': Inter_600SemiBold,
-    'Inter-Bold': Inter_700Bold,
-  });
 
   // Auto-collapse changelog when leaving the screen
   useFocusEffect(
@@ -67,16 +61,9 @@ export default function SettingScreen() {
     setShowColorThemeModal(!showColorThemeModal);
   };
 
-  const togglePrivacyModal = () => {
-    setShowPrivacyModal(!showPrivacyModal);
-  };
-
-  const toggleAboutModal = () => {
-    setShowAboutModal(!showAboutModal);
-  };
-
-  const toggleHelpModal = () => {
-    setShowHelpModal(!showHelpModal);
+  const openInfoModal = (tab: 'help' | 'privacy' | 'about') => {
+    setActiveInfoTab(tab);
+    setShowInfoModal(true);
   };
 
   const toggleContributorsModal = () => {
@@ -111,10 +98,6 @@ export default function SettingScreen() {
 
     return translatedName;
   };
-
-  if (!fontsLoaded) {
-    return null;
-  }
 
   return (
     <SafeAreaView
@@ -287,9 +270,7 @@ export default function SettingScreen() {
         ]}>
           <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>{t('help')}</Text>
 
-
-
-          <TouchableOpacity style={[styles.row, isDarkMode && styles.darkRow]} onPress={toggleHelpModal}>
+          <TouchableOpacity style={[styles.row, isDarkMode && styles.darkRow, { borderTopWidth: 0 }]} onPress={() => openInfoModal('help')}>
             <View style={styles.rowContent}>
               <HelpCircle size={24} color={isDarkMode ? "#fff" : "#333"} />
               <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('helpCenter')}</Text>
@@ -297,18 +278,20 @@ export default function SettingScreen() {
             <ChevronRight size={20} color={isDarkMode ? "#999" : "#999"} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.row, isDarkMode && styles.darkRow]} onPress={togglePrivacyModal}>
+          <TouchableOpacity
+            style={[styles.row, isDarkMode && styles.darkRow]}
+            onPress={async () => {
+              try {
+                await WebBrowser.openBrowserAsync('https://sites.google.com/view/bukulagukatolik/home');
+              } catch (error) {
+                console.error('Failed to open web browser:', error);
+                Linking.openURL('https://sites.google.com/view/bukulagukatolik/home');
+              }
+            }}
+          >
             <View style={styles.rowContent}>
-              <Lock size={24} color={isDarkMode ? "#fff" : "#333"} />
-              <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('privacyPolicy')}</Text>
-            </View>
-            <ChevronRight size={20} color={isDarkMode ? "#999" : "#999"} />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={[styles.row, isDarkMode && styles.darkRow]} onPress={toggleAboutModal}>
-            <View style={styles.rowContent}>
-              <Info size={24} color={isDarkMode ? "#fff" : "#333"} />
-              <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('aboutApp')}</Text>
+              <Coffee size={24} color={isDarkMode ? "#fff" : "#333"} />
+              <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('catholicSongbookWeb')}</Text>
             </View>
             <ChevronRight size={20} color={isDarkMode ? "#999" : "#999"} />
           </TouchableOpacity>
@@ -476,127 +459,84 @@ export default function SettingScreen() {
         </View>
       </Modal>
 
+      {/* Combined Info Modal with tabs: Help / Privacy / About */}
       <Modal
-        visible={showPrivacyModal}
+        visible={showInfoModal}
         transparent={true}
-        animationType="fade"
-        onRequestClose={togglePrivacyModal}
+        animationType="slide"
+        onRequestClose={() => setShowInfoModal(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.privacyModalContent, isDarkMode && styles.darkModalContent]}>
-            <Text style={[styles.modalTitle, isDarkMode && styles.darkText]}>{t('privacyPolicy')}</Text>
+          <View style={[styles.infoModalContent, isDarkMode && styles.darkModalContent, { flexDirection: 'column' }]}>
 
-            <ScrollView style={styles.privacyScrollView}>
-              <Text style={[styles.privacyHeader, isDarkMode && styles.darkText]}>
-                {t('privacyHeader')}
-              </Text>
-              <Text style={[styles.privacyText, isDarkMode && styles.darkText]}>
-                {t('privacyCoreStatement')}
-              </Text>
+            {/* Tab Pills */}
+            <View style={[styles.infoTabBar, { backgroundColor: isDarkMode ? '#3a3a3c' : '#f0f0f5' }]}>
+              {(['help', 'privacy', 'about'] as const).map((tab) => {
+                const isActive = activeInfoTab === tab;
+                const label = tab === 'help' ? t('helpCenter') : tab === 'privacy' ? t('privacyPolicy') : t('aboutApp');
+                return (
+                  <TouchableOpacity
+                    key={tab}
+                    style={[
+                      styles.infoTabItem,
+                      isActive && { backgroundColor: currentColorTheme.primary === '#ffffff' ? '#4872F4' : currentColorTheme.primary, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.15, shadowRadius: 4, elevation: 3 }
+                    ]}
+                    onPress={() => setActiveInfoTab(tab)}
+                  >
+                    <Text style={[styles.infoTabText, isActive && styles.infoTabTextActive]} numberOfLines={1}>{label}</Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            {/* Tab Content */}
+            <ScrollView style={styles.infoScrollView} contentContainerStyle={{ paddingBottom: 8 }} showsVerticalScrollIndicator={false}>
+              {activeInfoTab === 'help' && (
+                <View>
+                  <Text style={[styles.helpHeader, isDarkMode && styles.darkText]}>{t('helpCenterIntro')}</Text>
+                  <Text style={[styles.helpQuestion, isDarkMode && styles.darkText, { fontWeight: 'bold', marginTop: 0 }]}>{t('howToUse')}</Text>
+                  <Text style={[styles.helpQuestion, isDarkMode && styles.darkText]}>{t('helpQuestion1')}</Text>
+                  <Text style={[styles.helpAnswer, isDarkMode && styles.darkText]}>{t('helpAnswer1')}</Text>
+                  <Text style={[styles.helpQuestion, isDarkMode && styles.darkText]}>{t('helpQuestion2')}</Text>
+                  <Text style={[styles.helpAnswer, isDarkMode && styles.darkText]}>{t('helpAnswer2')}</Text>
+                  <Text style={[styles.helpQuestion, isDarkMode && styles.darkText]}>{t('helpQuestion3')}</Text>
+                  <Text style={[styles.helpAnswer, isDarkMode && styles.darkText]}>{t('helpAnswer3')}</Text>
+                  <Text style={[styles.helpQuestion, isDarkMode && styles.darkText]}>{t('helpQuestion4')}</Text>
+                  <Text style={[styles.helpAnswer, isDarkMode && styles.darkText]}>{t('helpAnswer4')}</Text>
+                </View>
+              )}
+              {activeInfoTab === 'privacy' && (
+                <View>
+                  <Text style={[styles.privacyHeader, isDarkMode && styles.darkText]}>{t('privacyHeader')}</Text>
+                  <Text style={[styles.privacyText, isDarkMode && styles.darkText]}>{t('privacyCoreStatement')}</Text>
+                </View>
+              )}
+              {activeInfoTab === 'about' && (
+                <View>
+                  <Text style={[styles.aboutText, isDarkMode && styles.darkText, { marginBottom: 15 }]}>{t('appIntroText')}</Text>
+                  <Text style={[styles.aboutHeader, isDarkMode && styles.darkText]}>{t('appFeatures')}</Text>
+                  <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appFeature1')}</Text>
+                  <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appFeature2')}</Text>
+                  <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appFeature3')}</Text>
+                  <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appFeature4')}</Text>
+                  <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appFeature5')}</Text>
+                  <Text style={[styles.aboutHeader, isDarkMode && styles.darkText]}>{t('appStructure')}</Text>
+                  <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appStructure1')}</Text>
+                  <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appStructure2')}</Text>
+                  <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appStructure3')}</Text>
+                  <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appStructure4')}</Text>
+                  <Text style={[styles.aboutHeader, isDarkMode && styles.darkText]}>{t('appContact')}</Text>
+                  <Text style={[styles.aboutText, isDarkMode && styles.darkText]}>{t('appContactText')}</Text>
+                </View>
+              )}
             </ScrollView>
 
             <TouchableOpacity
               style={[
                 styles.closeButton,
-                { backgroundColor: currentColorTheme.primary === '#ffffff' ? '#B8B8B8' : currentColorTheme.primary }
+                { backgroundColor: currentColorTheme.primary === '#ffffff' ? '#4872F4' : currentColorTheme.primary }
               ]}
-              onPress={togglePrivacyModal}
-            >
-              <Text style={styles.closeButtonText}>{t('close')}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-
-      <Modal
-        visible={showAboutModal}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={toggleAboutModal}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={[styles.aboutModalContent, isDarkMode && styles.darkModalContent]}>
-            <Text style={[styles.modalTitle, isDarkMode && styles.darkText]}>{t('appIntro')}</Text>
-
-            <ScrollView style={styles.aboutScrollView}>
-              <Text style={[styles.aboutText, isDarkMode && styles.darkText, { marginBottom: 15 }]}>
-                {t('appIntroText')}
-              </Text>
-
-              <Text style={[styles.aboutHeader, isDarkMode && styles.darkText]}>
-                {t('appFeatures')}
-              </Text>
-              <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appFeature1')}</Text>
-              <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appFeature2')}</Text>
-              <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appFeature3')}</Text>
-              <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appFeature4')}</Text>
-              <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appFeature5')}</Text>
-
-              <Text style={[styles.aboutHeader, isDarkMode && styles.darkText]}>
-                {t('appStructure')}
-              </Text>
-              <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appStructure1')}</Text>
-              <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appStructure2')}</Text>
-              <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appStructure3')}</Text>
-              <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appStructure4')}</Text>
-
-              <Text style={[styles.aboutHeader, isDarkMode && styles.darkText]}>
-                {t('appContact')}
-              </Text>
-              <Text style={[styles.aboutText, isDarkMode && styles.darkText]}>
-                {t('appContactText')}
-              </Text>
-            </ScrollView>
-
-            <TouchableOpacity
-              style={[
-                styles.closeButton,
-                { backgroundColor: currentColorTheme.primary === '#ffffff' ? '#B8B8B8' : currentColorTheme.primary }
-              ]}
-              onPress={toggleAboutModal}
-            >
-              <Text style={styles.closeButtonText}>{t('close')}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-
-      <Modal
-        visible={showHelpModal}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={toggleHelpModal}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={[styles.helpModalContent, isDarkMode && styles.darkModalContent]}>
-            <Text style={[styles.modalTitle, isDarkMode && styles.darkText]}>{t('helpCenterTitle')}</Text>
-
-            <ScrollView style={styles.helpScrollView}>
-              <Text style={[styles.helpHeader, isDarkMode && styles.darkText]}>
-                {t('helpCenterIntro')}
-              </Text>
-
-              <Text style={[styles.helpQuestion, isDarkMode && styles.darkText, { fontWeight: 'bold', marginTop: 0 }]}>{t('howToUse')}</Text>
-
-              <Text style={[styles.helpQuestion, isDarkMode && styles.darkText]}>{t('helpQuestion1')}</Text>
-              <Text style={[styles.helpAnswer, isDarkMode && styles.darkText]}>{t('helpAnswer1')}</Text>
-
-              <Text style={[styles.helpQuestion, isDarkMode && styles.darkText]}>{t('helpQuestion2')}</Text>
-              <Text style={[styles.helpAnswer, isDarkMode && styles.darkText]}>{t('helpAnswer2')}</Text>
-
-              <Text style={[styles.helpQuestion, isDarkMode && styles.darkText]}>{t('helpQuestion3')}</Text>
-              <Text style={[styles.helpAnswer, isDarkMode && styles.darkText]}>{t('helpAnswer3')}</Text>
-
-              <Text style={[styles.helpQuestion, isDarkMode && styles.darkText]}>{t('helpQuestion4')}</Text>
-              <Text style={[styles.helpAnswer, isDarkMode && styles.darkText]}>{t('helpAnswer4')}</Text>
-            </ScrollView>
-
-            <TouchableOpacity
-              style={[
-                styles.closeButton,
-                { backgroundColor: currentColorTheme.primary === '#ffffff' ? '#B8B8B8' : currentColorTheme.primary }
-              ]}
-              onPress={toggleHelpModal}
+              onPress={() => setShowInfoModal(false)}
             >
               <Text style={styles.closeButtonText}>{t('close')}</Text>
             </TouchableOpacity>
@@ -833,6 +773,48 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
   },
+  // Combined Info Modal
+  infoModalContent: {
+    width: '90%',
+    maxHeight: '82%',
+    backgroundColor: 'white',
+    borderRadius: 24,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.25,
+    shadowRadius: 15,
+    elevation: 8,
+  },
+  infoTabBar: {
+    flexDirection: 'row',
+    borderRadius: 14,
+    padding: 4,
+    marginBottom: 16,
+  },
+  infoTabItem: {
+    flex: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  infoTabText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#888',
+    textAlign: 'center',
+  },
+  infoTabTextActive: {
+    color: '#fff',
+  },
+  infoScrollView: {
+    maxHeight: 340,
+    marginBottom: 10,
+    paddingRight: 4,
+  },
+  // Privacy styles
   privacyModalContent: {
     width: '85%',
     maxHeight: '60%',
@@ -860,6 +842,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     lineHeight: 20,
   },
+  // About styles
   aboutModalContent: {
     width: '85%',
     maxHeight: '75%',
@@ -894,6 +877,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     marginBottom: 4,
   },
+  // Help styles
   helpModalContent: {
     width: '90%',
     maxHeight: '85%',

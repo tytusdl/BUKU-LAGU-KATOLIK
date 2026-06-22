@@ -64,7 +64,11 @@ export async function cacheImages(images: Array<string | number>): Promise<any[]
       }
     }));
     
-    return await loadPromise;
+    // Tetapkan timeout yang pendek untuk mempercepat pemulaan
+    const timeoutPromise = new Promise(resolve => setTimeout(resolve, 300));
+    
+    // Gunakan Promise.race untuk menetapkan batas masa
+    return await Promise.race([loadPromise, timeoutPromise]) as any[];
   } catch (error) {
     console.warn('Ralat memuatkan imej:', error);
     return [];

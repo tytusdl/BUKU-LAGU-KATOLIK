@@ -47,7 +47,7 @@ export default function TabLayout() {
     animationEnabled: false,
     unmountOnBlur: false, // Ubah ke false untuk mengelakkan kelipan putih semasa peralihan
     detachInactiveScreens: false, // Pastikan skrin tidak dipisahkan
-    freezeOnBlur: false, // Jangan bekukan skrin yang tidak aktif
+    freezeOnBlur: true, // Bekukan skrin yang tidak aktif untuk kurangkan memori
   }), [isDarkMode, currentLanguage, currentColorTheme, insets]);
 
   return (

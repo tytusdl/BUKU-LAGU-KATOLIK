@@ -16,8 +16,26 @@ export interface ChangelogEntry {
 // Add new versions at the top of the list
 export const changelogData: ChangelogEntry[] = [
     {
-        version: "1.7.1",
+        version: "1.8.0",
         changes: [
+            {
+                text: {
+                    Melayu: "Kelajuan Kategori Lagu: Mengurangkan masa muat kategori sebanyak 88% dengan data ringan tanpa lirik.",
+                    English: "Song Category Speed: Reduced category loading time by 88% using lightweight data without lyrics."
+                }
+            },
+            {
+                text: {
+                    Melayu: "Prestasi App: Memuatkan fon sekali sahaja di peringkat akar untuk navigasi lebih lancar.",
+                    English: "App Performance: Fonts now load once at root level for smoother navigation."
+                }
+            },
+            {
+                text: {
+                    Melayu: "Pembersihan Kod: Memadam fail dan dependensi yang tidak digunakan untuk saiz app lebih kecil.",
+                    English: "Code Cleanup: Removed unused files and dependencies for a smaller app size."
+                }
+            },
             {
                 text: {
                     Melayu: "Senarai Lagu Misa: Menambah bahagian 'Lagu Kesyukuran' selepas bahagian Lagu Komuni di bawah perancangan Senarai Lagu.",

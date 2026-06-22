@@ -8,7 +8,6 @@ import { useTheme } from '../context/ThemeContext';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Updates from 'expo-updates';
-import { useFonts, Inter_400Regular, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import { translations } from '../../src/translations'; // Updated import path
 import { useFavorites } from '../context/FavoritesContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -245,11 +244,6 @@ const exitApp = () => {
 export default function HomeScreen() {
   // HOOKS SECTION - Semua hooks mesti di bahagian atas
   const { isDarkMode, currentColorTheme } = useTheme();
-  const [fontsLoaded] = useFonts({
-    'Inter-Regular': Inter_400Regular,
-    'Inter-SemiBold': Inter_600SemiBold,
-    'Inter-Bold': Inter_700Bold,
-  });
 
   // Semua state hooks disusun berturutan
   const { currentLanguage, t } = useLanguage();
@@ -392,15 +386,6 @@ export default function HomeScreen() {
 
   // Tentukan sama ada untuk menunjukkan hasil carian
   const isSearchActive = searchQuery.trim() !== '';
-
-  // Conditional render untuk loading state
-  if (!fontsLoaded || !isFocused) {
-    return (
-      <SafeAreaView style={[styles.container, { backgroundColor: isDarkMode ? '#1a1a1a' : '#fff' }]}>
-        <StatusBar style={isDarkMode ? "light" : "dark"} />
-      </SafeAreaView>
-    );
-  }
 
   // Rendering untuk item kategori
   const renderCategoryItem = ({ item, index }: { item: SongCategory; index: number }) => (

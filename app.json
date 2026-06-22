@@ -2,8 +2,9 @@
   "expo": {
     "name": "Buku Lagu Katolik",
     "slug": "lagu_pozoo",
-    "version": "1.7.1",
+    "version": "1.8.0",
     "jsEngine": "hermes",
+    "newArchEnabled": true,
     "scheme": "lagu-pozoo",
     "icon": "./assets/images/icon-new-fixed.png",
     "splash": {
@@ -37,7 +38,6 @@
           ],
           "weights": [
             400,
-            500,
             600,
             700
           ]
@@ -74,7 +74,8 @@
       ]
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-web-browser"
     ],
     "updates": {
       "fallbackToCacheTimeout": 0,
@@ -88,15 +89,10 @@
       "name": "Buku Lagu Katolik",
       "supportsTablet": true,
       "bundleIdentifier": "com.tytusdl.lagu-pozoo",
-      "buildNumber": "1.7.1",
+      "buildNumber": "1.8.0",
       "jsEngine": "hermes",
       "infoPlist": {
         "CFBundleURLTypes": [
-          {
-            "CFBundleURLSchemes": [
-              "lagu-pozoo"
-            ]
-          },
           {
             "CFBundleURLSchemes": [
               "lagu-pozoo"
