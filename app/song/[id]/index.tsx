@@ -52,6 +52,7 @@ export default function SongDetail() {
       punggutan: t('punggutan'),
       persembahan: t('persembahan'),
       komuni: t('komuni'),
+      kesyukuran: t('kesyukuran'),
       penutup: t('penutup'),
     };
 
@@ -157,6 +158,7 @@ export default function SongDetail() {
         ...massSelection.punggutan,
         ...massSelection.persembahan,
         ...massSelection.komuni,
+        ...massSelection.kesyukuran,
         ...massSelection.penutup
       ].map(s => s.songId);
 
@@ -1126,7 +1128,7 @@ export default function SongDetail() {
             <Text style={[styles.modalTitle, { color: currentColorTheme.text, marginBottom: 10 }]}>{t('massTitle').toUpperCase()}</Text>
             <Text style={{ textAlign: 'center', color: currentColorTheme.textSecondary, marginBottom: 15, fontSize: 14 }}>{t('chooseMassPart').toUpperCase()}</Text>
 
-            {(['pembukaan', 'punggutan', 'persembahan', 'komuni', 'penutup'] as const).map((part) => (
+            {(['pembukaan', 'punggutan', 'persembahan', 'komuni', 'kesyukuran', 'penutup'] as const).map((part) => (
               <TouchableOpacity
                 key={part}
                 style={[styles.massPartOption, { borderBottomColor: currentColorTheme.border }]}

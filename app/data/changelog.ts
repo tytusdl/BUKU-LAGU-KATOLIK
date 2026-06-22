@@ -20,6 +20,12 @@ export const changelogData: ChangelogEntry[] = [
         changes: [
             {
                 text: {
+                    Melayu: "Senarai Lagu Misa: Menambah bahagian 'Lagu Kesyukuran' selepas bahagian Lagu Komuni di bawah perancangan Senarai Lagu.",
+                    English: "Mass Song List: Added the 'Thanksgiving Song' section after the Communion Song section in the Song List planner."
+                }
+            },
+            {
+                text: {
                     Melayu: "Sistem Navigasi Android: Memperbaiki isu tab menu bertindih dengan butang navigasi sistem Android pada sesetengah peranti.",
                     English: "Android Navigation System: Fixed overlapping issue between the bottom tab bar and Android system navigation buttons."
                 }

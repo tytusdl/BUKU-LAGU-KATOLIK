@@ -37,6 +37,7 @@ export default function MisaScreen() {
         { id: 'punggutan', label: t('punggutan') },
         { id: 'persembahan', label: t('persembahan') },
         { id: 'komuni', label: t('komuni') },
+        { id: 'kesyukuran', label: t('kesyukuran') },
         { id: 'penutup', label: t('penutup') },
     ];
 

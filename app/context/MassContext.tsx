@@ -14,6 +14,7 @@ export type MassSelection = {
     punggutan: MassSongSelection[];
     persembahan: MassSongSelection[];
     komuni: MassSongSelection[];
+    kesyukuran: MassSongSelection[];
     penutup: MassSongSelection[];
 };
 
@@ -31,6 +32,7 @@ const defaultMassSelection: MassSelection = {
     punggutan: [],
     persembahan: [],
     komuni: [],
+    kesyukuran: [],
     penutup: [],
 };
 

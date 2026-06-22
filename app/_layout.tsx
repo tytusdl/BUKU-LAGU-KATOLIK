@@ -155,18 +155,20 @@ function ThemedApp() {
 
     const checkForUpdates = async () => {
       // SET TO true TO PREVIEW THE UPDATE MODAL IMMEDIATELY:
-      const DEBUG_FORCE_SHOW_UPDATE = true;
+      const DEBUG_FORCE_SHOW_UPDATE = false;
 
       if (DEBUG_FORCE_SHOW_UPDATE) {
         if (active) {
           setUpdateMetadata({
-            version: '1.7.2',
+            version: '1.7.1',
             releaseNotes: {
               Melayu: [
+                'Senarai Lagu Misa: Menambah bahagian \'Lagu Kesyukuran\' selepas bahagian Lagu Komuni di bawah perancangan Senarai Lagu.',
                 'Sistem Navigasi Android: Memperbaiki isu tab menu bertindih dengan butang navigasi sistem Android pada sesetengah peranti.',
                 'Kestabilan Aplikasi: Memperbaiki ralat \'Unable to activate keep awake\' yang menyebabkan aplikasi tergendala semasa dimulakan.'
               ],
               English: [
+                'Mass Song List: Added the \'Thanksgiving Song\' section after the Communion Song section in the Song List planner.',
                 'Android Navigation System: Fixed overlapping issue between the bottom tab bar and Android system navigation buttons.',
                 'App Stability: Fixed \'Unable to activate keep awake\' error that caused app crashes on startup.'
               ]
