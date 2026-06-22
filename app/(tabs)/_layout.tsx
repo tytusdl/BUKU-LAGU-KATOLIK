@@ -36,6 +36,7 @@ export default function TabLayout() {
     tabBarHideOnKeyboard: true,
     tabBarLabelStyle: {
       fontSize: 12,
+      textTransform: 'uppercase',
       color: currentColorTheme.text,
     },
     lazy: false, // Ubah dari true ke false untuk pra-muat semua tab
