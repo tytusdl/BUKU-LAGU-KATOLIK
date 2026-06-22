@@ -115,7 +115,7 @@ function ThemedApp() {
       try {
         const localVersion = packages.version;
         // Fetch remote version config
-        const response = await fetch('https://raw.githubusercontent.com/tytusdl/project/master/version.json');
+        const response = await fetch('https://raw.githubusercontent.com/tytusdl/BUKU-LAGU-KATOLIK/master/version.json');
         if (response.ok) {
           const remoteConfig = (await response.json()) as UpdateMetadata;
           if (isNewerVersion(remoteConfig.version, localVersion)) {
