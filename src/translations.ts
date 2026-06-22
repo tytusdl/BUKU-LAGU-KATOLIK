@@ -124,13 +124,13 @@ export const translations = {
     sentFromApp: 'Dikongsi via Aplikasi Buku Lagu Katolik (Pozoo)',
 
     // Setting & Layout translations
-    home: 'Lagu',
+    home: 'Utama',
     favorites: 'Lagu Kegemaran',
-    favorites_tab: 'Senarai Kegemaran',
+    favorites_tab: 'Kegemaran',
     noFavorites: 'Anda belum menambah sebarang lagu ke senarai kegemaran.',
     addFavoritesInstruction: 'Tekan ikon ❤️ pada halaman detail lagu untuk menambahkannya ke senarai kegemaran.',
     misa_tab: 'Senarai Lagu',
-    setting: 'Tetapan Apl',
+    setting: 'Tetapan',
     settings: 'Tetapan',
     languageSection: 'Bahasa',
     language: 'Bahasa',
@@ -341,13 +341,13 @@ export const translations = {
     sentFromApp: 'Sent from Buku Lagu Katolik (Pozoo) App',
 
     // Setting & Layout translations
-    home: 'Songs',
+    home: 'Home',
     favorites: 'Favorite Songs',
-    favorites_tab: 'Favorite List',
+    favorites_tab: 'Favorites',
     noFavorites: 'You have not added any songs to your favorites list yet.',
     addFavoritesInstruction: 'Tap the ❤️ icon on a song detail page to add it to your favorites.',
     misa_tab: 'Song List',
-    setting: 'App Settings',
+    setting: 'Settings',
     settings: 'Settings',
     languageSection: 'Language',
     language: 'Language',
