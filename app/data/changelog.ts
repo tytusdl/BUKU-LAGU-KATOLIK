@@ -20,38 +20,8 @@ export const changelogData: ChangelogEntry[] = [
         changes: [
             {
                 text: {
-                    Melayu: "Kelajuan Kategori Lagu: Mengurangkan masa muat kategori sebanyak 88% dengan data ringan tanpa lirik.",
-                    English: "Song Category Speed: Reduced category loading time by 88% using lightweight data without lyrics."
-                }
-            },
-            {
-                text: {
-                    Melayu: "Prestasi App: Memuatkan fon sekali sahaja di peringkat akar untuk navigasi lebih lancar.",
-                    English: "App Performance: Fonts now load once at root level for smoother navigation."
-                }
-            },
-            {
-                text: {
-                    Melayu: "Pembersihan Kod: Memadam fail dan dependensi yang tidak digunakan untuk saiz app lebih kecil.",
-                    English: "Code Cleanup: Removed unused files and dependencies for a smaller app size."
-                }
-            },
-            {
-                text: {
-                    Melayu: "Senarai Lagu Misa: Menambah bahagian 'Lagu Kesyukuran' selepas bahagian Lagu Komuni di bawah perancangan Senarai Lagu.",
-                    English: "Mass Song List: Added the 'Thanksgiving Song' section after the Communion Song section in the Song List planner."
-                }
-            },
-            {
-                text: {
-                    Melayu: "Sistem Navigasi Android: Memperbaiki isu tab menu bertindih dengan butang navigasi sistem Android pada sesetengah peranti.",
-                    English: "Android Navigation System: Fixed overlapping issue between the bottom tab bar and Android system navigation buttons."
-                }
-            },
-            {
-                text: {
-                    Melayu: "Kestabilan Aplikasi: Memperbaiki ralat 'Unable to activate keep awake' yang menyebabkan aplikasi tergendala semasa dimulakan.",
-                    English: "App Stability: Fixed 'Unable to activate keep awake' error that caused app crashes on startup."
+                    Melayu: "Muat lebih cepat, guna lebih ringan. Nikmati pengalaman baru yang lebih smooth!",
+                    English: "Loads faster, runs lighter. Enjoy a smoother experience!"
                 }
             }
         ]
