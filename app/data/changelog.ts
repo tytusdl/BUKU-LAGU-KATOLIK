@@ -20,14 +20,14 @@ export const changelogData: ChangelogEntry[] = [
         changes: [
             {
                 text: {
-                    Melayu: "Kelajuan Kategori Lagu: Mengurangkan masa muat kategori sebanyak 88% dengan data ringan tanpa lirik.",
-                    English: "Song Category Speed: Reduced category loading time by 88% using lightweight data without lyrics."
+                    Melayu: "Kategori lagu kini dibuka 88% lebih cepat dengan data yang lebih ringan.",
+                    English: "Song categories now load 88% faster with lighter data."
                 }
             },
             {
                 text: {
-                    Melayu: "Prestasi App: Memuatkan fon sekali sahaja di peringkat akar untuk navigasi lebih lancar.",
-                    English: "App Performance: Fonts now load once at root level for smoother navigation."
+                    Melayu: "App lebih smooth — fon dimuat sekali sahaja untuk navigasi lebih lancar.",
+                    English: "Smoother app — fonts load once for faster navigation."
                 }
             },
             {
