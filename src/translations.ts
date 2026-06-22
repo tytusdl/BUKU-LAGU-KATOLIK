@@ -124,7 +124,7 @@ export const translations = {
     sentFromApp: 'Dikongsi via Aplikasi Buku Lagu Katolik (Pozoo)',
 
     // Setting & Layout translations
-    home: 'utama',
+    home: 'lagu',
     favorites: 'Lagu Kegemaran',
     favorites_tab: 'kegemaran',
     noFavorites: 'Anda belum menambah sebarang lagu ke senarai kegemaran.',
@@ -341,7 +341,7 @@ export const translations = {
     sentFromApp: 'Sent from Buku Lagu Katolik (Pozoo) App',
 
     // Setting & Layout translations
-    home: 'home',
+    home: 'songs',
     favorites: 'Favorite Songs',
     favorites_tab: 'favorites',
     noFavorites: 'You have not added any songs to your favorites list yet.',
