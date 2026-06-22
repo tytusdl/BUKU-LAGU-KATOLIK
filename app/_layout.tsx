@@ -90,11 +90,11 @@ function ThemedApp() {
             version: '1.8.0',
             releaseNotes: {
               Melayu: [
-                'Muat lebih cepat, guna lebih ringan. Nikmati pengalaman baru yang lebih smooth!',
+                'Peningkatan Prestasi: Muat lebih cepat, guna lebih ringan. Nikmati pengalaman baru yang lebih smooth!',
                 'Kestabilan Aplikasi: Memperbaiki ralat \'Unable to activate keep awake\' yang menyebabkan aplikasi tergendala semasa dimulakan.'
               ],
               English: [
-                'Loads faster, runs lighter. Enjoy a smoother experience!',
+                'Performance Upgrade: Loads faster, runs lighter. Enjoy a smoother experience!',
                 'App Stability: Fixed \'Unable to activate keep awake\' error that caused app crashes on startup.'
               ]
             },

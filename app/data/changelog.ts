@@ -20,8 +20,8 @@ export const changelogData: ChangelogEntry[] = [
         changes: [
             {
                 text: {
-                    Melayu: "Muat lebih cepat, guna lebih ringan. Nikmati pengalaman baru yang lebih smooth!",
-                    English: "Loads faster, runs lighter. Enjoy a smoother experience!"
+                    Melayu: "Peningkatan Prestasi: Muat lebih cepat, guna lebih ringan. Nikmati pengalaman baru yang lebih smooth!",
+                    English: "Performance Upgrade: Loads faster, runs lighter. Enjoy a smoother experience!"
                 }
             },
             {
