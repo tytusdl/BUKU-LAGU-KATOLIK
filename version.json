@@ -5,13 +5,17 @@
   "iosUrl": "https://apps.apple.com/app/buku-lagu-katolik/id6479187123",
   "releaseNotes": {
     "Melayu": [
-      "Peningkatan Prestasi: Muat lebih cepat, guna lebih ringan. Nikmati pengalaman baru yang lebih smooth!",
+      "Kelajuan Kategori Lagu: Mengurangkan masa muat kategori sebanyak 88% dengan data ringan tanpa lirik.",
+      "Prestasi App: Memuatkan fon sekali sahaja di peringkat akar untuk navigasi lebih lancar.",
+      "Pembersihan Kod: Memadam fail dan dependensi yang tidak digunakan untuk saiz app lebih kecil.",
       "Senarai Lagu Misa: Menambah bahagian 'Lagu Kesyukuran' selepas bahagian Lagu Komuni di bawah perancangan Senarai Lagu.",
       "Sistem Navigasi Android: Memperbaiki isu tab menu bertindih dengan butang navigasi sistem Android pada sesetengah peranti.",
       "Kestabilan Aplikasi: Memperbaiki ralat 'Unable to activate keep awake' yang menyebabkan aplikasi tergendala semasa dimulakan."
     ],
     "English": [
-      "Performance Upgrade: Loads faster, runs lighter. Enjoy a smoother experience!",
+      "Song Category Speed: Reduced category loading time by 88% using lightweight data without lyrics.",
+      "App Performance: Fonts now load once at root level for smoother navigation.",
+      "Code Cleanup: Removed unused files and dependencies for a smaller app size.",
       "Mass Song List: Added the 'Thanksgiving Song' section after the Communion Song section in the Song List planner.",
       "Android Navigation System: Fixed overlapping issue between the bottom tab bar and Android system navigation buttons.",
       "App Stability: Fixed 'Unable to activate keep awake' error that caused app crashes on startup."
