@@ -90,13 +90,11 @@ function ThemedApp() {
             version: '1.8.0',
             releaseNotes: {
               Melayu: [
-                'Senarai Lagu Misa: Menambah bahagian \'Lagu Kesyukuran\' selepas bahagian Lagu Komuni di bawah perancangan Senarai Lagu.',
-                'Sistem Navigasi Android: Memperbaiki isu tab menu bertindih dengan butang navigasi sistem Android pada sesetengah peranti.',
+                'Muat lebih cepat, guna lebih ringan. Nikmati pengalaman baru yang lebih smooth!',
                 'Kestabilan Aplikasi: Memperbaiki ralat \'Unable to activate keep awake\' yang menyebabkan aplikasi tergendala semasa dimulakan.'
               ],
               English: [
-                'Mass Song List: Added the \'Thanksgiving Song\' section after the Communion Song section in the Song List planner.',
-                'Android Navigation System: Fixed overlapping issue between the bottom tab bar and Android system navigation buttons.',
+                'Loads faster, runs lighter. Enjoy a smoother experience!',
                 'App Stability: Fixed \'Unable to activate keep awake\' error that caused app crashes on startup.'
               ]
             },
