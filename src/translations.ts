@@ -265,6 +265,78 @@ export const translations = {
     contactLyricsReportDesc: 'Laporkan masalah lirik lagu (salah ejaan, baris hilang, dll)',
     contactEmailSubjectGeneral: 'Buku Lagu Katolik - Maklum Balas',
     contactEmailBodyGeneral: 'Hai, saya ingin berkongsi maklum balas tentang aplikasi Buku Lagu Katolik:',
+
+    // My Songs — search, sort, metadata, empty state (v.x.x)
+    mySongsSearchPlaceholder: 'Cari dalam Lagu Saya...',
+    sortBy: 'Susun',
+    sortNewest: 'Terbaru',
+    sortOldest: 'Terlama',
+    sortAZ: 'A-Z',
+    sortZA: 'Z-A',
+    songLinesCount: '{count} baris',
+    songAddedToday: 'Ditambah hari ini',
+    songAddedYesterday: 'Ditambah semalam',
+    songAddedDaysAgo: '{count} hari lalu',
+    songAddedWeeksAgo: '{count} minggu lalu',
+    songAddedMonthsAgo: '{count} bulan lalu',
+    sharedBadge: 'Dikongsi',
+    emptyMySongsTitle: 'Lagu Saya Kosong',
+    emptyMySongsSubtitle: 'Tambah lagu pertama anda menggunakan butang ➕ di bawah.',
+    searchNoMatches: 'Tiada lagu sepadan dengan carian anda.',
+
+    // FAB Bottom Sheet — cara tambah lagu (v.x.x)
+    addSongSheetTitle: 'Tambah Lagu',
+    addSongSheetSubtitle: 'Pilih cara untuk tambah lagu baru',
+    addSongOptionManual: 'Taip Sendiri',
+    addSongOptionManualDesc: 'Masukkan tajuk dan lirik lagu secara manual',
+    addSongOptionPaste: 'Tampal Pautan',
+    addSongOptionPasteDesc: 'Tampal pautan lagu-pozoo:// yang dikongsi',
+    addSongOptionHelp: 'Cara Berkongsi',
+    addSongOptionHelpDesc: 'Ketahui cara berkongsi lagu dengan orang lain',
+
+    // Header CTA button — gantikan FAB lama (v.x.x)
+    addSongPrimaryCTA: 'Tambah Lagu',
+    addSongPrimaryCTADesc: 'Taip sendiri atau tampal link',
+    quickActions: 'Tindakan Pantas',
+    moreActions: 'Lagi',
+
+    // Shared link preview modal — Pilihan A (v.x.x)
+    sharedLinkDetectedTitle: 'Pautan Lagu Dikesan',
+    sharedLinkDetectedSubtitle: 'Pautan lagu dikongsi dijumpai dalam clipboard. Mahu simpan ke Lagu Saya?',
+    sharedLinkSongPreview: 'Pratonton Lagu',
+    sharedLinkSaveButton: 'Simpan Lagu Ini',
+    sharedLinkViewLyrics: 'Lihat Lirik',
+    sharedLinkDismiss: 'Tidak, Terima Kasih',
+    sharedLinkOpen: 'Buka dalam My Songs',
+
+    // QR Scanner — Pilihan C (v.x.x)
+    scanQRTitle: 'Imbas Kod QR',
+    scanQRSubtitle: 'Arahkan kamera ke kod QR lagu untuk import secara automatik.',
+    scanQRPermissionTitle: 'Kebenaran Kamera Diperlukan',
+    scanQRPermissionMessage: 'Aplikasi memerlukan akses kamera untuk mengimbas kod QR lagu.',
+    scanQRPermissionGrant: 'Beri Kebenaran',
+    scanQRNotLinkTitle: 'Bukan Pautan Lagu',
+    scanQRNotLinkMessage: 'Kod QR yang diimbas bukan pautan lagu yang sah.',
+    scanQRCancel: 'Batal',
+
+    // Recent shares — Pilihan D (v.x.x)
+    recentSharesTitle: 'Pautan Terbaru',
+    recentSharesEmpty: 'Tiada pautan yang belum disimpan.',
+    recentSharesClearAll: 'Kosongkan',
+    recentSharesClearConfirm: 'Padam semua pautan dari sejarah?',
+    recentShareSave: 'Simpan',
+    recentShareRemove: 'Buang',
+    recentShareJustNow: 'Baru sahaja',
+    recentShareMinutesAgo: '{count} minit lalu',
+    recentShareHoursAgo: '{count} jam lalu',
+
+    // Add Song screen improvements (v.x.x)
+    songCharacterCount: '{count} aksara',
+    pasteFromClipboardHere: 'Tampal dari Clipboard',
+    pasteDetected: 'Lirik dikesan dari clipboard. Tampal?',
+    saveButton: 'Simpan',
+    saveAsTitle: 'Simpan lagu ini?',
+    lyricsEmpty: 'Sila masukkan lirik lagu',
   },
   'English': {
     searchPlaceholder: 'Search songs by title or number',
@@ -523,14 +595,86 @@ export const translations = {
     reportExportSuccess: 'Reports copied to clipboard. Paste into an email or message.',
     reportCharacterCount: 'characters',
 
-    // Contact Modal (Settings)
+// Contact Modal (Settings)
     contactTitle: 'Contact Me',
     contactSubtitle: 'Choose the type of message you want to send:',
     contactGeneral: 'General Inquiry',
     contactGeneralDesc: 'Suggestions, feedback, or any other questions',
     contactLyricsReport: 'Report Lyrics',
-    contactLyricsReportDesc: 'Report a song lyrics issue (spelling, missing lines, etc.)',
+    contactLyricsReportDesc: 'Report a song lyrics issue (spelling, missing lines, etc)',
     contactEmailSubjectGeneral: 'Buku Lagu Katolik - Feedback',
     contactEmailBodyGeneral: 'Hi, I would like to share some feedback about the Buku Lagu Katolik app:',
+
+    // My Songs — search, sort, metadata, empty state (v.x.x)
+    mySongsSearchPlaceholder: 'Search in My Songs...',
+    sortBy: 'Sort',
+    sortNewest: 'Newest',
+    sortOldest: 'Oldest',
+    sortAZ: 'A-Z',
+    sortZA: 'Z-A',
+    songLinesCount: '{count} lines',
+    songAddedToday: 'Added today',
+    songAddedYesterday: 'Added yesterday',
+    songAddedDaysAgo: '{count} days ago',
+    songAddedWeeksAgo: '{count} weeks ago',
+    songAddedMonthsAgo: '{count} months ago',
+    sharedBadge: 'Shared',
+    emptyMySongsTitle: 'My Songs is Empty',
+    emptyMySongsSubtitle: 'Add your first song using the ➕ button below.',
+    searchNoMatches: 'No songs match your search.',
+
+    // FAB Bottom Sheet — cara tambah lagu (v.x.x)
+    addSongSheetTitle: 'Add Song',
+    addSongSheetSubtitle: 'Choose how to add a new song',
+    addSongOptionManual: 'Type Manually',
+    addSongOptionManualDesc: 'Enter the song title and lyrics manually',
+    addSongOptionPaste: 'Paste Link',
+    addSongOptionPasteDesc: 'Paste a shared lagu-pozoo:// link',
+    addSongOptionHelp: 'How to Share',
+    addSongOptionHelpDesc: 'Learn how to share songs with others',
+
+    // Header CTA button — gantikan FAB lama (v.x.x)
+    addSongPrimaryCTA: 'Add Song',
+    addSongPrimaryCTADesc: 'Type manually or paste link',
+    quickActions: 'Quick Actions',
+    moreActions: 'More',
+
+    // Shared link preview modal — Pilihan A (v.x.x)
+    sharedLinkDetectedTitle: 'Song Link Detected',
+    sharedLinkDetectedSubtitle: 'A shared song link was found in your clipboard. Save it to My Songs?',
+    sharedLinkSongPreview: 'Song Preview',
+    sharedLinkSaveButton: 'Save This Song',
+    sharedLinkViewLyrics: 'View Lyrics',
+    sharedLinkDismiss: 'No, Thanks',
+    sharedLinkOpen: 'Open in My Songs',
+
+    // QR Scanner — Pilihan C (v.x.x)
+    scanQRTitle: 'Scan QR Code',
+    scanQRSubtitle: 'Point your camera at a song QR code to import automatically.',
+    scanQRPermissionTitle: 'Camera Permission Required',
+    scanQRPermissionMessage: 'The app needs camera access to scan song QR codes.',
+    scanQRPermissionGrant: 'Grant Permission',
+    scanQRNotLinkTitle: 'Not a Song Link',
+    scanQRNotLinkMessage: 'The scanned QR code is not a valid song link.',
+    scanQRCancel: 'Cancel',
+
+    // Recent shares — Pilihan D (v.x.x)
+    recentSharesTitle: 'Recent Links',
+    recentSharesEmpty: 'No unsaved links yet.',
+    recentSharesClearAll: 'Clear All',
+    recentSharesClearConfirm: 'Remove all links from history?',
+    recentShareSave: 'Save',
+    recentShareRemove: 'Remove',
+    recentShareJustNow: 'Just now',
+    recentShareMinutesAgo: '{count} min ago',
+    recentShareHoursAgo: '{count} hr ago',
+
+    // Add Song screen improvements (v.x.x)
+    songCharacterCount: '{count} characters',
+    pasteFromClipboardHere: 'Paste from Clipboard',
+    pasteDetected: 'Lyrics detected from clipboard. Paste?',
+    saveButton: 'Save',
+    saveAsTitle: 'Save this song?',
+    lyricsEmpty: 'Please enter the song lyrics',
   }
 };

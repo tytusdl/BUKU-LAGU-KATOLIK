@@ -38,7 +38,7 @@ export default function TabLayout() {
       fontSize: 12,
       textTransform: 'uppercase',
       color: currentColorTheme.text,
-    },
+    } as const,
     lazy: false, // Ubah dari true ke false untuk pra-muat semua tab
     tabBarItemStyle: {
       // Optimasi untuk tab rendering

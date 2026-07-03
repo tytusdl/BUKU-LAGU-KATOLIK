@@ -9,6 +9,13 @@ export interface UserSong {
   id: string; // Mungkin UUID atau timestamp
   title: string;
   lyrics: string;
+  // createdAt ditambah pada v.x.x — optional untuk backward compat dengan
+  // lagu lama yang disimpan sebelum field ini wujud. Jika undefined,
+  // UI akan treat lagu tersebut sebagai "lagu lama tanpa tarikh".
+  createdAt?: number;
+  // sourceAdded: 'manual' (user tambah sendiri), 'shared' (paste deeplink atau @MYSONG@)
+  // — optional untuk backward compat, default dianggap 'manual' kalau undefined.
+  sourceAdded?: 'manual' | 'shared';
 }
 
 // Definisi jenis context
@@ -73,12 +80,14 @@ export const MySongsProvider = ({ children }: MySongsProviderProps) => {
     const newSong: UserSong = {
       ...songData,
       id: Date.now().toString(), // Gunakan timestamp sebagai ID baru
+      createdAt: Date.now(),
+      sourceAdded: songData.sourceAdded ?? 'manual',
     };
     const newSongs = [...mySongs, newSong];
     setMySongs(newSongs);
     await saveMySongs(newSongs);
   };
-  
+
   // Tambah lagu dengan ID sedia ada (dari deeplink/perkongsian)
   const addMySongWithId = async (songData: UserSong): Promise<{success: boolean, message: string}> => {
     // Periksa jika lagu dengan ID yang sama sudah ada
@@ -87,8 +96,14 @@ export const MySongsProvider = ({ children }: MySongsProviderProps) => {
         return { success: false, message: 'Lagu ini sudah ada dalam koleksi anda' };
     }
 
-    // Tambah lagu baru ke senarai
-    const newSongs = [...mySongs, songData];
+    // Tambah lagu baru ke senarai — pastikan createdAt dan sourceAdded diisi
+    // walaupun caller (deeplink/share) mungkin tak hantar.
+    const enrichedSong: UserSong = {
+      ...songData,
+      createdAt: songData.createdAt ?? Date.now(),
+      sourceAdded: songData.sourceAdded ?? 'shared',
+    };
+    const newSongs = [...mySongs, enrichedSong];
     setMySongs(newSongs);
     await saveMySongs(newSongs);
     return { success: true, message: 'Lagu berjaya disimpan' };
@@ -179,7 +194,9 @@ export const MySongsProvider = ({ children }: MySongsProviderProps) => {
       const newSharedSong: UserSong = {
         id: sharedId,
         title: sharedTitle,
-        lyrics: lyrics
+        lyrics: lyrics,
+        createdAt: Date.now(),
+        sourceAdded: 'shared',
       };
 
       // Tambah ke senarai lagu pengguna

@@ -1,26 +1,53 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Modal,
-  TextInput, Button, Alert, Platform, ToastAndroid, Share
+  TextInput, Alert, Platform, ToastAndroid, Share
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Plus, ArrowLeft, Link, HelpCircle, Link2, Heart, Share as ShareIcon, X } from 'lucide-react-native';
+import {
+  Plus, ArrowLeft, Link, HelpCircle, Link2, Heart, Share as ShareIcon,
+  X, Search, ArrowUpDown, Music, Edit3, ChevronRight, Clipboard as ClipboardIcon,
+  History, Trash2
+} from 'lucide-react-native';
 import { useTheme } from './context/ThemeContext';
 import { useMySongs, UserSong } from './context/MySongsContext';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Clipboard from 'expo-clipboard';
 import { useFavorites } from './context/FavoritesContext';
-import { translations } from '../src/translations'; // Updated import path
+import { translations } from '../src/translations';
 import { useLanguage } from './context/LanguageContext';
-
-// Path mungkin perlu disemak semula jika diletak di utils
-// const headerImage = require('../assets/images/banners-webp/banner_s.webp'); // Guna banner_s.webp? - SALAH
-// Guna imej kategori asal
-// const headerImage = require('../assets/images/categories-webp/category_s.webp');
+import { parseSongShareLink } from './utils/songLink';
+import {
+  addRecentShare, removeRecentShare, clearRecentShares, loadRecentShares,
+  RecentShare
+} from './utils/recentShares';
 
 // Guna banner_s.webp untuk header skrin Lagu Saya
 const headerImage = require('../assets/images/banners-webp/banner_s.webp');
+
+// Sort mode untuk senarai Lagu Saya
+type SortMode = 'newest' | 'oldest' | 'az' | 'za';
+
+// Kira bilangan baris lirik (skip baris kosong)
+const countLyricsLines = (lyrics: string): number => {
+  if (!lyrics) return 0;
+  return lyrics.split('\n').filter(line => line.trim().length > 0).length;
+};
+
+// Format tarikh relatif — "Hari ini" / "Semalam" / "X hari lalu" / "X minggu lalu" / "X bulan lalu"
+const formatRelativeDate = (timestamp: number | undefined, t: (key: string, params?: Record<string, string>) => string): string => {
+  if (!timestamp) return '';
+  const now = Date.now();
+  const diff = now - timestamp;
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+  if (days < 1) return t('songAddedToday');
+  if (days === 1) return t('songAddedYesterday');
+  if (days < 7) return t('songAddedDaysAgo', { count: String(days) });
+  if (days < 30) return t('songAddedWeeksAgo', { count: String(Math.floor(days / 7)) });
+  return t('songAddedMonthsAgo', { count: String(Math.floor(days / 30)) });
+};
 
 export default function MySongsScreen() {
   const { isDarkMode, currentColorTheme } = useTheme();
@@ -32,13 +59,38 @@ export default function MySongsScreen() {
   const { currentLanguage, t } = useLanguage();
   const [isFabMenuOpen, setIsFabMenuOpen] = useState(false);
 
+  // Search + sort state — ditambah v.x.x untuk koleksi lagu yang besar
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortMode, setSortMode] = useState<SortMode>('newest');
+  const [isSortMenuOpen, setIsSortMenuOpen] = useState(false);
+
+  // Recent shares history — Pilihan D (v.x.x)
+  const [recentShares, setRecentShares] = useState<RecentShare[]>([]);
+  const [savingShareId, setSavingShareId] = useState<string | null>(null);
+
+  const refreshRecentShares = useCallback(async () => {
+    const list = await loadRecentShares();
+    setRecentShares(list);
+  }, []);
+
+  // Load recent shares on mount, dan refresh setiap kali My Songs dibuka
+  useEffect(() => {
+    refreshRecentShares();
+  }, [refreshRecentShares]);
+
+  // Refresh juga bila paste modal ditutup (ada kemungkinan baru save)
+  useEffect(() => {
+    if (!isPasteModalVisible) {
+      refreshRecentShares();
+    }
+  }, [isPasteModalVisible, refreshRecentShares]);
+
   // Periksa jika lagu baru sahaja dipadam
   useEffect(() => {
     const checkSongDeleted = async () => {
       try {
         const songDeleted = await AsyncStorage.getItem('song_deleted');
         if (songDeleted === 'true') {
-          // Reset tanda pemadaman
           await AsyncStorage.removeItem('song_deleted');
           console.log('Pemadaman lagu selesai');
         }
@@ -55,7 +107,6 @@ export default function MySongsScreen() {
     router.push('/add-song');
   };
 
-  // Fungsi untuk modal tampal pautan
   const openPasteModal = () => {
     setPastedLink('');
     setIsSavingPasted(false);
@@ -78,42 +129,42 @@ export default function MySongsScreen() {
     setIsSavingPasted(true);
 
     try {
-      if (urlToProcess.startsWith('lagu-pozoo://savesong')) {
-        // Ekstrak parameter pertanyaan 'data'
-        const urlParts = urlToProcess.split('?');
-        let encodedData = null;
-        if (urlParts.length > 1) {
-          const params = new URLSearchParams(urlParts[1]);
-          encodedData = params.get('data');
-        }
-
-        if (!encodedData) {
-          console.error('handleSavePastedLink: Parameter "data" tidak ditemui dalam URL.');
+      const parsed = parseSongShareLink(urlToProcess);
+      if (!parsed.success) {
+        if (parsed.error === 'notALink') {
+          Alert.alert(t('linkErrorTitle'), t('linkErrorInvalid'));
+        } else if (parsed.error === 'noData') {
           Alert.alert(t('linkErrorTitle'), t('linkErrorNoData'));
-          setIsSavingPasted(false);
-          return;
-        }
-
-        console.log(`handleSavePastedLink: Data terenkod dari parameter: ${encodedData}`);
-        try {
-          const songData: UserSong = JSON.parse(decodeURIComponent(encodedData));
-          if (songData && songData.id && songData.title && songData.lyrics) {
-            const result = await addMySongWithId(songData);
-            if (result.success) {
-              Alert.alert(t('saveSuccessTitle'), t('saveSuccessMessage').replace('{songTitle}', songData.title));
-              closePasteModal();
-            } else {
-              Alert.alert(t('saveFailTitle'), result.message);
-            }
-          } else {
-            Alert.alert(t('linkErrorTitle'), t('linkErrorInvalidData'));
-          }
-        } catch (error) {
-          console.error('Ralat memproses data pautan:', error);
+        } else if (parsed.error === 'invalidData') {
+          Alert.alert(t('linkErrorTitle'), t('linkErrorInvalidData'));
+        } else {
           Alert.alert(t('linkErrorTitle'), t('linkErrorParsing'));
         }
+        return;
+      }
+
+      // Track dalam recent shares supaya boleh re-save kalau accidentally dismissed
+      await addRecentShare({
+        id: parsed.song.id,
+        title: parsed.song.title,
+        lyrics: parsed.song.lyrics,
+        rawLink: urlToProcess,
+      });
+
+      const result = await addMySongWithId({
+        ...parsed.song,
+        sourceAdded: 'shared',
+        createdAt: Date.now(),
+      });
+
+      if (result.success) {
+        Alert.alert(t('saveSuccessTitle'), t('saveSuccessMessage').replace('{songTitle}', parsed.song.title));
+        // Buang dari recent shares sebab dah saved
+        await removeRecentShare(parsed.song.id);
+        await refreshRecentShares();
+        closePasteModal();
       } else {
-        Alert.alert(t('linkErrorTitle'), t('linkErrorInvalid'));
+        Alert.alert(t('saveFailTitle'), result.message);
       }
     } catch (error) {
       console.error('Ralat luar jangkaan semasa menyimpan pautan:', error);
@@ -123,7 +174,6 @@ export default function MySongsScreen() {
     }
   };
 
-  // Fungsi baru untuk menyalin pautan kongsi dari senarai
   const handleCopyLinkPress = async (songToCopy: UserSong) => {
     if (!songToCopy) return;
 
@@ -141,8 +191,6 @@ export default function MySongsScreen() {
       if (Platform.OS === 'android') {
         ToastAndroid.show(t('copyLinkSuccess'), ToastAndroid.SHORT);
       } else {
-        // Di skrin senarai, lebih baik guna Toast juga jika boleh, atau Alert ringkas.
-        // Menggunakan Alert di sini untuk konsisten dengan kod asal.
         Alert.alert(t('saveSuccessTitle'), t('copyLinkSuccess'));
       }
       console.log('Share link copied from list:', link);
@@ -152,7 +200,6 @@ export default function MySongsScreen() {
     }
   };
 
-  // Fungsi baru untuk kongsi teks biasa dari senarai
   const handleShareSongPress = async (songToShare: UserSong) => {
     if (!songToShare) return;
 
@@ -168,30 +215,26 @@ export default function MySongsScreen() {
       console.log('Share.share call successful from list');
     } catch (error) {
       console.error('Error sharing song from list:', error);
-      Alert.alert(t('alertError'), t('alertFailedSave')); // Guna alertFailedSave
+      Alert.alert(t('alertError'), t('alertFailedSave'));
     }
   };
 
-  // Fungsi untuk toggle kegemaran
   const handleToggleFavorite = async (songId: string) => {
     if (isFavorite(songId)) {
       await removeFromFavorites(songId);
     } else {
       await addToFavorites(songId);
     }
-    // Mungkin perlu refresh state atau UI jika perlu (bergantung pada implementasi useFavorites)
   };
 
-  // Fungsi untuk toggle menu FAB
   const toggleFabMenu = () => {
     setIsFabMenuOpen(!isFabMenuOpen);
   };
 
-  // Pindahkan logik handleAddSong ke fungsi berasingan jika perlu
   const navigateToAddSong = () => {
     console.log('Navigasi ke skrin tambah lagu dari menu FAB');
     router.push('/add-song');
-    setIsFabMenuOpen(false); // Tutup menu selepas navigasi
+    setIsFabMenuOpen(false);
   };
 
   const openPasteModalFromFab = () => {
@@ -209,14 +252,132 @@ export default function MySongsScreen() {
     setIsFabMenuOpen(false);
   };
 
+  // Save satu entry dari recent shares (one-tap re-save)
+  const handleSaveRecentShare = async (share: RecentShare) => {
+    if (savingShareId) return;
+    setSavingShareId(share.id);
+    try {
+      const result = await addMySongWithId({
+        id: share.id,
+        title: share.title,
+        lyrics: share.lyrics,
+        sourceAdded: 'shared',
+        createdAt: Date.now(),
+      });
+      if (result.success) {
+        await removeRecentShare(share.id);
+        await refreshRecentShares();
+        if (Platform.OS === 'android') {
+          ToastAndroid.show(t('saveSuccessMessage').replace('{songTitle}', share.title), ToastAndroid.SHORT);
+        } else {
+          Alert.alert(t('saveSuccessTitle'), t('saveSuccessMessage').replace('{songTitle}', share.title));
+        }
+      } else {
+        Alert.alert(t('saveFailTitle'), result.message);
+      }
+    } finally {
+      setSavingShareId(null);
+    }
+  };
+
+  // Buang satu entry dari recent shares
+  const handleRemoveRecentShare = async (share: RecentShare) => {
+    await removeRecentShare(share.id);
+    await refreshRecentShares();
+  };
+
+  // Kosongkan semua
+  const handleClearRecentShares = () => {
+    Alert.alert(
+      t('recentSharesClearAll'),
+      t('recentSharesClearConfirm'),
+      [
+        { text: t('cancel'), style: 'cancel' },
+        {
+          text: t('recentSharesClearAll'),
+          style: 'destructive',
+          onPress: async () => {
+            await clearRecentShares();
+            await refreshRecentShares();
+          },
+        },
+      ]
+    );
+  };
+
+  // Format relative time untuk recent shares
+  const formatRecentTime = (timestamp: number): string => {
+    const diff = Date.now() - timestamp;
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return t('recentShareJustNow');
+    if (mins < 60) return t('recentShareMinutesAgo', { count: String(mins) });
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return t('recentShareHoursAgo', { count: String(hours) });
+    return formatRelativeDate(timestamp, t);
+  };
+
+  // Filter dan susun lagu ikut carian + sort mode
+  const filteredAndSortedSongs = useMemo(() => {
+    const query = searchQuery.toLowerCase().trim();
+    let list = mySongs;
+
+    if (query !== '') {
+      list = list.filter(song =>
+        song.title.toLowerCase().includes(query) ||
+        song.lyrics.toLowerCase().includes(query)
+      );
+    }
+
+    const sorted = [...list];
+    switch (sortMode) {
+      case 'newest':
+        sorted.sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
+        break;
+      case 'oldest':
+        sorted.sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0));
+        break;
+      case 'az':
+        sorted.sort((a, b) => a.title.localeCompare(b.title));
+        break;
+      case 'za':
+        sorted.sort((a, b) => b.title.localeCompare(a.title));
+        break;
+    }
+    return sorted;
+  }, [mySongs, searchQuery, sortMode]);
+
+  const sortModeLabel = (mode: SortMode): string => {
+    switch (mode) {
+      case 'newest': return t('sortNewest');
+      case 'oldest': return t('sortOldest');
+      case 'az': return t('sortAZ');
+      case 'za': return t('sortZA');
+    }
+  };
+
+  // Render satu lagu dalam senarai
   const renderSongItem = ({ item }: { item: UserSong }) => {
     const songIsFavorite = isFavorite(item.id);
+    const lineCount = countLyricsLines(item.lyrics);
+    const relativeDate = formatRelativeDate(item.createdAt, t);
+    const isShared = item.sourceAdded === 'shared';
+
+    // Warna border kiri mengikut status:
+    // - Ungu = lagu kegemaran
+    // - Oren = lagu dikongsi dari orang lain
+    // - Biru = lagu biasa / manual
+    let borderColor = currentColorTheme.accent;
+    if (songIsFavorite) {
+      borderColor = '#8e44ad'; // ungu — kegemaran
+    } else if (isShared) {
+      borderColor = '#e67e22'; // oren — dikongsi
+    }
 
     return (
       <View style={[
         styles.songCard,
         isDarkMode && styles.songCardDark,
-        { backgroundColor: currentColorTheme.surface, borderColor: currentColorTheme.border }
+        { backgroundColor: currentColorTheme.surface, borderColor: currentColorTheme.border, borderLeftColor: borderColor }
       ]}>
         <TouchableOpacity
           onPress={() => router.push(`/song/${item.id}?isUserSong=true`)}
@@ -226,7 +387,31 @@ export default function MySongsScreen() {
             styles.songTitle,
             isDarkMode && styles.textDark,
             { color: isDarkMode ? '#fff' : '#333' }
-          ]}>{item.title}</Text>
+          ]} numberOfLines={2}>{item.title}</Text>
+          <View style={styles.metaRow}>
+            <Text style={[
+              styles.metaText,
+              { color: currentColorTheme.textSecondary }
+            ]}>
+              {t('songLinesCount', { count: String(lineCount) })}
+            </Text>
+            {relativeDate !== '' && (
+              <>
+                <Text style={[styles.metaSeparator, { color: currentColorTheme.textSecondary }]}>·</Text>
+                <Text style={[
+                  styles.metaText,
+                  { color: currentColorTheme.textSecondary }
+                ]}>
+                  {relativeDate}
+                </Text>
+              </>
+            )}
+            {isShared && (
+              <View style={[styles.sharedBadge, { backgroundColor: isDarkMode ? 'rgba(230, 126, 34, 0.2)' : 'rgba(230, 126, 34, 0.15)' }]}>
+                <Text style={styles.sharedBadgeText}>{t('sharedBadge')}</Text>
+              </View>
+            )}
+          </View>
         </TouchableOpacity>
         <View style={styles.iconButtonsContainer}>
           <TouchableOpacity
@@ -256,6 +441,114 @@ export default function MySongsScreen() {
     );
   };
 
+  // Empty state — bezakan antara tiada lagu langsung vs tiada match carian
+  const renderEmptyState = () => {
+    if (mySongs.length === 0) {
+      // Tiada lagu langsung dalam koleksi
+      return (
+        <View style={styles.emptyStateContainer}>
+          <View style={[styles.emptyIconCircle, { backgroundColor: isDarkMode ? '#2a2a2a' : '#eef4ff' }]}>
+            <Music size={48} color={isDarkMode ? '#5A9AF5' : '#3498db'} />
+          </View>
+          <Text style={[
+            styles.emptyStateTitle,
+            { color: currentColorTheme.text }
+          ]}>{t('emptyMySongsTitle')}</Text>
+          <Text style={[
+            styles.emptyStateSubtitle,
+            { color: currentColorTheme.textSecondary }
+          ]}>{t('emptyMySongsSubtitle')}</Text>
+        </View>
+      );
+    }
+    // Ada lagu tapi takde match carian
+    return (
+      <Text style={[
+        styles.emptyText,
+        isDarkMode && styles.textDarkMuted,
+        { color: currentColorTheme.textSecondary }
+      ]}>{t('searchNoMatches')}</Text>
+    );
+  };
+
+  // Recent shares section — muncul di atas list kalau ada entry
+  const renderRecentSharesSection = () => {
+    if (recentShares.length === 0) return null;
+
+    return (
+      <View style={styles.recentSection}>
+        <View style={styles.recentSectionHeader}>
+          <View style={styles.recentSectionTitleRow}>
+            <History size={16} color={currentColorTheme.textSecondary} />
+            <Text style={[styles.recentSectionTitle, { color: currentColorTheme.textSecondary }]}>
+              {t('recentSharesTitle')}
+            </Text>
+          </View>
+          <TouchableOpacity onPress={handleClearRecentShares} hitSlop={{ top: 6, right: 6, bottom: 6, left: 6 }}>
+            <Trash2 size={16} color={currentColorTheme.textSecondary} />
+          </TouchableOpacity>
+        </View>
+
+        {recentShares.map((share) => {
+          const isAlreadySaved = mySongs.some(s => s.id === share.id);
+          const isSaving = savingShareId === share.id;
+          const lineCount = share.lyrics.split('\n').filter(l => l.trim().length > 0).length;
+
+          return (
+            <View
+              key={share.id}
+              style={[
+                styles.recentShareCard,
+                isDarkMode && styles.recentShareCardDark,
+                {
+                  backgroundColor: isDarkMode ? 'rgba(230, 126, 34, 0.08)' : 'rgba(230, 126, 34, 0.06)',
+                  borderColor: isDarkMode ? 'rgba(230, 126, 34, 0.3)' : 'rgba(230, 126, 34, 0.25)',
+                }
+              ]}
+            >
+              <View style={styles.recentShareInfo}>
+                <Text
+                  style={[styles.recentShareTitle, { color: currentColorTheme.text }]}
+                  numberOfLines={1}
+                >
+                  {share.title}
+                </Text>
+                <Text style={[styles.recentShareMeta, { color: currentColorTheme.textSecondary }]}>
+                  {t('songLinesCount', { count: String(lineCount) })} · {formatRecentTime(share.addedAt)}
+                </Text>
+              </View>
+              <View style={styles.recentShareActions}>
+                {isAlreadySaved ? (
+                  <View style={[styles.recentShareSavedBadge, { backgroundColor: isDarkMode ? 'rgba(39, 174, 96, 0.2)' : 'rgba(39, 174, 96, 0.15)' }]}>
+                    <Text style={styles.recentShareSavedBadgeText}>✓</Text>
+                  </View>
+                ) : (
+                  <TouchableOpacity
+                    style={[styles.recentShareSaveButton, isSaving && styles.recentShareSaveButtonDisabled]}
+                    onPress={() => handleSaveRecentShare(share)}
+                    disabled={isSaving || savingShareId !== null}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.recentShareSaveButtonText}>
+                      {isSaving ? '...' : t('recentShareSave')}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+                <TouchableOpacity
+                  onPress={() => handleRemoveRecentShare(share)}
+                  style={styles.recentShareRemoveButton}
+                  hitSlop={{ top: 8, right: 8, bottom: 8, left: 8 }}
+                >
+                  <X size={16} color={currentColorTheme.textSecondary} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          );
+        })}
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView style={[
       styles.container,
@@ -277,63 +570,242 @@ export default function MySongsScreen() {
           <Text style={[styles.headerTitle, styles.headerOverlayText]}>{t('mySongsCategoryTitle')}</Text>
         </View>
       </View>
-      <FlatList
-        data={mySongs}
-        renderItem={renderSongItem}
-        keyExtractor={(item) => item.id}
-        ListEmptyComponent={
-          <Text style={[
-            styles.emptyText,
-            isDarkMode && styles.textDarkMuted,
-            { color: currentColorTheme.textSecondary }
-          ]}>{t('noSongsFound')}</Text>
-        }
-        contentContainerStyle={styles.listContainer}
-      />
-      <View style={styles.fabContainer}>
-        {/* Menu FAB Tambahan (muncul bila isFabMenuOpen true) */}
-        {isFabMenuOpen && (
-          <>
-            {/* Pindahkan butang Tambah Lagu ke dalam menu */}
-            <View style={styles.fabRowContainer}>
-              <Text style={[styles.externalFabLabel, isDarkMode && styles.externalFabLabelDark]}>{t('addSongButtonLabel')}</Text>
-              <TouchableOpacity
-                style={[styles.fab, styles.fabAdd, isDarkMode && styles.fabDark]}
-                onPress={navigateToAddSong} // Guna fungsi baru
-              >
-                <Plus size={28} color="#27ae60" />
-              </TouchableOpacity>
-            </View>
 
-            <View style={styles.fabRowContainer}>
-              <Text style={[styles.externalFabLabel, isDarkMode && styles.externalFabLabelDark]}>{t('pasteLinkButtonLabel')}</Text>
-              <TouchableOpacity
-                style={[styles.fab, styles.fabPaste, isDarkMode && styles.fabDark]}
-                onPress={openPasteModalFromFab} // Guna fungsi baru
-              >
-                <Link size={24} color="#3498db" />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.fabRowContainer}>
-              <Text style={[styles.externalFabLabel, isDarkMode && styles.externalFabLabelDark]}>{t('shareHelpTitle')}</Text>
-              <TouchableOpacity
-                style={[styles.fab, styles.fabHelp, isDarkMode && styles.fabDark]}
-                onPress={showHelpAlertFromFab} // Guna fungsi baru
-              >
-                <HelpCircle size={24} color="#8e44ad" />
-              </TouchableOpacity>
-            </View>
-          </>
-        )}
-
-        {/* Butang FAB Utama (Toggle Menu) */}
+      {/* Search + sort bar — ditambah supaya koleksi lagu yang besar senang diurus */}
+      <View style={[styles.searchSortBar, { backgroundColor: currentColorTheme.background }]}>
+        <View style={[
+          styles.searchBar,
+          isDarkMode
+            ? { backgroundColor: '#2a2a2a', borderColor: '#333' }
+            : { backgroundColor: '#f2f2f2', borderColor: '#e0e0e0' }
+        ]}>
+          <Search size={18} color={currentColorTheme.textSecondary} />
+          <TextInput
+            style={[
+              styles.searchInput,
+              { color: currentColorTheme.text }
+            ]}
+            placeholder={t('mySongsSearchPlaceholder')}
+            placeholderTextColor={currentColorTheme.textSecondary}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            returnKeyType="search"
+          />
+          {searchQuery !== '' && (
+            <TouchableOpacity onPress={() => setSearchQuery('')}>
+              <X size={18} color={currentColorTheme.textSecondary} />
+            </TouchableOpacity>
+          )}
+        </View>
         <TouchableOpacity
-          style={[styles.fab, styles.mainFab, isDarkMode && styles.fabDark]} // Guna style baru untuk main FAB
-          onPress={toggleFabMenu} // Guna fungsi toggle
+          style={[
+            styles.sortButton,
+            isDarkMode
+              ? { backgroundColor: '#2a2a2a', borderColor: '#333' }
+              : { backgroundColor: '#f2f2f2', borderColor: '#e0e0e0' }
+          ]}
+          onPress={() => setIsSortMenuOpen(true)}
         >
-          {isFabMenuOpen ? <X size={28} color={isDarkMode ? "#fff" : "#000"} /> : <Plus size={28} color={isDarkMode ? "#fff" : "#000"} />}
+          <ArrowUpDown size={18} color={currentColorTheme.text} />
+          <Text style={[styles.sortButtonText, { color: currentColorTheme.text }]} numberOfLines={1}>
+            {sortModeLabel(sortMode)}
+          </Text>
         </TouchableOpacity>
       </View>
+
+      {/* Primary CTA + secondary actions (v.x.x) — gantikan FAB bulat lama.
+          Prominent button di atas sebab first-time user nampak terus, jelas,
+          dan label penuh (bukan ikon sahaja macam FAB). */}
+      <View style={[styles.primaryActionBar, { backgroundColor: currentColorTheme.background }]}>
+        <TouchableOpacity
+          style={styles.primaryCTA}
+          onPress={toggleFabMenu}
+          activeOpacity={0.8}
+        >
+          <View style={styles.primaryCTAIconCircle}>
+            <Plus size={22} color="#fff" />
+          </View>
+          <View style={styles.primaryCTAText}>
+            <Text style={styles.primaryCTATitle}>{t('addSongPrimaryCTA')}</Text>
+            <Text style={styles.primaryCTADesc}>{t('addSongPrimaryCTADesc')}</Text>
+          </View>
+          <ChevronRight size={20} color="#fff" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.secondaryActionButton,
+            isDarkMode
+              ? { backgroundColor: '#1f3a5f', borderColor: '#2a4a7f' }
+              : { backgroundColor: '#e8f4ff', borderColor: '#b8d8f0' }
+          ]}
+          onPress={openPasteModal}
+          activeOpacity={0.7}
+        >
+          <ClipboardIcon size={18} color={isDarkMode ? '#a0c4ff' : '#3498db'} />
+          <Text style={[
+            styles.secondaryActionText,
+            { color: isDarkMode ? '#a0c4ff' : '#3498db' }
+          ]} numberOfLines={1}>
+            {t('pasteLinkButtonLabel')}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <FlatList
+        data={filteredAndSortedSongs}
+        renderItem={renderSongItem}
+        keyExtractor={(item) => item.id}
+        ListEmptyComponent={renderEmptyState}
+        ListHeaderComponent={renderRecentSharesSection}
+        contentContainerStyle={styles.listContainer}
+        keyboardShouldPersistTaps="handled"
+      />
+      {/* FAB lama dibuang dalam v.x.x — prominent CTA di header mengambil alih fungsinya.
+          Bottom sheet di bawah tetap dipaparkan bila user tekan CTA / paste button. */}
+
+      {/* Bottom sheet — cara tambah lagu (v.x.x). Lebih kemas dari FAB menu lama. */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isFabMenuOpen}
+        onRequestClose={() => setIsFabMenuOpen(false)}
+        statusBarTranslucent={true}
+      >
+        <TouchableOpacity
+          style={styles.bottomSheetOverlay}
+          activeOpacity={1}
+          onPress={() => setIsFabMenuOpen(false)}
+        >
+          <TouchableOpacity
+            activeOpacity={1}
+            style={[
+              styles.bottomSheetContainer,
+              { backgroundColor: currentColorTheme.surface }
+            ]}
+            onPress={() => { /* swallow supaya tak tutup bila tekan dalam sheet */ }}
+          >
+            <View style={[styles.bottomSheetHandle, { backgroundColor: isDarkMode ? '#444' : '#ddd' }]} />
+            <Text style={[styles.bottomSheetTitle, { color: currentColorTheme.text }]}>
+              {t('addSongSheetTitle')}
+            </Text>
+            <Text style={[styles.bottomSheetSubtitle, { color: currentColorTheme.textSecondary }]}>
+              {t('addSongSheetSubtitle')}
+            </Text>
+
+            <TouchableOpacity
+              style={[
+                styles.bottomSheetOption,
+                { backgroundColor: isDarkMode ? '#222' : '#f8f9fa', borderColor: currentColorTheme.border }
+              ]}
+              onPress={navigateToAddSong}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.bottomSheetIconCircle, { backgroundColor: '#27ae6020' }]}>
+                <Edit3 size={22} color="#27ae60" />
+              </View>
+              <View style={styles.bottomSheetOptionText}>
+                <Text style={[styles.bottomSheetOptionTitle, { color: currentColorTheme.text }]}>
+                  {t('addSongOptionManual')}
+                </Text>
+                <Text style={[styles.bottomSheetOptionDesc, { color: currentColorTheme.textSecondary }]}>
+                  {t('addSongOptionManualDesc')}
+                </Text>
+              </View>
+              <ChevronRight size={20} color={currentColorTheme.textSecondary} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.bottomSheetOption,
+                { backgroundColor: isDarkMode ? '#222' : '#f8f9fa', borderColor: currentColorTheme.border }
+              ]}
+              onPress={openPasteModalFromFab}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.bottomSheetIconCircle, { backgroundColor: '#3498db20' }]}>
+                <Link size={22} color="#3498db" />
+              </View>
+              <View style={styles.bottomSheetOptionText}>
+                <Text style={[styles.bottomSheetOptionTitle, { color: currentColorTheme.text }]}>
+                  {t('addSongOptionPaste')}
+                </Text>
+                <Text style={[styles.bottomSheetOptionDesc, { color: currentColorTheme.textSecondary }]}>
+                  {t('addSongOptionPasteDesc')}
+                </Text>
+              </View>
+              <ChevronRight size={20} color={currentColorTheme.textSecondary} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.bottomSheetOption,
+                { backgroundColor: isDarkMode ? '#222' : '#f8f9fa', borderColor: currentColorTheme.border }
+              ]}
+              onPress={showHelpAlertFromFab}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.bottomSheetIconCircle, { backgroundColor: '#8e44ad20' }]}>
+                <HelpCircle size={22} color="#8e44ad" />
+              </View>
+              <View style={styles.bottomSheetOptionText}>
+                <Text style={[styles.bottomSheetOptionTitle, { color: currentColorTheme.text }]}>
+                  {t('addSongOptionHelp')}
+                </Text>
+                <Text style={[styles.bottomSheetOptionDesc, { color: currentColorTheme.textSecondary }]}>
+                  {t('addSongOptionHelpDesc')}
+                </Text>
+              </View>
+              <ChevronRight size={20} color={currentColorTheme.textSecondary} />
+            </TouchableOpacity>
+
+            {/* Safe area bawah supaya tak ditutupi gesture bar iPhone */}
+            <View style={{ height: 20 }} />
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* Sort menu modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={isSortMenuOpen}
+        onRequestClose={() => setIsSortMenuOpen(false)}
+      >
+        <TouchableOpacity
+          style={styles.sortMenuOverlay}
+          activeOpacity={1}
+          onPress={() => setIsSortMenuOpen(false)}
+        >
+          <View style={[
+            styles.sortMenuContainer,
+            isDarkMode && styles.sortMenuContainerDark,
+            { backgroundColor: currentColorTheme.surface, borderColor: currentColorTheme.border }
+          ]}>
+            <Text style={[styles.sortMenuTitle, { color: currentColorTheme.text }]}>{t('sortBy')}</Text>
+            {(['newest', 'oldest', 'az', 'za'] as SortMode[]).map((mode) => (
+              <TouchableOpacity
+                key={mode}
+                style={[
+                  styles.sortMenuItem,
+                  sortMode === mode && { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)' }
+                ]}
+                onPress={() => {
+                  setSortMode(mode);
+                  setIsSortMenuOpen(false);
+                }}
+              >
+                <Text style={[styles.sortMenuItemText, { color: currentColorTheme.text }]}>
+                  {sortModeLabel(mode)}
+                </Text>
+                {sortMode === mode && (
+                  <Text style={[styles.sortMenuCheck, { color: currentColorTheme.primary }]}>✓</Text>
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
       <Modal
         animationType="slide"
         transparent={true}
@@ -450,23 +922,106 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 6,
   },
-  loadingContainer: {
+  // Search + sort bar
+  searchSortBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    gap: 8,
+  },
+  searchBar: {
     flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    height: 40,
+    borderWidth: 1,
+    gap: 8,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 15,
+    paddingVertical: 0,
+  },
+  sortButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    height: 40,
+    borderWidth: 1,
+    gap: 6,
+    maxWidth: 130,
+  },
+  sortButtonText: {
+    fontSize: 13,
+    fontWeight: '500',
+    flexShrink: 1,
+  },
+  // Sort menu modal
+  sortMenuOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 20,
   },
+  sortMenuContainer: {
+    width: '100%',
+    maxWidth: 320,
+    borderRadius: 12,
+    borderWidth: 1,
+    overflow: 'hidden',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+  },
+  sortMenuContainerDark: {
+    backgroundColor: '#2a2a2a',
+  },
+  sortMenuTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    opacity: 0.7,
+  },
+  sortMenuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  sortMenuItemText: {
+    fontSize: 16,
+  },
+  sortMenuCheck: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  // List
   listContainer: {
     paddingHorizontal: 15,
-    paddingTop: 10,
+    paddingTop: 4,
     paddingBottom: 100,
+    flexGrow: 1,
   },
+  // Song card
   songCard: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#fff',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
+    paddingVertical: 14,
+    paddingHorizontal: 18,
     borderRadius: 10,
     marginBottom: 10,
     shadowColor: "#000",
@@ -479,7 +1034,6 @@ const styles = StyleSheet.create({
   },
   songCardDark: {
     backgroundColor: '#2a2a2a',
-    borderLeftColor: '#5dade2',
     elevation: 3,
   },
   songTitleContainer: {
@@ -491,6 +1045,40 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#333',
   },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+    flexWrap: 'wrap',
+    gap: 4,
+  },
+  metaText: {
+    fontSize: 12,
+  },
+  metaSeparator: {
+    fontSize: 12,
+    marginHorizontal: 2,
+  },
+  sharedBadge: {
+    marginLeft: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+  sharedBadgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#e67e22',
+  },
+  iconButtonsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconButton: {
+    padding: 8,
+    marginLeft: 4,
+  },
+  // Empty state
   emptyText: {
     textAlign: 'center',
     marginTop: 50,
@@ -503,67 +1091,156 @@ const styles = StyleSheet.create({
   textDarkMuted: {
     color: '#888',
   },
-  fabContainer: {
-    position: 'absolute',
-    bottom: 30,
-    right: 30,
-    flexDirection: 'column',
-    alignItems: 'flex-end',
+  emptyStateContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
+    paddingHorizontal: 30,
   },
-  fabRowContainer: {
+  emptyIconCircle: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  emptyStateTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  emptyStateSubtitle: {
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  // Primary CTA bar (v.x.x) — gantikan FAB bulat lama
+  primaryActionBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 15,
+    paddingHorizontal: 15,
+    paddingTop: 4,
+    paddingBottom: 10,
+    gap: 10,
   },
-  externalFabLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#444',
-    marginRight: 10,
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 10,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
+  primaryCTA: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 14,
+    backgroundColor: '#27ae60',
+    elevation: 3,
+    shadowColor: '#27ae60',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
   },
-  externalFabLabelDark: {
-    color: '#ddd',
-    backgroundColor: 'rgba(50, 50, 50, 0.9)',
-  },
-  fab: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+  primaryCTAIconCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255, 255, 255, 0.22)',
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 8,
+    marginRight: 10,
+  },
+  primaryCTAText: {
+    flex: 1,
+  },
+  primaryCTATitle: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 1,
+  },
+  primaryCTADesc: {
+    color: 'rgba(255, 255, 255, 0.85)',
+    fontSize: 11,
+    fontWeight: '500',
+  },
+  secondaryActionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+    gap: 6,
+    maxWidth: 130,
+  },
+  secondaryActionText: {
+    fontSize: 13,
+    fontWeight: '600',
+    flexShrink: 1,
+  },
+  // Bottom sheet (v.x.x) — popup pilihan lengkap bila tekan primary CTA
+  bottomSheetOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  bottomSheetContainer: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 24,
+    elevation: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    backgroundColor: '#ffffff',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
   },
-  mainFab: {
-    // Inherits from fab, can override or add specifics if needed
-    // Example: different background color if needed
+  bottomSheetHandle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    alignSelf: 'center',
+    marginBottom: 16,
   },
-  fabAdd: {
-    // Specific styles for Add button if needed, otherwise inherits from fab
+  bottomSheetTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 4,
   },
-  fabPaste: {
-    // Specific styles for Paste button if needed
+  bottomSheetSubtitle: {
+    fontSize: 14,
+    marginBottom: 20,
+    lineHeight: 18,
   },
-  fabHelp: {
-    // Specific styles for Help button if needed
+  bottomSheetOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginBottom: 10,
   },
-  fabDark: {
-    backgroundColor: '#444',
-    shadowColor: '#000',
+  bottomSheetIconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 14,
   },
+  bottomSheetOptionText: {
+    flex: 1,
+  },
+  bottomSheetOptionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  bottomSheetOptionDesc: {
+    fontSize: 13,
+    lineHeight: 17,
+  },
+  // Paste link modal
   modalOverlay: {
     flex: 1,
     justifyContent: 'center',
@@ -653,12 +1330,87 @@ const styles = StyleSheet.create({
   buttonDisabled: {
     backgroundColor: '#999',
   },
-  iconButtonsContainer: {
+  // Recent shares section (Pilihan D v.x.x)
+  recentSection: {
+    marginBottom: 16,
+    marginTop: 4,
+  },
+  recentSectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+    paddingHorizontal: 4,
   },
-  iconButton: {
-    padding: 8,
-    marginLeft: 8,
+  recentSectionTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
-}); 
+  recentSectionTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  recentShareCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: '#e67e22',
+  },
+  recentShareCardDark: {
+    // Background colour set inline supaya ada tone oren yang konsisten
+  },
+  recentShareInfo: {
+    flex: 1,
+    marginRight: 10,
+  },
+  recentShareTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  recentShareMeta: {
+    fontSize: 11,
+  },
+  recentShareActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  recentShareSaveButton: {
+    backgroundColor: '#27ae60',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  recentShareSaveButtonDisabled: {
+    backgroundColor: '#999',
+  },
+  recentShareSaveButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  recentShareRemoveButton: {
+    padding: 4,
+  },
+  recentShareSavedBadge: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  recentShareSavedBadgeText: {
+    color: '#27ae60',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+});
