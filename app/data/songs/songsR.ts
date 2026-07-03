@@ -5103,19 +5103,18 @@ Untuk diriku`,
     id: 'R235',
     title: 'KAMI BAWA PERSEMBAHAN',
     lyrics: `Kami bawa persembahan
-Hati yang tulus
-Dengan sukacita
-Kami beri kepadaMu
-Allah yang hidup
-Terima kasih Tuhan
-Atas anugerahMu
-Kami bawa persembahan
-Hati yang tulus
-Dengan sukacita
-Kami beri kepadaMu
-Allah yang hidup
-Terima kasih Tuhan
-Atas anugerahMu`,
+Roti dan anggur ini lambang
+kurban diri kami dalam amal kasih
+
+Korus: Trimalah... ya Bapa
+Persembahan umatMu
+Bersatu... selalu
+Berbakti kepadaMu
+
+Namun kerna kurban kami
+Tanpa nilai dan erti
+Maka jadikanlah satu
+Dengan kurban Yesus`,
     songNumber: 'R'
   },
   {
