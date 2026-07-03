@@ -1,24 +1,20 @@
 {
-  "version": "1.8.0",
+  "version": "1.9.0",
   "minVersion": "1.7.0",
   "url": "https://play.google.com/store/apps/details?id=com.tytusdl.lagu_pozoo",
   "iosUrl": "https://apps.apple.com/app/buku-lagu-katolik/id6479187123",
   "releaseNotes": {
     "Melayu": [
-      "Kelajuan Kategori Lagu: Mengurangkan masa muat kategori sebanyak 88% dengan data ringan tanpa lirik.",
-      "Prestasi App: Memuatkan fon sekali sahaja di peringkat akar untuk navigasi lebih lancar.",
-      "Pembersihan Kod: Memadam fail dan dependensi yang tidak digunakan untuk saiz app lebih kecil.",
-      "Senarai Lagu Misa: Menambah bahagian 'Lagu Kesyukuran' selepas bahagian Lagu Komuni di bawah perancangan Senarai Lagu.",
-      "Sistem Navigasi Android: Memperbaiki isu tab menu bertindih dengan butang navigasi sistem Android pada sesetengah peranti.",
-      "Kestabilan Aplikasi: Memperbaiki ralat 'Unable to activate keep awake' yang menyebabkan aplikasi tergendala semasa dimulakan."
+      "Ciri Baru - Lapor Lirik: Kini anda boleh melaporkan masalah lirik lagu (salah ejaan, baris hilang, dll) terus dari halaman detail lagu. Laporan akan dihantar melalui emel kepada pembangun dan disimpan dalam peranti.",
+      "Tetapan - Senarai Laporan: Bahagian 'Laporan Lirik' baru di Tetapan untuk melihat semua laporan yang dihantar dari peranti ini, dengan pilihan eksport atau padam.",
+      "Metadata Lagu Automatik: Laporan menyertakan ID lagu, tajuk, jenis masalah, dan versi aplikasi supaya pembangun mudah kenal pasti dan membaiki.",
+      "Hubungi Saya Dipermudahkan: Menu 'Hubungi Saya' gabungan — pilih 'Pertanyaan Umum' untuk emel biasa atau 'Lapor Lirik' untuk panduan."
     ],
     "English": [
-      "Song Category Speed: Reduced category loading time by 88% using lightweight data without lyrics.",
-      "App Performance: Fonts now load once at root level for smoother navigation.",
-      "Code Cleanup: Removed unused files and dependencies for a smaller app size.",
-      "Mass Song List: Added the 'Thanksgiving Song' section after the Communion Song section in the Song List planner.",
-      "Android Navigation System: Fixed overlapping issue between the bottom tab bar and Android system navigation buttons.",
-      "App Stability: Fixed 'Unable to activate keep awake' error that caused app crashes on startup."
+      "New Feature - Lyrics Report: You can now report song lyrics issues (spelling errors, missing lines, etc.) directly from the song detail page. Reports are sent to the developer via email and also saved on this device.",
+      "Settings - Reports List: A new 'Lyrics Reports' section in Settings to view all reports submitted from this device, with options to export or delete.",
+      "Automatic Song Metadata: Each report includes the song ID, title, issue type, and app version so the developer can quickly identify and fix problems.",
+      "Simplified Contact: 'Contact Me' menu is now combined — choose 'General Inquiry' for regular email, or 'Report Lyrics' for guidance."
     ]
   },
   "forceUpdate": false

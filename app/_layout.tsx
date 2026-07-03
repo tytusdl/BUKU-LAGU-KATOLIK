@@ -7,6 +7,7 @@ import { FavoritesProvider } from './context/FavoritesContext';
 import ThemeProvider, { useTheme } from './context/ThemeContext';
 import { MySongsProvider, useMySongs, UserSong } from './context/MySongsContext';
 import { MassProvider } from './context/MassContext';
+import { LyricsReportProvider } from './context/LyricsReportContext';
 import { router } from 'expo-router';
 import { Asset } from 'expo-asset';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -450,7 +451,9 @@ export default function RootLayout() {
           <FavoritesProvider>
             <MySongsProvider>
               <MassProvider>
-                <ThemedApp />
+                <LyricsReportProvider>
+                  <ThemedApp />
+                </LyricsReportProvider>
               </MassProvider>
             </MySongsProvider>
           </FavoritesProvider>

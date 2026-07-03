@@ -2,7 +2,7 @@
   "expo": {
     "name": "Buku Lagu Katolik",
     "slug": "lagu_pozoo",
-    "version": "1.8.0",
+    "version": "1.9.0",
     "jsEngine": "hermes",
     "newArchEnabled": true,
     "scheme": "lagu-pozoo",
@@ -89,7 +89,7 @@
       "name": "Buku Lagu Katolik",
       "supportsTablet": true,
       "bundleIdentifier": "com.tytusdl.lagu-pozoo",
-      "buildNumber": "1.8.0",
+      "buildNumber": "1.9.0",
       "jsEngine": "hermes",
       "infoPlist": {
         "CFBundleURLTypes": [

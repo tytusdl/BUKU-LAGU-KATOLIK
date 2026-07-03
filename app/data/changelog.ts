@@ -16,6 +16,35 @@ export interface ChangelogEntry {
 // Add new versions at the top of the list
 export const changelogData: ChangelogEntry[] = [
     {
+        version: "1.9.0",
+        changes: [
+            {
+                text: {
+                    Melayu: "Ciri Baru - Lapor Lirik: Sekarang anda boleh melaporkan masalah lirik lagu (salah ejaan, baris hilang, masalah kod lagu, dll) terus dari halaman detail lagu.",
+                    English: "New Feature - Lyrics Report: You can now report song lyrics issues (spelling errors, missing lines, chord issues, etc.) directly from the song detail page."
+                }
+            },
+            {
+                text: {
+                    Melayu: "Senarai Laporan di Tetapan: Lihat semua laporan lirik yang dihantar dari peranti ini, dengan pilihan eksport atau padam laporan.",
+                    English: "Reports List in Settings: View all lyrics reports submitted from this device, with options to export or delete reports."
+                }
+            },
+            {
+                text: {
+                    Melayu: "Penghantaran Pintar: Laporan disimpan dalam peranti dan boleh dihantar terus ke emel pembangun dengan metadata lagu yang lengkap.",
+                    English: "Smart Delivery: Reports are saved on this device and can be sent directly to the developer's email with complete song metadata."
+                }
+            },
+            {
+                text: {
+                    Melayu: "Hubungi Saya Dipermudahkan: Menu 'Hubungi Saya' kini gabungan — pilih 'Pertanyaan Umum' untuk emel biasa atau 'Lapor Lirik' untuk panduan melaporkan masalah lirik dari halaman lagu.",
+                    English: "Simplified Contact: 'Contact Me' menu is now combined — choose 'General Inquiry' for regular email, or 'Report Lyrics' for guidance on reporting lyrics issues from the song page."
+                }
+            }
+        ]
+    },
+    {
         version: "1.8.0",
         changes: [
             {

@@ -1,7 +1,7 @@
 {
   "name": "buku-lagu-katolik",
   "main": "buku_pozoo",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "private": true,
   "scripts": {
     "dev": "expo start --clear -c",
@@ -50,6 +50,8 @@
     "@tsconfig/react-native": "^3.0.5",
     "@types/react": "~19.1.10",
     "babel-plugin-transform-remove-console": "^6.9.4",
+    "eslint": "^9.0.0",
+    "eslint-config-expo": "~10.0.0",
     "sharp-cli": "^5.1.0",
     "typescript": "~5.9.2"
   },

@@ -14,6 +14,9 @@ import * as WebBrowser from 'expo-web-browser';
 
 import { useLanguage } from '../context/LanguageContext';
 import { translations } from '../../src/translations';
+import { useLyricsReports } from '../context/LyricsReportContext';
+import LyricsReportsListModal from '../components/LyricsReportsListModal';
+import ContactModal from '../components/ContactModal';
 
 export default function SettingScreen() {
   const { isDarkMode, toggleTheme, currentColorTheme, colorThemeId, setColorTheme } = useTheme();
@@ -27,6 +30,9 @@ export default function SettingScreen() {
   const [isChangelogExpanded, setIsChangelogExpanded] = useState(false);
   const [expandedOldVersions, setExpandedOldVersions] = useState<string[]>([]);
   const [appVersion] = useState(packages.version);
+  const [showReportsModal, setShowReportsModal] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
+  const { reports: lyricsReports } = useLyricsReports();
 
   // Auto-collapse changelog when leaving the screen
   useFocusEffect(
@@ -306,13 +312,42 @@ export default function SettingScreen() {
 
           <TouchableOpacity
             style={[styles.row, isDarkMode && styles.darkRow]}
-            onPress={() => Linking.openURL('mailto:tytusdl@gmail.com')}
+            onPress={() => setShowContactModal(true)}
           >
             <View style={styles.rowContent}>
               <Mail size={24} color={isDarkMode ? "#fff" : "#333"} />
               <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('helpContact')}</Text>
             </View>
             <ChevronRight size={20} color={isDarkMode ? "#999" : "#999"} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.row, isDarkMode && styles.darkRow]}
+            onPress={() => setShowReportsModal(true)}
+          >
+            <View style={styles.rowContent}>
+              <Sparkles size={24} color={isDarkMode ? "#fff" : "#333"} />
+              <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('reportViewAll')}</Text>
+            </View>
+            <View style={styles.rowRight}>
+              {lyricsReports.length > 0 && (
+                <View style={{
+                  backgroundColor: '#E22D2D',
+                  borderRadius: 10,
+                  minWidth: 22,
+                  height: 22,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  paddingHorizontal: 6,
+                  marginRight: 8,
+                }}>
+                  <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>
+                    {lyricsReports.length > 99 ? '99+' : lyricsReports.length}
+                  </Text>
+                </View>
+              )}
+              <ChevronRight size={20} color={isDarkMode ? "#999" : "#999"} />
+            </View>
           </TouchableOpacity>
         </View>
 
@@ -610,6 +645,28 @@ export default function SettingScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Laporan Lirik Viewer */}
+      <LyricsReportsListModal
+        visible={showReportsModal}
+        onClose={() => setShowReportsModal(false)}
+      />
+
+      {/* Contact Modal — pilih generic atau lapor lirik */}
+      <ContactModal
+        visible={showContactModal}
+        onClose={() => setShowContactModal(false)}
+        onRequestLyricsReport={() => {
+          // Dari Tetapan, takde lagu context — guide user ke halaman lagu
+          Alert.alert(
+            t('contactLyricsReport'),
+            currentLanguage === 'Melayu'
+              ? 'Sila buka mana-mana lagu, kemudian tekan ikon ⚠️ atau buka menu untuk memilih "LAPOR LIRIK".'
+              : 'Please open any song, then tap the ⚠️ icon or open the menu and select "REPORT LYRICS".',
+            [{ text: t('close') }]
+          );
+        }}
+      />
 
     </SafeAreaView>
   );

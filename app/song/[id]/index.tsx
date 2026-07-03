@@ -2,7 +2,7 @@ import React from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, FlatList, Share, /*ActivityIndicator,*/ TouchableHighlight, Alert, Platform, ToastAndroid, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Minus, Plus, Type, Heart, Share as ShareIcon, Menu, X, Edit, Trash2, ChevronLeft, ChevronRight, Link2, Image as ImageIcon, PlayCircle, Music, Music2 } from 'lucide-react-native';
+import { ArrowLeft, Minus, Plus, Type, Heart, Share as ShareIcon, Menu, X, Edit, Trash2, ChevronLeft, ChevronRight, Link2, Image as ImageIcon, PlayCircle, Music, Music2, AlertCircle } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { songs as defaultSongs, songs as allSongs, Song } from '../../data/songs';
 import { useState, useEffect, useMemo, Fragment, useRef, useCallback } from 'react';
@@ -18,6 +18,8 @@ import * as MediaLibrary from 'expo-media-library';
 import { captureRef } from 'react-native-view-shot';
 import { translations } from '../../../src/translations';
 import { useLanguage } from '../../context/LanguageContext';
+import ReportLyricsModal from '../../components/ReportLyricsModal';
+import packages from '../../../package.json';
 
 const FONT_SIZE_KEY = 'appFontSize';
 
@@ -40,7 +42,9 @@ export default function SongDetail() {
   const [nextSongId, setNextSongId] = useState<string | null>(null);
   const [isCapturingImage, setIsCapturingImage] = useState(false);
   const [showMassModal, setShowMassModal] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
   const { massSelection, addSongToMassPart } = useMass();
+  const [appVersion] = useState(packages.version);
 
   const { massPartLabel, songKey } = useMemo(() => {
     if (!id || !fromMass) return { massPartLabel: null, songKey: null };
@@ -785,6 +789,16 @@ export default function SongDetail() {
               fill={songIsFavorite ? '#E22D2D' : 'transparent'}
             />
           </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setShowReportModal(true)}
+            style={styles.favoriteButton}
+            hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}
+          >
+            <AlertCircle
+              size={22}
+              color={isDarkMode ? '#fff' : '#666'}
+            />
+          </TouchableOpacity>
         </View>
       </View>
       <ScrollView
@@ -1022,6 +1036,19 @@ export default function SongDetail() {
               <Text style={[styles.fabMenuText, { color: isDarkMode ? '#fff' : '#000' }]}>{t('massTitle').toUpperCase()}</Text>
             </TouchableOpacity>
 
+            {!isUserSong && (
+              <TouchableOpacity
+                style={styles.fabMenuItemWide}
+                onPress={() => {
+                  setShowButtons(false);
+                  setShowReportModal(true);
+                }}
+              >
+                <AlertCircle size={20} color={isDarkMode ? '#fff' : '#000'} style={styles.fabMenuIcon} />
+                <Text style={[styles.fabMenuText, { color: isDarkMode ? '#fff' : '#000' }]}>{t('reportLyrics').toUpperCase()}</Text>
+              </TouchableOpacity>
+            )}
+
             {isUserSong && (
               <TouchableOpacity
                 style={styles.fabMenuItemWide}
@@ -1147,6 +1174,15 @@ export default function SongDetail() {
           </View>
         </TouchableOpacity>
       </Modal>
+
+      {/* Modal Lapor Lirik */}
+      <ReportLyricsModal
+        visible={showReportModal}
+        onClose={() => setShowReportModal(false)}
+        songId={isUserSong ? t('lagusaya') : song.id}
+        songTitle={song.title}
+        appVersion={appVersion}
+      />
 
     </SafeAreaView>
   );
