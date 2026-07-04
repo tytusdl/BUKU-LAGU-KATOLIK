@@ -15,6 +15,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useLyricsReports, LyricsReport, LyricsReportType } from '../context/LyricsReportContext';
 import { X, Trash2, Copy, FileText, Music2 } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface LyricsReportsListModalProps {
   visible: boolean;
@@ -36,6 +37,7 @@ export default function LyricsReportsListModal({
   const { isDarkMode, currentColorTheme } = useTheme();
   const { currentLanguage, t } = useLanguage();
   const { reports, removeReport, clearAllReports, exportReportsAsText } = useLyricsReports();
+  const insets = useSafeAreaInsets();
 
   const showToast = (msg: string) => {
     if (Platform.OS === 'android') {
@@ -100,7 +102,10 @@ export default function LyricsReportsListModal({
         <View style={[
           styles.modalContainer,
           isDarkMode && styles.darkModalContainer,
-          { backgroundColor: currentColorTheme.surface }
+          {
+            backgroundColor: currentColorTheme.surface,
+            paddingBottom: Math.max(insets.bottom, 20) + 8,
+          }
         ]}>
           {/* Header */}
           <View style={styles.header}>

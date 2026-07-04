@@ -383,6 +383,17 @@ export default function RootLayout() {
         cacheImages(mainBanners)
           .catch(e => console.warn('Ralat pratambahan:', e));
 
+        // Pre-warm the splash icon so iOS has the image decoded BEFORE the
+        // splash screen renders. Without this, iOS first-paint shows the
+        // logo for a frame or two at opacity 0 before the fade-in finishes,
+        // because image decode blocks the worklet.
+        try {
+          await Asset.fromModule(require('../assets/images/icon.png')).downloadAsync();
+        } catch (e) {
+          // non-fatal — splash will still render, just may have one extra
+          // decode frame on cold start
+        }
+
         // Tunggu fonts dimuatkan
         if (!fontsLoaded) {
           await new Promise(resolve => {
@@ -406,11 +417,25 @@ export default function RootLayout() {
   }, [fontsLoaded]);
 
   // Aplikasi siap, balut ThemedApp dengan Provider
-  if (!splashAnimationFinished) {
-    return (
-      <AnimatedSplash onAnimationFinish={() => setSplashAnimationFinished(true)} />
-    );
-  }
+  //
+  // iOS fix: don't immediately unmount the splash when its animation
+  // finishes — instead, render it as an overlay above the mounted app
+  // tree, fade it out via Reanimated's `exiting` prop, and only unmount
+  // it after the exit fade has visually completed.
+  //
+  // What this avoids: when `splashAnimationFinished` flipped synchronously
+  // in the old code, RootLayout returned a *different* component subtree
+  // on the very next render. React then unmounted <AnimatedSplash/> and
+  // mounted the whole <SafeAreaProvider> ... <Stack> tree in one big
+  // commit. On iOS that commit triggers all six Contexts to hydrate from
+  // AsyncStorage, expo-router to bring up its native screens, and the
+  // first tab to mount — all on the same frame the user sees, producing
+  // a visible stutter.
+  //
+  // Returning the App tree immediately (instead of waiting for splash
+  // finish) lets those Contexts hydrate while the splash is still on
+  // screen, so by the time the splash fades out the app is already warm.
+  const splashDone = splashAnimationFinished;
 
   return (
     <SafeAreaProvider>
@@ -421,6 +446,17 @@ export default function RootLayout() {
               <MassProvider>
                 <LyricsReportProvider>
                   <ThemedApp appIsReady={appIsReady} />
+                  {/* Splash overlays the app until its exit animation
+                      completes. Reanimated's `exiting={FadeOut.duration(800)}`
+                      handles the fade; we keep it mounted for the duration
+                      so React doesn't reconcile a brand-new tree exactly
+                      when the user sees the swap. Once the fade would have
+                      visibly ended, we unmount for memory. */}
+                  {!splashDone && (
+                    <AnimatedSplash
+                      onAnimationFinish={() => setSplashAnimationFinished(true)}
+                    />
+                  )}
                 </LyricsReportProvider>
               </MassProvider>
             </MySongsProvider>

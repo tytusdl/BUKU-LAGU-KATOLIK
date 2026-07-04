@@ -2,7 +2,7 @@ import { useFocusEffect } from 'expo-router';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, StyleSheet, Switch, ScrollView, TouchableOpacity, Modal, Alert, Linking, Animated } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { ChevronRight, Moon, Globe, HelpCircle, Check, Palette, Heart, ChevronUp, Sparkles, Mail, Coffee } from 'lucide-react-native';
+import { ChevronRight, Moon, Globe, HelpCircle, Check, Palette, Heart, ChevronUp, Sparkles, Mail, HandHeart } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme, colorThemes, darkColorThemes } from '../context/ThemeContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -142,15 +142,18 @@ export default function SettingScreen() {
           <TouchableOpacity
             style={[styles.row, isDarkMode && styles.darkRow, { borderTopWidth: 0 }]}
             onPress={() => setIsChangelogExpanded(!isChangelogExpanded)}
+            activeOpacity={0.7}
           >
             <View style={styles.rowContent}>
-              <Sparkles size={24} color={isDarkMode ? "#fff" : "#333"} />
+              <View style={[styles.iconContainer, { backgroundColor: isDarkMode ? 'rgba(175,82,222,0.18)' : 'rgba(175,82,222,0.12)' }]}>
+                <Sparkles size={20} color={isDarkMode ? "#C68FE8" : "#AF52DE"} strokeWidth={2.2} />
+              </View>
               <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('newUpdate')}</Text>
             </View>
             {isChangelogExpanded ? (
-              <ChevronUp size={20} color={isDarkMode ? "#999" : "#999"} />
+              <ChevronUp size={18} color={isDarkMode ? "#666" : "#999"} />
             ) : (
-              <ChevronRight size={20} color={isDarkMode ? "#999" : "#999"} />
+              <ChevronRight size={18} color={isDarkMode ? "#666" : "#999"} />
             )}
           </TouchableOpacity>
 
@@ -218,16 +221,26 @@ export default function SettingScreen() {
           isDarkMode && styles.darkSection,
           { backgroundColor: currentColorTheme.surface }
         ]}>
-          <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>{t('languageSection')}</Text>
+          <View style={styles.sectionHeader}>
+            <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>{t('languageSection')}</Text>
+          </View>
 
-          <TouchableOpacity style={[styles.row, isDarkMode && styles.darkRow]} onPress={toggleLanguageModal}>
+          <TouchableOpacity
+            style={[styles.row, isDarkMode && styles.darkRow]}
+            onPress={toggleLanguageModal}
+            activeOpacity={0.7}
+          >
             <View style={styles.rowContent}>
-              <Globe size={24} color={isDarkMode ? "#fff" : "#333"} />
+              <View style={[styles.iconContainer, { backgroundColor: isDarkMode ? 'rgba(72,114,244,0.18)' : 'rgba(72,114,244,0.12)' }]}>
+                <Globe size={20} color={isDarkMode ? "#7BA0FF" : "#4872F4"} strokeWidth={2.2} />
+              </View>
               <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('language')}</Text>
             </View>
             <View style={styles.rowRight}>
-              <Text style={[styles.selectedOption, isDarkMode && styles.darkText]}>{currentLanguage}</Text>
-              <ChevronRight size={20} color={isDarkMode ? "#999" : "#999"} />
+              <View style={[styles.languagePill, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)' }]}>
+                <Text style={[styles.languagePillText, isDarkMode && styles.darkText]}>{currentLanguage}</Text>
+              </View>
+              <ChevronRight size={18} color={isDarkMode ? "#666" : "#999"} />
             </View>
           </TouchableOpacity>
         </View>
@@ -237,11 +250,15 @@ export default function SettingScreen() {
           isDarkMode && styles.darkSection,
           { backgroundColor: currentColorTheme.surface }
         ]}>
-          <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>{t('themeSettings')}</Text>
+          <View style={styles.sectionHeader}>
+            <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>{t('themeSettings')}</Text>
+          </View>
 
           <View style={[styles.row, isDarkMode && styles.darkRow]}>
             <View style={styles.rowContent}>
-              <Moon size={24} color={isDarkMode ? "#fff" : "#333"} />
+              <View style={[styles.iconContainer, { backgroundColor: isDarkMode ? 'rgba(120,120,128,0.24)' : 'rgba(120,120,128,0.14)' }]}>
+                <Moon size={20} color={isDarkMode ? "#C7C7CC" : "#48484A"} strokeWidth={2.2} />
+              </View>
               <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('darkMode')}</Text>
             </View>
             <View style={styles.rowRight}>
@@ -254,9 +271,11 @@ export default function SettingScreen() {
             </View>
           </View>
 
-          <TouchableOpacity style={[styles.row, isDarkMode && styles.darkRow]} onPress={toggleColorThemeModal}>
+          <TouchableOpacity style={[styles.row, isDarkMode && styles.darkRow]} onPress={toggleColorThemeModal} activeOpacity={0.7}>
             <View style={styles.rowContent}>
-              <Palette size={24} color={isDarkMode ? "#fff" : "#333"} />
+              <View style={[styles.iconContainer, { backgroundColor: isDarkMode ? 'rgba(255,159,10,0.18)' : 'rgba(255,159,10,0.14)' }]}>
+                <Palette size={20} color={isDarkMode ? "#FFB340" : "#FF9F0A"} strokeWidth={2.2} />
+              </View>
               <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('colorTheme')}</Text>
             </View>
             <View style={styles.rowRight}>
@@ -265,7 +284,7 @@ export default function SettingScreen() {
                 { backgroundColor: currentColorTheme.primary }
               ]} />
               <Text style={[styles.selectedOption, isDarkMode && styles.darkText]}>{getColorThemeName(colorThemeId)}</Text>
-              <ChevronRight size={20} color={isDarkMode ? "#999" : "#999"} />
+              <ChevronRight size={18} color={isDarkMode ? "#666" : "#999"} />
             </View>
           </TouchableOpacity>
         </View>
@@ -275,18 +294,22 @@ export default function SettingScreen() {
           isDarkMode && styles.darkSection,
           { backgroundColor: currentColorTheme.surface }
         ]}>
-          <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>{t('help')}</Text>
+          <View style={styles.sectionHeader}>
+            <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>{t('help')}</Text>
+          </View>
 
-          <TouchableOpacity style={[styles.row, isDarkMode && styles.darkRow, { borderTopWidth: 0 }]} onPress={() => openInfoModal('help')}>
+          <TouchableOpacity style={[styles.row, isDarkMode && styles.darkRow, { borderTopWidth: 0 }]} onPress={() => openInfoModal('help')} activeOpacity={0.7}>
             <View style={styles.rowContent}>
-              <HelpCircle size={24} color={isDarkMode ? "#fff" : "#333"} />
+              <View style={[styles.iconContainer, { backgroundColor: isDarkMode ? 'rgba(72,114,244,0.18)' : 'rgba(72,114,244,0.12)' }]}>
+                <HelpCircle size={20} color={isDarkMode ? "#7BA0FF" : "#4872F4"} strokeWidth={2.2} />
+              </View>
               <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('helpCenter')}</Text>
             </View>
-            <ChevronRight size={20} color={isDarkMode ? "#999" : "#999"} />
+            <ChevronRight size={18} color={isDarkMode ? "#666" : "#999"} />
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.row, isDarkMode && styles.darkRow]}
+            style={[styles.supportCard, isDarkMode && styles.darkSupportCard]}
             onPress={async () => {
               try {
                 await WebBrowser.openBrowserAsync('https://sites.google.com/view/bukulagukatolik/home');
@@ -295,39 +318,59 @@ export default function SettingScreen() {
                 Linking.openURL('https://sites.google.com/view/bukulagukatolik/home');
               }
             }}
+            activeOpacity={0.85}
           >
-            <View style={styles.rowContent}>
-              <Coffee size={24} color={isDarkMode ? "#fff" : "#333"} />
-              <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('catholicSongbookWeb')}</Text>
+            <View style={styles.supportCardInner}>
+              <View style={[styles.supportIconWrap, isDarkMode && styles.darkSupportIconWrap]}>
+                <HandHeart size={22} color="#fff" strokeWidth={2.2} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.supportTitle, isDarkMode && { color: '#fff' }]}>
+                  {t('catholicSongbookWeb')}
+                </Text>
+                <Text style={[styles.supportSubtitle, isDarkMode && { color: 'rgba(255,255,255,0.75)' }]}>
+                  {currentLanguage === 'Melayu'
+                    ? 'Laman web rasmi Buku Lagu Katolik'
+                    : 'Official Catholic Songbook website'}
+                </Text>
+              </View>
+              <ChevronRight size={18} color="rgba(255,255,255,0.85)" />
             </View>
-            <ChevronRight size={20} color={isDarkMode ? "#999" : "#999"} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.row, isDarkMode && styles.darkRow]} onPress={toggleContributorsModal}>
+          <TouchableOpacity style={[styles.row, isDarkMode && styles.darkRow]} onPress={toggleContributorsModal} activeOpacity={0.7}>
             <View style={styles.rowContent}>
-              <Heart size={24} color={isDarkMode ? "#fff" : "#333"} />
+              <View style={[styles.iconContainer, { backgroundColor: isDarkMode ? 'rgba(255,69,58,0.18)' : 'rgba(255,69,58,0.12)' }]}>
+                <Heart size={20} color={isDarkMode ? "#FF7A6B" : "#FF453A"} strokeWidth={2.2} />
+              </View>
               <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('contributors')}</Text>
             </View>
-            <ChevronRight size={20} color={isDarkMode ? "#999" : "#999"} />
+            <ChevronRight size={18} color={isDarkMode ? "#666" : "#999"} />
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.row, isDarkMode && styles.darkRow]}
             onPress={() => setShowContactModal(true)}
+            activeOpacity={0.7}
           >
             <View style={styles.rowContent}>
-              <Mail size={24} color={isDarkMode ? "#fff" : "#333"} />
+              <View style={[styles.iconContainer, { backgroundColor: isDarkMode ? 'rgba(52,199,89,0.18)' : 'rgba(52,199,89,0.12)' }]}>
+                <Mail size={20} color={isDarkMode ? "#5DD879" : "#34C759"} strokeWidth={2.2} />
+              </View>
               <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('helpContact')}</Text>
             </View>
-            <ChevronRight size={20} color={isDarkMode ? "#999" : "#999"} />
+            <ChevronRight size={18} color={isDarkMode ? "#666" : "#999"} />
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.row, isDarkMode && styles.darkRow]}
             onPress={() => setShowReportsModal(true)}
+            activeOpacity={0.7}
           >
             <View style={styles.rowContent}>
-              <Sparkles size={24} color={isDarkMode ? "#fff" : "#333"} />
+              <View style={[styles.iconContainer, { backgroundColor: isDarkMode ? 'rgba(175,82,222,0.18)' : 'rgba(175,82,222,0.12)' }]}>
+                <Sparkles size={20} color={isDarkMode ? "#C68FE8" : "#AF52DE"} strokeWidth={2.2} />
+              </View>
               <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('reportViewAll')}</Text>
             </View>
             <View style={styles.rowRight}>
@@ -347,7 +390,7 @@ export default function SettingScreen() {
                   </Text>
                 </View>
               )}
-              <ChevronRight size={20} color={isDarkMode ? "#999" : "#999"} />
+              <ChevronRight size={18} color={isDarkMode ? "#666" : "#999"} />
             </View>
           </TouchableOpacity>
         </View>
@@ -369,49 +412,56 @@ export default function SettingScreen() {
         onRequestClose={toggleLanguageModal}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, isDarkMode && styles.darkModalContent, { paddingVertical: 20 }]}>
+          <View style={[styles.languageModalContent, isDarkMode && styles.darkModalContent]}>
             <Text style={[styles.modalTitle, isDarkMode && styles.darkText]}>{t('chooseLang')}</Text>
+            <Text style={[styles.modalSubtitle, isDarkMode && { color: '#999' }]}>
+              {currentLanguage === 'Melayu'
+                ? 'Pilih bahasa antara muka anda'
+                : 'Select your interface language'}
+            </Text>
 
             {languages.map(language => {
               const isSelected = currentLanguage === language;
+              const flag = language === 'Melayu' ? '🇲🇾' : '🇬🇧';
+              const nativeName = language === 'Melayu' ? 'Bahasa Melayu' : 'English';
+              const englishName = language === 'Melayu' ? 'Malay' : 'English';
               return (
                 <TouchableOpacity
                   key={language}
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    paddingVertical: 14,
-                    paddingHorizontal: 20,
-                    marginVertical: 4,
-                    backgroundColor: isSelected ? (isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)') : 'transparent',
-                    width: '100%',
-                    borderRadius: 12,
-                    borderWidth: 1,
-                    borderColor: isSelected ? (isDarkMode ? '#555' : '#e0e0e0') : 'transparent',
-                  }}
+                  style={[
+                    styles.languageOption,
+                    isSelected && styles.languageOptionSelected,
+                    isDarkMode && styles.darkLanguageOption,
+                    isSelected && isDarkMode && styles.darkLanguageOptionSelected,
+                  ]}
                   onPress={() => selectLanguage(language)}
+                  activeOpacity={0.7}
                 >
-                  <Text style={[styles.languageText, isDarkMode && styles.darkText, { fontWeight: isSelected ? 'bold' : 'normal' }]}>{language}</Text>
-                  {isSelected && <Check size={20} color={isDarkMode ? "#fff" : "#000"} />}
+                  <Text style={styles.languageFlag}>{flag}</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[
+                      styles.languageOptionTitle,
+                      isDarkMode && { color: '#fff' },
+                      isSelected && { fontWeight: '700' }
+                    ]}>
+                      {nativeName}
+                    </Text>
+                    <Text style={[
+                      styles.languageOptionSubtitle,
+                      isDarkMode && { color: '#888' }
+                    ]}>
+                      {englishName}
+                    </Text>
+                  </View>
+                  <View style={[
+                    styles.languageCheck,
+                    isSelected && { backgroundColor: currentColorTheme.primary === '#ffffff' ? '#4872F4' : currentColorTheme.primary, borderColor: 'transparent' }
+                  ]}>
+                    {isSelected && <Check size={14} color="#fff" strokeWidth={3} />}
+                  </View>
                 </TouchableOpacity>
               )
             })}
-
-            <TouchableOpacity
-              style={[
-                styles.closeButton,
-                {
-                  position: 'relative',
-                  bottom: 0,
-                  marginTop: 20,
-                  backgroundColor: isDarkMode ? '#444' : currentColorTheme.primary
-                }
-              ]}
-              onPress={toggleLanguageModal}
-            >
-              <Text style={styles.closeButtonText}>{t('close')}</Text>
-            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -718,8 +768,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 18,
-    paddingHorizontal: 20,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
     borderTopWidth: 1,
     borderTopColor: 'rgba(0,0,0,0.04)',
   },
@@ -732,7 +782,7 @@ const styles = StyleSheet.create({
   },
   rowText: {
     fontSize: 16,
-    marginLeft: 16,
+    marginLeft: 14,
     color: '#333',
     fontWeight: '500',
   },
@@ -744,6 +794,142 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#999',
     marginRight: 8,
+  },
+  sectionHeader: {
+    paddingHorizontal: 20,
+    paddingTop: 18,
+    paddingBottom: 8,
+  },
+  iconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  languagePill: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    marginRight: 8,
+  },
+  languagePillText: {
+    fontSize: 13,
+    color: '#666',
+    fontWeight: '600',
+  },
+  // Support card (Sokong Pembangun) — gradient, prominent
+  supportCard: {
+    margin: 16,
+    marginTop: 4,
+    marginBottom: 4,
+    borderRadius: 16,
+    padding: 2,
+    backgroundColor: '#4872F4',
+    shadowColor: '#4872F4',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.28,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  darkSupportCard: {
+    backgroundColor: '#3a5fd8',
+    shadowColor: '#000',
+    shadowOpacity: 0.45,
+  },
+  supportCardInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+  },
+  supportIconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.22)',
+    marginRight: 12,
+  },
+  darkSupportIconWrap: {
+    backgroundColor: 'rgba(255,255,255,0.14)',
+  },
+  supportTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  supportSubtitle: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.85)',
+    marginTop: 2,
+  },
+  // Language picker modal
+  languageModalContent: {
+    width: '88%',
+    backgroundColor: 'white',
+    borderRadius: 22,
+    padding: 22,
+    alignItems: 'stretch',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.28,
+    shadowRadius: 18,
+    elevation: 10,
+  },
+  modalSubtitle: {
+    fontSize: 13,
+    color: '#777',
+    textAlign: 'center',
+    marginTop: -8,
+    marginBottom: 18,
+  },
+  languageOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    marginVertical: 5,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: 'transparent',
+    backgroundColor: 'rgba(0,0,0,0.025)',
+  },
+  darkLanguageOption: {
+    backgroundColor: 'rgba(255,255,255,0.04)',
+  },
+  languageOptionSelected: {
+    backgroundColor: 'rgba(72,114,244,0.08)',
+    borderColor: '#4872F4',
+  },
+  darkLanguageOptionSelected: {
+    backgroundColor: 'rgba(72,114,244,0.16)',
+    borderColor: '#7BA0FF',
+  },
+  languageFlag: {
+    fontSize: 28,
+    marginRight: 14,
+  },
+  languageOptionTitle: {
+    fontSize: 16,
+    color: '#222',
+  },
+  languageOptionSubtitle: {
+    fontSize: 12,
+    color: '#888',
+    marginTop: 2,
+  },
+  languageCheck: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#ccc',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   modalOverlay: {
     flex: 1,

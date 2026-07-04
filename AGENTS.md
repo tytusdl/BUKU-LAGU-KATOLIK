@@ -112,9 +112,36 @@ src/translations.ts         i18n strings keyed by 'Melayu' | 'English'
 
 - **`expo-patch.js` is Windows-specific.** It writes the local IPv4 into
   `./.expo/ip.txt` so the QR code resolves. Safe to delete on macOS/Linux.
+- **Bottom-sheet Modals MUST respect `useSafeAreaInsets().bottom` on Android**.
+  Slide-up modals (`Modal animationType="slide"`, `justifyContent: 'flex-end'`,
+  `statusBarTranslucent`) extend all the way to the screen edge and will
+  overlap the Android system nav bar (3-button or gesture pill). Symptom:
+  the modal's footer button / last card gets hidden behind nav buttons, or
+  user can't tap the close button without hitting nav. Fix: in the modal
+  container style, set
+  `paddingBottom: Math.max(insets.bottom, 20) + 8`
+  where `insets = useSafeAreaInsets()`. iOS-only `paddingBottom: 20` is
+  not enough on Android — the bottom nav bar is taller. Required on any
+  new bottom-sheet style modal (e.g. `LyricsReportsListModal`,
+  `ShareBottomSheet`, `ContactModal`, `ReportLyricsModal`).
 - **Splash race**: `SplashScreen.preventAutoHideAsync()` is set, then
   fonts + main banner preload in `RootLayout.prepare()`. Hide only after
   `AnimatedSplash.onAnimationFinish` fires — see `app/_layout.tsx`.
+- **Splash → App transition MUST stay as overlay, not swap**: `_layout.tsx`
+  keeps the full Provider tree mounted from the start; `<AnimatedSplash/>`
+  is rendered as an *overlay sibling* (use `absoluteFillObject`) inside the
+  same Providers and gated by `{!splashAnimationFinished && ...}`. Do NOT
+  `return <AnimatedSplash/>` while splash is up and `return <SafeAreaProvider>`
+  after — that swap causes an iOS stutter because all six Contexts hydrate
+  + Stack mounts on the same frame the user first sees content.
+- **First-paint logo must use `Animated.View` wrapping plain `<Image>`**:
+  never `Animated.Image` for the splash logo. `Animated.Image` drops frames
+  on iOS first paint because Reanimated's worklet attaches at the same time
+  the native side is decoding the asset. Also avoid `withSequence(...)` for
+  the logo's intro — replace with `withSpring(1, {damping:18, stiffness:180, mass:0.8})`
+  for cross-platform parity. Pre-download the icon via
+  `Asset.fromModule(require('./assets/images/icon.png')).downloadAsync()` in
+  `prepare()` so the asset is in cache before splash mounts.
 - **Bilingual alerts**: `Alert.alert` copy in `_layout.tsx` already
   branches on `currentLanguage`. Re-use that pattern instead of writing
   English-only `Alert`s in new code.
