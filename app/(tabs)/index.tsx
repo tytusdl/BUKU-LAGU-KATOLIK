@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, FlatList, TouchableOpacity, Image, BackHandler, Platform, Alert, Modal, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, FlatList, TouchableOpacity, Image, BackHandler, Platform, Alert, Modal, ActivityIndicator, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Bell, Search, Heart, CheckCircle, ArrowLeft } from 'lucide-react-native';
 import { router, useFocusEffect, useNavigation } from 'expo-router';
@@ -244,6 +244,12 @@ const exitApp = () => {
 export default function HomeScreen() {
   // HOOKS SECTION - Semua hooks mesti di bahagian atas
   const { isDarkMode, currentColorTheme } = useTheme();
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+
+  // Responsive scaling — base design assumes 393px width (iPhone 14 Pro).
+  // Phones narrower than 360px (small Android) get scaled-down sizes so the
+  // header title and tab labels don't overflow.
+  const sizeScale = Math.min(1, Math.max(0.78, screenWidth / 393));
 
   // Semua state hooks disusun berturutan
   const { currentLanguage, t } = useLanguage();
@@ -472,10 +478,14 @@ export default function HomeScreen() {
           <Text
             style={[
               styles.songTitleText,
-              isDarkMode && styles.darkText
+              isDarkMode && styles.darkText,
+              { fontSize: Math.max(12, Math.round(14 * sizeScale)) }
             ]}
             numberOfLines={2}
             ellipsizeMode="tail"
+            adjustsFontSizeToFit
+            minimumFontScale={0.85}
+            maxFontSizeMultiplier={1.1}
           >
             {t(item.titleKey as keyof typeof translations['Melayu'])}
           </Text>
@@ -543,17 +553,42 @@ export default function HomeScreen() {
         <View style={styles.logoContainer}>
           <Image
             source={require('../../assets/images/icon.png')}
-            style={styles.logo}
+            style={[
+              styles.logo,
+              {
+                width: Math.round(56 * sizeScale),
+                height: Math.round(56 * sizeScale),
+                marginRight: Math.round(10 * sizeScale),
+              },
+            ]}
           />
-          <View>
-            <Text style={[
-              styles.title,
-              isDarkMode && { color: '#fff' }
-            ]}>BUKU LAGU KATOLIK</Text>
-            <Text style={[
-              styles.subtitle,
-              isDarkMode && { color: '#fff' }
-            ]}>Pozoo No Kinoingan</Text>
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <Text
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.7}
+              maxFontSizeMultiplier={1}
+              style={[
+                styles.title,
+                {
+                  fontSize: Math.round(26 * sizeScale),
+                },
+                isDarkMode && { color: '#fff' }
+              ]}
+            >BUKU LAGU KATOLIK</Text>
+            <Text
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.7}
+              maxFontSizeMultiplier={1}
+              style={[
+                styles.subtitle,
+                {
+                  fontSize: Math.round(14 * sizeScale),
+                },
+                isDarkMode && { color: '#fff' }
+              ]}
+            >Pozoo No Kinoingan</Text>
           </View>
         </View>
       </View>
@@ -732,20 +767,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
-    width: 60,
-    height: 60,
-    marginRight: 12,
+    width: 56,
+    height: 56,
+    marginRight: 10,
     borderRadius: 8,
   },
   title: {
-    fontSize: 30,
+    fontSize: 26,
     fontFamily: 'Inter-Bold',
     color: '#000',
+    flexShrink: 1,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: 'Inter-Regular',
     color: '#000',
+    flexShrink: 1,
   },
   searchContainer: {
     flexDirection: 'row',

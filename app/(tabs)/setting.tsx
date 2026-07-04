@@ -1,6 +1,6 @@
 import { useFocusEffect } from 'expo-router';
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, Switch, ScrollView, TouchableOpacity, Modal, Alert, Linking } from 'react-native';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { View, Text, StyleSheet, Switch, ScrollView, TouchableOpacity, Modal, Alert, Linking, Animated } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { ChevronRight, Moon, Globe, HelpCircle, Check, Palette, Heart, ChevronUp, Sparkles, Mail, Coffee } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -17,6 +17,7 @@ import { translations } from '../../src/translations';
 import { useLyricsReports } from '../context/LyricsReportContext';
 import LyricsReportsListModal from '../components/LyricsReportsListModal';
 import ContactModal from '../components/ContactModal';
+import PageHeader from '../components/PageHeader';
 
 export default function SettingScreen() {
   const { isDarkMode, toggleTheme, currentColorTheme, colorThemeId, setColorTheme } = useTheme();
@@ -32,6 +33,7 @@ export default function SettingScreen() {
   const [appVersion] = useState(packages.version);
   const [showReportsModal, setShowReportsModal] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
+  const scrollY = useRef(new Animated.Value(0)).current;
   const { reports: lyricsReports } = useLyricsReports();
 
   // Auto-collapse changelog when leaving the screen
@@ -115,22 +117,21 @@ export default function SettingScreen() {
       ]}>
       <StatusBar style={isDarkMode ? "light" : "dark"} />
 
-      <View style={[
-        styles.header,
-        isDarkMode && styles.darkHeader,
-        { backgroundColor: currentColorTheme.background }
-      ]}>
-        <Text
-          style={[
-            styles.title,
-            isDarkMode && styles.darkText
-          ]}
-          adjustsFontSizeToFit={true}
-          numberOfLines={1}
-        >{t('settings')}</Text>
-      </View>
+<PageHeader
+          title={t('settings')}
+          subtitle={t('settingsDescription')}
+          scrollY={scrollY}
+          condenseDistance={140}
+        />
 
-      <ScrollView style={styles.scrollView}>
+      <ScrollView
+        style={styles.scrollView}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: false }
+        )}
+        scrollEventThrottle={16}
+      >
 
         {/* New Update Section */}
         <View style={[
@@ -679,25 +680,6 @@ const styles = StyleSheet.create({
   },
   darkContainer: {
     backgroundColor: '#1a1a1a',
-  },
-  header: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 12,
-    marginBottom: 4,
-    backgroundColor: '#fff',
-    minHeight: 70,
-    justifyContent: 'center',
-  },
-  darkHeader: {
-    backgroundColor: '#1a1a1a',
-  },
-  title: {
-    fontSize: 24,
-    fontFamily: 'Inter-Bold',
-    color: '#000',
-    marginBottom: 0,
-    flexShrink: 1,
   },
   darkText: {
     color: '#fff',

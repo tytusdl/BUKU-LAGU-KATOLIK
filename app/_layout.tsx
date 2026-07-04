@@ -3,6 +3,13 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { enableScreens } from 'react-native-screens';
 import { LogBox, View, Text, StyleSheet, Image, Appearance, Alert, Linking, Platform } from 'react-native';
+
+// Cap Android system font scaling. Otherwise devices with large system font
+// setting would multiply our lyrics/UI sizes and break layouts across phones.
+if ((Text as any).defaultProps == null) {
+  (Text as any).defaultProps = {};
+}
+(Text as any).defaultProps.maxFontSizeMultiplier = 1.3;
 import { FavoritesProvider } from './context/FavoritesContext';
 import ThemeProvider, { useTheme } from './context/ThemeContext';
 import { MySongsProvider, useMySongs, UserSong } from './context/MySongsContext';

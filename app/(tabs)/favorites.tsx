@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFavorites } from '../context/FavoritesContext';
 import { useTheme } from '../context/ThemeContext';
@@ -12,12 +12,14 @@ import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useLanguage } from '../context/LanguageContext';
+import PageHeader from '../components/PageHeader';
 
 export default function FavoritesScreen() {
   const { favorites } = useFavorites();
   const { isDarkMode, currentColorTheme } = useTheme();
   const { mySongs } = useMySongs();
   const { currentLanguage, t } = useLanguage();
+  const scrollY = useRef(new Animated.Value(0)).current;
 
   const favoriteSongs = useMemo(() => {
     const allFavoriteSongs = favorites.map((id: string) => {
@@ -77,22 +79,29 @@ export default function FavoritesScreen() {
         { backgroundColor: currentColorTheme.background }
       ]}>
       <StatusBar style={isDarkMode ? "light" : "dark"} />
-      <Text style={[
-        styles.title,
-        isDarkMode && styles.darkText
-      ]}>{t('favorites')}</Text>
+      <PageHeader
+        title={t('favorites')}
+        subtitle={t('favoritesDescription')}
+        scrollY={scrollY}
+        condenseDistance={140}
+      />
 
       {favoriteSongs.length > 0 ? (
-        <FlatList
-          data={favoriteSongs}
-          renderItem={renderSongItem}
-          keyExtractor={(item: FavoriteSongItem) => item?.id || String(Math.random())}
-          contentContainerStyle={styles.listContainer}
-          removeClippedSubviews={false}
-          maxToRenderPerBatch={25}
-          initialNumToRender={20}
-          windowSize={10}
-        />
+<FlatList
+        data={favoriteSongs}
+        renderItem={renderSongItem}
+        keyExtractor={(item: FavoriteSongItem) => item?.id || String(Math.random())}
+        contentContainerStyle={styles.listContainer}
+        removeClippedSubviews={false}
+        maxToRenderPerBatch={25}
+        initialNumToRender={20}
+        windowSize={10}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: false }
+        )}
+        scrollEventThrottle={16}
+      />
       ) : (
         <View style={styles.emptyContainer}>
           <Text style={[
@@ -118,18 +127,10 @@ export default function FavoritesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
     backgroundColor: '#fff',
   },
   darkContainer: {
     backgroundColor: '#1a1a1a',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    fontFamily: 'Inter-Bold',
-    marginBottom: 20,
-    color: '#000',
   },
   darkText: {
     color: '#fff',
@@ -138,7 +139,8 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   songItem: {
-    paddingVertical: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
@@ -167,6 +169,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     flex: 1,
     color: '#000',
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
   },
   emptyContainer: {
     flex: 1,

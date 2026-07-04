@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, FlatList, Share, /*ActivityIndicator,*/ TouchableHighlight, Alert, Platform, ToastAndroid, Modal } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft, Minus, Plus, Type, Heart, Share as ShareIcon, Menu, X, Edit, Trash2, ChevronLeft, ChevronRight, Link2, Image as ImageIcon, PlayCircle, Music, Music2, AlertCircle } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { songs as defaultSongs, songs as allSongs, Song } from '../../data/songs';
@@ -45,6 +45,8 @@ export default function SongDetail() {
   const [showReportModal, setShowReportModal] = useState(false);
   const { massSelection, addSongToMassPart } = useMass();
   const [appVersion] = useState(packages.version);
+
+  const insets = useSafeAreaInsets();
 
   const { massPartLabel, songKey } = useMemo(() => {
     if (!id || !fromMass) return { massPartLabel: null, songKey: null };
@@ -954,6 +956,7 @@ export default function SongDetail() {
           isDarkMode && styles.fabMenuContainerDark,
           {
             backgroundColor: isDarkMode ? '#2a2a2a' : '#f8f8f8',
+            bottom: insets.bottom + 90,
           }
         ]}>
           <View style={styles.fabHeader}>
@@ -1067,6 +1070,7 @@ export default function SongDetail() {
           styles.mainButton,
           isDarkMode && styles.darkShareButton,
           {
+            bottom: insets.bottom + 90,
             backgroundColor: isDarkMode ? '#444444' : (
               currentColorTheme.id === 'white' ? '#ffffff' :
                 currentColorTheme.primary === '#9AC2F0' ? '#d8ecff' :
@@ -1385,7 +1389,7 @@ const styles = StyleSheet.create({
   },
   mainButton: {
     position: 'absolute',
-    bottom: Platform.OS === 'ios' ? 110 : 80,
+    bottom: 90,
     right: 20,
     width: 56,
     height: 56,
@@ -1405,13 +1409,12 @@ const styles = StyleSheet.create({
   },
   fabMenuContainer: {
     position: 'absolute',
-    bottom: Platform.OS === 'ios' ? 176 : 146,
+    bottom: 90,
     right: 20,
+    left: 20,
     backgroundColor: '#f8f8f8',
     borderRadius: 24,
     padding: 20,
-    width: '90%',
-    maxWidth: 380,
     elevation: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },

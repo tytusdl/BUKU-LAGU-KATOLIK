@@ -22,6 +22,7 @@ import {
   addRecentShare, removeRecentShare, clearRecentShares, loadRecentShares,
   RecentShare
 } from './utils/recentShares';
+import ShareHelpModal from './components/ShareHelpModal';
 
 // Guna banner_s.webp untuk header skrin Lagu Saya
 const headerImage = require('../assets/images/banners-webp/banner_s.webp');
@@ -58,6 +59,7 @@ export default function MySongsScreen() {
   const [isSavingPasted, setIsSavingPasted] = useState(false);
   const { currentLanguage, t } = useLanguage();
   const [isFabMenuOpen, setIsFabMenuOpen] = useState(false);
+  const [showShareHelp, setShowShareHelp] = useState(false);
 
   // Search + sort state — ditambah v.x.x untuk koleksi lagu yang besar
   const [searchQuery, setSearchQuery] = useState('');
@@ -243,13 +245,8 @@ export default function MySongsScreen() {
   };
 
   const showHelpAlertFromFab = () => {
-    Alert.alert(
-      t('shareHelpTitle'),
-      t('shareHelpMessage'),
-      [{ text: t('shareHelpConfirm') }],
-      { cancelable: true }
-    );
     setIsFabMenuOpen(false);
+    setShowShareHelp(true);
   };
 
   // Save satu entry dari recent shares (one-tap re-save)
@@ -623,31 +620,19 @@ export default function MySongsScreen() {
           activeOpacity={0.8}
         >
           <View style={styles.primaryCTAIconCircle}>
-            <Plus size={22} color="#fff" />
+            <Plus size={18} color="#fff" />
           </View>
           <View style={styles.primaryCTAText}>
-            <Text style={styles.primaryCTATitle}>{t('addSongPrimaryCTA')}</Text>
-            <Text style={styles.primaryCTADesc}>{t('addSongPrimaryCTADesc')}</Text>
+            <Text
+              style={styles.primaryCTATitle}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.7}
+            >
+              {t('addSongPrimaryCTA')}
+            </Text>
           </View>
           <ChevronRight size={20} color="#fff" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.secondaryActionButton,
-            isDarkMode
-              ? { backgroundColor: '#1f3a5f', borderColor: '#2a4a7f' }
-              : { backgroundColor: '#e8f4ff', borderColor: '#b8d8f0' }
-          ]}
-          onPress={openPasteModal}
-          activeOpacity={0.7}
-        >
-          <ClipboardIcon size={18} color={isDarkMode ? '#a0c4ff' : '#3498db'} />
-          <Text style={[
-            styles.secondaryActionText,
-            { color: isDarkMode ? '#a0c4ff' : '#3498db' }
-          ]} numberOfLines={1}>
-            {t('pasteLinkButtonLabel')}
-          </Text>
         </TouchableOpacity>
       </View>
 
@@ -814,10 +799,40 @@ export default function MySongsScreen() {
       >
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContainer, isDarkMode && styles.modalContainerDark]}>
-            <Text style={[styles.modalTitle, isDarkMode && styles.textDark]}>{t('pasteLinkTitle')}</Text>
+            <View style={styles.modalHeaderRow}>
+              <View style={[styles.modalIconCircle, { backgroundColor: '#3498db22' }]}>
+                <Link size={22} color="#3498db" />
+              </View>
+              <View style={{ flex: 1, marginLeft: 12 }}>
+                <Text style={[styles.modalTitle, isDarkMode && styles.textDark]}>{t('pasteLinkTitle')}</Text>
+              </View>
+            </View>
             <Text style={[styles.modalInstructions, isDarkMode && styles.textDarkMuted]}>
               {t('pasteLinkInstructions')}
             </Text>
+
+            {/* Tip card — directs user to the share guide */}
+            <TouchableOpacity
+              style={[
+                styles.pasteTipCard,
+                {
+                  backgroundColor: isDarkMode
+                    ? `${currentColorTheme.primary}1A`
+                    : `${currentColorTheme.primary}14`,
+                  borderColor: `${currentColorTheme.primary}55`,
+                },
+              ]}
+              onPress={() => {
+                closePasteModal();
+                setTimeout(() => setShowShareHelp(true), 280);
+              }}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.pasteTipText, { color: currentColorTheme.primary }]}>
+                {t('pasteLinkTip')}
+              </Text>
+            </TouchableOpacity>
+
             <TextInput
               style={[styles.modalInput, isDarkMode && styles.modalInputDark]}
               placeholder={t('pasteLinkPlaceholder')}
@@ -855,6 +870,21 @@ export default function MySongsScreen() {
           </View>
         </View>
       </Modal>
+
+      <ShareHelpModal
+        visible={showShareHelp}
+        title={t('shareHelpTitle')}
+        tipText={t('shareHelpIntro')}
+        steps={[
+          t('shareHelpStep1'),
+          t('shareHelpStep2'),
+          t('shareHelpStep3'),
+          t('shareHelpStep4'),
+          t('shareHelpStep5'),
+        ]}
+        closeText={t('close')}
+        onClose={() => setShowShareHelp(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -1126,12 +1156,11 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   primaryCTA: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
     backgroundColor: '#27ae60',
     elevation: 3,
     shadowColor: '#27ae60',
@@ -1140,9 +1169,9 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
   },
   primaryCTAIconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: 'rgba(255, 255, 255, 0.22)',
     justifyContent: 'center',
     alignItems: 'center',
@@ -1153,29 +1182,8 @@ const styles = StyleSheet.create({
   },
   primaryCTATitle: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 1,
-  },
-  primaryCTADesc: {
-    color: 'rgba(255, 255, 255, 0.85)',
-    fontSize: 11,
-    fontWeight: '500',
-  },
-  secondaryActionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 12,
-    borderWidth: 1,
-    gap: 6,
-    maxWidth: 130,
-  },
-  secondaryActionText: {
-    fontSize: 13,
-    fontWeight: '600',
-    flexShrink: 1,
+    fontSize: 15,
+    fontWeight: '700',
   },
   // Bottom sheet (v.x.x) — popup pilihan lengkap bila tekan primary CTA
   bottomSheetOverlay: {
@@ -1266,13 +1274,36 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 10,
+  },
+  modalHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  modalIconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   modalInstructions: {
     fontSize: 14,
     color: '#666',
-    marginBottom: 20,
+    marginBottom: 12,
     textAlign: 'center',
+  },
+  pasteTipCard: {
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    marginBottom: 16,
+  },
+  pasteTipText: {
+    fontSize: 12,
+    lineHeight: 17,
+    fontWeight: '600',
   },
   modalInput: {
     width: '100%',

@@ -17,6 +17,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useLyricsReports, LyricsReportType } from '../context/LyricsReportContext';
 import { X, AlertCircle, Check } from 'lucide-react-native';
 import { Linking } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface ReportLyricsModalProps {
   visible: boolean;
@@ -35,6 +36,22 @@ const REPORT_TYPES: { value: LyricsReportType; key: string }[] = [
   { value: 'other', key: 'reportTypeOther' },
 ];
 
+// Pick a readable text color for a given background using relative luminance.
+// If the bg is light (luminance > 0.6), return black; otherwise return white.
+// This keeps selected chips & primary buttons legible across all 7 light
+// themes and the dark theme — including the white-theme dark-mode where
+// the primary is pure white.
+function readableTextOn(hex: string): string {
+  const cleaned = hex.replace('#', '');
+  if (cleaned.length !== 6 && cleaned.length !== 8) return '#000000';
+  const r = parseInt(cleaned.slice(0, 2), 16) / 255;
+  const g = parseInt(cleaned.slice(2, 4), 16) / 255;
+  const b = parseInt(cleaned.slice(4, 6), 16) / 255;
+  // Approx sRGB luminance
+  const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  return lum > 0.6 ? '#000000' : '#FFFFFF';
+}
+
 export default function ReportLyricsModal({
   visible,
   onClose,
@@ -46,6 +63,7 @@ export default function ReportLyricsModal({
   const { isDarkMode, currentColorTheme } = useTheme();
   const { currentLanguage, t } = useLanguage();
   const { addReport } = useLyricsReports();
+  const insets = useSafeAreaInsets();
 
   const [selectedType, setSelectedType] = useState<LyricsReportType>('wrong_word');
   const [description, setDescription] = useState('');
@@ -161,7 +179,10 @@ export default function ReportLyricsModal({
         <View style={[
           styles.modalContainer,
           isDarkMode && styles.darkModalContainer,
-          { backgroundColor: currentColorTheme.surface }
+          {
+            backgroundColor: currentColorTheme.surface,
+            paddingBottom: Platform.OS === 'ios' ? 32 : Math.max(20, insets.bottom + 12),
+          }
         ]}>
           {/* Header */}
           <View style={styles.header}>
@@ -237,13 +258,17 @@ export default function ReportLyricsModal({
                     ]}
                   >
                     {isSelected && (
-                      <Check size={14} color="#fff" style={{ marginRight: 4 }} />
+                      <Check
+                        size={14}
+                        color={readableTextOn(currentColorTheme.primary)}
+                        style={{ marginRight: 4 }}
+                      />
                     )}
                     <Text style={[
                       styles.chipText,
                       {
                         color: isSelected
-                          ? '#fff'
+                          ? readableTextOn(currentColorTheme.primary)
                           : (isDarkMode ? '#ddd' : '#333'),
                         fontWeight: isSelected ? '700' : '500',
                       }
@@ -341,7 +366,15 @@ export default function ReportLyricsModal({
               onPress={handleSubmit}
               disabled={isSubmitting || !description.trim()}
             >
-              <Text style={styles.submitButtonText}>
+              <Text
+                style={[
+                  styles.submitButtonText,
+                  { color: readableTextOn(currentColorTheme.primary) },
+                ]}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.7}
+              >
                 {isSubmitting ? t('reportSubmitting') : t('reportSubmit')}
               </Text>
             </TouchableOpacity>
@@ -365,7 +398,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 20,
-    paddingBottom: Platform.OS === 'ios' ? 32 : 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -4 },
     shadowOpacity: 0.15,

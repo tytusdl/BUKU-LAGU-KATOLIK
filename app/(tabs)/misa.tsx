@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Modal, FlatList, Platform, Alert, Share, ToastAndroid } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Modal, FlatList, Platform, Alert, Share, ToastAndroid, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { useMass, MassSelection, MassSongSelection } from '../context/MassContext';
@@ -7,6 +7,9 @@ import { songIndex } from '../data/songs/songIndex';
 import { Music, Search, X, Trash2, ChevronRight, Save, Info, Music2, Share as ShareIcon, PlayCircle, ChevronUp, ChevronDown, MessageSquare, Image as ImageIcon } from 'lucide-react-native';
 import { useLanguage } from '../context/LanguageContext';
 import { useMySongs } from '../context/MySongsContext';
+import PageHeader from '../components/PageHeader';
+import ConfirmDialog from '../components/ConfirmDialog';
+import ShareBottomSheet, { ShareOption } from '../components/ShareBottomSheet';
 import * as Sharing from 'expo-sharing';
 import { captureRef } from 'react-native-view-shot';
 import { router } from 'expo-router';
@@ -25,8 +28,10 @@ export default function MisaScreen() {
     const [searchQuery, setSearchQuery] = useState('');
     const [isCapturingImage, setIsCapturingImage] = useState(false);
     const [showShareModal, setShowShareModal] = useState(false);
+    const [showClearDialog, setShowClearDialog] = useState(false);
     const searchInputRef = useRef<TextInput>(null);
     const fullContentRef = useRef<View>(null);
+    const scrollY = useRef(new Animated.Value(0)).current;
 
     const actionColor = isDarkMode
         ? (currentColorTheme.id === 'white' ? '#ffffff' : currentColorTheme.primary)
@@ -70,14 +75,15 @@ export default function MisaScreen() {
     };
 
     const handleClear = () => {
-        Alert.alert(
-            t('clearMass'),
-            t('clearMassConfirm'),
-            [
-                { text: t('cancel'), style: 'cancel' },
-                { text: t('clearMass'), style: 'destructive', onPress: clearMassSelection }
-            ]
-        );
+        setShowClearDialog(true);
+    };
+
+    const confirmClear = () => {
+        setShowClearDialog(false);
+        // Defer to let dialog close animation finish before clearing state.
+        setTimeout(() => {
+            clearMassSelection();
+        }, 150);
     };
 
     const moveSong = (partId: MassPart, index: number, direction: 'up' | 'down') => {
@@ -264,7 +270,7 @@ export default function MisaScreen() {
                                                         </Text>
                                                     </View>
                                                     <View style={styles.songTitleInfo}>
-                                                        <Text style={[styles.songTitle, { color: currentColorTheme.text }]}>{song.title.toUpperCase()}</Text>
+                                                        <Text style={[styles.songTitle, { color: currentColorTheme.text }]}>{song.title}</Text>
                                                         {!isCapturingImage && (
                                                             <Text style={[styles.viewLyricsSmall, { color: '#888' }]}>{t('viewLyricsSmall').toUpperCase()}</Text>
                                                         )}
@@ -294,14 +300,29 @@ export default function MisaScreen() {
                         ) : (
                             !isCapturingImage && (
                                 <TouchableOpacity
-                                    style={styles.pilihLaguBox}
+                                    style={[
+                                        styles.pilihLaguBox,
+                                        {
+                                            borderColor: currentColorTheme.primary,
+                                            backgroundColor: isDarkMode
+                                                ? `${currentColorTheme.primary}1A`
+                                                : `${currentColorTheme.primary}0D`,
+                                        },
+                                    ]}
                                     onPress={() => {
                                         setActivePart(part.id);
                                         setIsModalVisible(true);
                                     }}
                                 >
-                                    <Music size={18} color={isDarkMode ? '#888' : '#666'} />
-                                    <Text style={styles.pilihLaguText}>{t('selectSong')}</Text>
+                                    <Music size={18} color={currentColorTheme.primary} />
+                                    <Text
+                                        style={[
+                                            styles.pilihLaguText,
+                                            { color: currentColorTheme.primary },
+                                        ]}
+                                    >
+                                        {t('selectSong')}
+                                    </Text>
                                 </TouchableOpacity>
                             )
                         )}
@@ -319,29 +340,34 @@ export default function MisaScreen() {
             <StatusBar style={isDarkMode ? "light" : "dark"} />
 
             {/* Header */}
-            <View style={styles.header}>
-                <View style={{ flex: 1 }}>
-                    <Text style={[styles.headerTitle, { color: currentColorTheme.text }]}>{t('massTitle')}</Text>
-                    <Text style={[styles.headerDescription, { color: currentColorTheme.textSecondary }]}>
-                        {t('massDescription')}
-                    </Text>
-                </View>
-                {!isCapturingImage && (
-                    <View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 8 }}>
-                        <TouchableOpacity onPress={handleShareOptions} style={[styles.clearButton, { marginRight: 15 }]}>
-                            <ShareIcon size={22} color={actionColor} />
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={handleClear} style={styles.clearButton}>
-                            <Trash2 size={22} color={actionColor} />
-                        </TouchableOpacity>
-                    </View>
-                )}
-            </View>
+            <PageHeader
+                title={t('massTitle')}
+                subtitle={t('massDescription')}
+                scrollY={scrollY}
+                condenseDistance={140}
+                rightActions={
+                    !isCapturingImage ? (
+                        <>
+                            <TouchableOpacity onPress={handleShareOptions} style={[styles.clearButton, { marginRight: 15 }]}>
+                                <ShareIcon size={22} color={actionColor} />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={handleClear} style={styles.clearButton}>
+                                <Trash2 size={22} color={actionColor} />
+                            </TouchableOpacity>
+                        </>
+                    ) : undefined
+                }
+            />
 
             <ScrollView
                 style={{ flex: 1 }}
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
+                onScroll={Animated.event(
+                    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+                    { useNativeDriver: false }
+                )}
+                scrollEventThrottle={16}
             >
                 {renderPlanList()}
             </ScrollView>
@@ -354,9 +380,9 @@ export default function MisaScreen() {
                 >
                     <View style={[styles.header, { paddingHorizontal: 0, paddingTop: 0, paddingVertical: 5, marginBottom: 10, borderBottomWidth: 0 }]}>
                         <View style={{ flex: 1 }}>
-                            <Text style={[styles.headerTitle, { color: '#000', fontSize: 24, fontWeight: 'bold' }]}>{t('massTitle').toUpperCase()}</Text>
+                            <Text style={[styles.headerTitle, { color: '#000', fontSize: 24, fontWeight: 'bold' }]}>{t('massTitle')}</Text>
                             <Text style={[styles.headerDescription, { color: '#666', fontSize: 13, lineHeight: 18 }]}>
-                                {t('shareQuote')}
+                                {t('massDescription')}
                             </Text>
                         </View>
                     </View>
@@ -476,73 +502,44 @@ export default function MisaScreen() {
                 </View>
             </Modal>
 
-            <Modal
+            <ShareBottomSheet
                 visible={showShareModal}
-                transparent={true}
-                animationType="slide"
-                onRequestClose={() => setShowShareModal(false)}
-            >
-                <TouchableOpacity
-                    style={styles.bottomSheetOverlay}
-                    activeOpacity={1}
-                    onPress={() => setShowShareModal(false)}
-                >
-                    <View style={[styles.bottomSheetContent, isDarkMode && styles.darkModalContent]}>
-                        <View style={styles.bottomSheetIndicator} />
+                title={t('shareMassPlan')}
+                subtitle={t('chooseShareMethod')}
+                cancelText={t('cancel')}
+                onCancel={() => setShowShareModal(false)}
+                options={[
+                    {
+                        id: 'text',
+                        label: t('text'),
+                        description: t('textDesc'),
+                        icon: MessageSquare,
+                        iconBg: isDarkMode ? '#1A2535' : '#E8F1FF',
+                        iconColor: isDarkMode ? '#7AB3FF' : '#2563EB',
+                        onPress: handleShareText,
+                    },
+                    {
+                        id: 'image',
+                        label: t('image'),
+                        description: t('imageDesc'),
+                        icon: ImageIcon,
+                        iconBg: isDarkMode ? '#2A1A24' : '#FCE4F0',
+                        iconColor: isDarkMode ? '#F584B3' : '#DB2777',
+                        onPress: shareAsImage,
+                    },
+                ]}
+            />
 
-                        <View style={styles.bottomSheetHeader}>
-                            <Text style={[styles.bottomSheetTitle, isDarkMode && styles.darkText]}>
-                                {t('shareMassPlan')}
-                            </Text>
-                            <TouchableOpacity
-                                style={styles.modalCloseButtonCircle}
-                                onPress={() => setShowShareModal(false)}
-                            >
-                                <X size={20} color={isDarkMode ? "#fff" : "#333"} />
-                            </TouchableOpacity>
-                        </View>
-
-                        <Text style={[styles.shareSubtitle, { color: isDarkMode ? '#888' : '#8c8c8c' }]}>
-                            {t('chooseShareMethod')}
-                        </Text>
-
-                        <View style={styles.shareOptionsRow}>
-                            <TouchableOpacity
-                                style={[styles.shareOptionCard, { borderColor: isDarkMode ? '#333' : '#f0f0f0', backgroundColor: isDarkMode ? '#222' : '#fff' }]}
-                                onPress={() => {
-                                    setShowShareModal(false);
-                                    setTimeout(handleShareText, 300);
-                                }}
-                            >
-                                <View style={[styles.shareIconCircle, { backgroundColor: '#f0f7ff' }]}>
-                                    <MessageSquare size={24} color="#4a90e2" />
-                                </View>
-                                <Text style={[styles.shareOptionText, isDarkMode && styles.darkText]}>{t('text')}</Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                style={[styles.shareOptionCard, { borderColor: isDarkMode ? '#333' : '#f0f0f0', backgroundColor: isDarkMode ? '#222' : '#fff' }]}
-                                onPress={() => {
-                                    setShowShareModal(false);
-                                    setTimeout(shareAsImage, 300);
-                                }}
-                            >
-                                <View style={[styles.shareIconCircle, { backgroundColor: '#fff0f6' }]}>
-                                    <ImageIcon size={24} color="#eb2f96" />
-                                </View>
-                                <Text style={[styles.shareOptionText, isDarkMode && styles.darkText]}>{t('image')}</Text>
-                            </TouchableOpacity>
-                        </View>
-
-                        <TouchableOpacity
-                            style={[styles.cancelShareButton, { backgroundColor: isDarkMode ? '#333' : '#f2f2f2' }]}
-                            onPress={() => setShowShareModal(false)}
-                        >
-                            <Text style={[styles.cancelShareText, { color: isDarkMode ? '#fff' : '#000' }]}>{t('cancel')}</Text>
-                        </TouchableOpacity>
-                    </View>
-                </TouchableOpacity>
-            </Modal>
+            <ConfirmDialog
+                visible={showClearDialog}
+                title={t('clearMass')}
+                message={t('clearMassConfirm')}
+                confirmText={t('clearMass')}
+                cancelText={t('cancel')}
+                destructive
+                onConfirm={confirmClear}
+                onCancel={() => setShowClearDialog(false)}
+            />
         </SafeAreaView>
     );
 }
@@ -562,6 +559,8 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 2,
+        textTransform: 'uppercase',
+        letterSpacing: 1.2,
     },
     headerDescription: {
         fontSize: 13,
@@ -683,15 +682,14 @@ const styles = StyleSheet.create({
         margin: 12,
         borderRadius: 12,
         borderWidth: 1.5,
-        borderColor: '#e5e5e5',
         borderStyle: 'dashed',
-        backgroundColor: 'rgba(0,0,0,0.01)',
     },
     pilihLaguText: {
         marginLeft: 10,
         fontSize: 15,
         fontWeight: '600',
-        color: '#333',
+        textTransform: 'uppercase',
+        letterSpacing: 0.6,
     },
     songsList: {
         // No margin/padding here to allow items to handle their own space
@@ -736,6 +734,8 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '800',
         marginBottom: 2,
+        textTransform: 'uppercase',
+        letterSpacing: 0.6,
     },
     viewLyricsSmall: {
         fontSize: 12,
@@ -874,6 +874,8 @@ const styles = StyleSheet.create({
     modalTitle: {
         fontSize: 20,
         fontWeight: 'bold',
+        textTransform: 'uppercase',
+        letterSpacing: 1,
     },
     closeModalButton: {
         padding: 5,

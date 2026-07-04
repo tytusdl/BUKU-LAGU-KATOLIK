@@ -43,6 +43,7 @@ export const translations = {
     pasteLinkInstructions: 'Tampal pautan lagu yang dikongsi (bermula dengan lagu-pozoo://...) di bawah.',
     pasteLinkPlaceholder: 'lagu-pozoo://savesong?...',
     pasteFromClipboard: 'Tampal dari Clipboard',
+    pasteLinkTip: 'ℹ️ Tak faham menu ini? Ketuk sini untuk lihat panduan "Cara Berkongsi"',
     savePastedLink: 'Simpan Lagu',
     savingPastedLink: 'Menyimpan...',
     linkErrorTitle: 'Ralat Pautan',
@@ -59,8 +60,13 @@ export const translations = {
     copyLinkSuccess: 'Pautan kongsi telah disalin! Sila kongsi dengan kawan-kawan.',
     copyLinkError: 'Gagal menyalin pautan kongsi.',
     // Kunci untuk Alert Bantuan Kongsi
-    shareHelpTitle: 'Cara Berkongsi & Menyimpan Lagu',
-    shareHelpMessage: 'HOW TO SHARE (URL):\n\n1. Tekan "Salin Pautan Kongsi" (ikon 🔗) untuk salin pautan khas ke clipboard.\nKemudian, tampal pautan ini dalam mesej (cth: WhatsApp, Telegram, dll).\n\nCARA SIMPAN (Untuk Penerima):\n\n1. Salin pautan `lagu-pozoo://...` tersebut.\n\n2. Buka aplikasi Buku Lagu ➔ Pergi ke "Lagu Saya" ➔ Tekan butang "Tampal Pautan" (ikon 🔗) ➔ Tampal pautan & simpan.',
+    shareHelpTitle: 'Cara Berkongsi Pautan Lagu',
+    shareHelpIntro: 'Menu ini untuk kongsi & simpan lagu dari kawan — anda tidak perlu taip lagu sendiri. Cukup hantar & terima pautan.',
+    shareHelpStep1: 'Buka mana-mana lagu dari senarai "Lagu Saya"',
+    shareHelpStep2: 'Tekan butang menu (⋮) di skrin lagu, kemudian pilih "Salinan Pautan Kongsi" dari menu',
+    shareHelpStep3: 'Buka WhatsApp, Telegram, atau aplikasi mesej lain',
+    shareHelpStep4: 'Tampal (paste) pautan tadi dan hantar kepada kawan',
+    shareHelpStep5: 'Kawan yang menerima: salin (copy) pautan tadi & tampal di "Tampal Pautan" — lagu akan tersimpan sendiri',
     shareHelpConfirm: 'Tutup',
     cancel: 'Batal',
     // Kunci untuk Pengesahan Padam Lagu
@@ -88,6 +94,8 @@ export const translations = {
     // Misa translations
     massTitle: 'SENARAI LAGU',
     massDescription: 'Rancang lagu-lagu untuk Misa dan tetapkan kod lagu untuk pemuzik.',
+    favoritesDescription: 'Senarai lagu kegemaran anda — cepat diakses bila diperlukan.',
+    settingsDescription: 'Ubahsuai aplikasi mengikut citarasa dan keperluan anda.',
     pembukaan: 'Lagu Pembukaan',
     punggutan: 'Lagu Punggutan',
     persembahan: 'Lagu Persembahan',
@@ -112,7 +120,9 @@ export const translations = {
     shareMassPlan: 'Kongsi Senarai Lagu',
     chooseShareMethod: 'Pilih jenis perkongsian:',
     text: 'Teks',
+    textDesc: 'Kongsi senarai lagu sebagai teks biasa',
     image: 'Gambar',
+    imageDesc: 'Kongsi sebagai imej untuk paparan yang lebih cantik',
     addMore: '+ Tambah',
     viewLyricsSmall: 'Lihat Lirik',
     songAddedTo: 'Lagu ditambah ke {part}',
@@ -281,7 +291,7 @@ export const translations = {
     songAddedMonthsAgo: '{count} bulan lalu',
     sharedBadge: 'Dikongsi',
     emptyMySongsTitle: 'Lagu Saya Kosong',
-    emptyMySongsSubtitle: 'Tambah lagu pertama anda menggunakan butang ➕ di bawah.',
+    emptyMySongsSubtitle: 'Tambah lagu pertama anda menggunakan butang ➕ di skrin.',
     searchNoMatches: 'Tiada lagu sepadan dengan carian anda.',
 
     // FAB Bottom Sheet — cara tambah lagu (v.x.x)
@@ -292,11 +302,11 @@ export const translations = {
     addSongOptionPaste: 'Tampal Pautan',
     addSongOptionPasteDesc: 'Tampal pautan lagu-pozoo:// yang dikongsi',
     addSongOptionHelp: 'Cara Berkongsi',
-    addSongOptionHelpDesc: 'Ketahui cara berkongsi lagu dengan orang lain',
+    addSongOptionHelpDesc: 'Langkah mudah untuk kongsi lagu',
 
     // Header CTA button — gantikan FAB lama (v.x.x)
     addSongPrimaryCTA: 'Tambah Lagu',
-    addSongPrimaryCTADesc: 'Taip sendiri atau tampal link',
+    addSongPrimaryCTADesc: '',
     quickActions: 'Tindakan Pantas',
     moreActions: 'Lagi',
 
@@ -382,6 +392,7 @@ export const translations = {
     pasteLinkInstructions: 'Paste the shared song link (starting with lagu-pozoo://...) below.',
     pasteLinkPlaceholder: 'lagu-pozoo://savesong?...',
     pasteFromClipboard: 'Paste from Clipboard',
+    pasteLinkTip: 'ℹ️ Not sure what this menu does? Tap here to see the "How to Share" guide',
     savePastedLink: 'Save Song',
     savingPastedLink: 'Saving...',
     linkErrorTitle: 'Link Error',
@@ -398,8 +409,13 @@ export const translations = {
     copyLinkSuccess: 'Share link copied! Please share with friends.',
     copyLinkError: 'Failed to copy share link.',
     // English keys for Share Help Alert
-    shareHelpTitle: 'How to Share & Save Songs',
-    shareHelpMessage: 'HOW TO SHARE (URL):\n\n1. Press "Copy Share Link" (🔗 icon) to copy the special link to the clipboard.\nThen, paste this link in a message (e.g., WhatsApp, Telegram, etc.).\n\nHOW TO SAVE (For Receiver):\n\n1. Copy the received `lagu-pozoo://...` link.\n\n2. Open the Buku Lagu app ➔ Go to "My Songs" ➔ Press the "paste link" button (🔗 icon) ➔ Paste the link & save.',
+    shareHelpTitle: 'How to Share a Song Link',
+    shareHelpIntro: 'This menu is for sharing & saving songs with friends — you don\'t have to type songs yourself. Just send & receive the link.',
+    shareHelpStep1: 'Open any song from the "My Songs" list',
+    shareHelpStep2: 'Tap the menu button (⋮) on the song page, then choose "Copy Share Link" from the menu',
+    shareHelpStep3: 'Open WhatsApp, Telegram, or any messaging app',
+    shareHelpStep4: 'Paste the link and send it to your friend',
+    shareHelpStep5: 'For the receiver: copy the link and paste it in "Paste Link" — the song saves automatically',
     shareHelpConfirm: 'Close',
     cancel: 'Cancel',
     // English keys for Delete Song Confirmation
@@ -427,6 +443,8 @@ export const translations = {
     // Mass translations
     massTitle: 'SONG LIST',
     massDescription: 'Plan songs for Mass and set song codes for musicians.',
+    favoritesDescription: 'Your favourite songs — quick access when you need them.',
+    settingsDescription: 'Customise the app to your taste and needs.',
     pembukaan: 'Opening Song',
     punggutan: 'Offertory Song',
     persembahan: 'Presentation Song',
@@ -451,7 +469,9 @@ export const translations = {
     shareMassPlan: 'Share Song List',
     chooseShareMethod: 'Choose share method:',
     text: 'Text',
+    textDesc: 'Share the song list as plain text',
     image: 'Image',
+    imageDesc: 'Share as an image for a nicer look',
     addMore: '+ Add',
     viewLyricsSmall: 'View Lyrics',
     songAddedTo: 'Song added to {part}',
@@ -620,7 +640,7 @@ export const translations = {
     songAddedMonthsAgo: '{count} months ago',
     sharedBadge: 'Shared',
     emptyMySongsTitle: 'My Songs is Empty',
-    emptyMySongsSubtitle: 'Add your first song using the ➕ button below.',
+    emptyMySongsSubtitle: 'Add your first song using the ➕ button on the screen.',
     searchNoMatches: 'No songs match your search.',
 
     // FAB Bottom Sheet — cara tambah lagu (v.x.x)
@@ -631,11 +651,11 @@ export const translations = {
     addSongOptionPaste: 'Paste Link',
     addSongOptionPasteDesc: 'Paste a shared lagu-pozoo:// link',
     addSongOptionHelp: 'How to Share',
-    addSongOptionHelpDesc: 'Learn how to share songs with others',
+    addSongOptionHelpDesc: 'Simple steps to share a song',
 
     // Header CTA button — gantikan FAB lama (v.x.x)
     addSongPrimaryCTA: 'Add Song',
-    addSongPrimaryCTADesc: 'Type manually or paste link',
+    addSongPrimaryCTADesc: '',
     quickActions: 'Quick Actions',
     moreActions: 'More',
 
