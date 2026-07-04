@@ -415,154 +415,143 @@ export default function SongDetail() {
     // Dynamic text color based on theme for visibility
     const textColor = isDarkMode ? '#fff' : '#000';
 
+    const formattedLines = [];
 
-    return useMemo(() => {
-      let formattedLines = [];
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
 
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
+      if (line.match(/^(\*\*)??(Chorus|Cho|Kor|Korus|Ref|Refrain|Choros|Ant|Dend)(\s*\(.*?\))?\s*:(.*)$/i)) {
+        inChorus = true;
+        inIntro = false;
+        const matchResult = line.match(/^(\*\*)??(Chorus|Cho|Kor|Korus|Ref|Refrain|Choros|Ant|Dend)(\s*\(.*?\))?\s*:(.*)$/i);
 
-        if (line.match(/^(\*\*)??(Chorus|Cho|Kor|Korus|Ref|Refrain|Choros|Ant|Dend)(\s*\(.*?\))?\s*:(.*)$/i)) {
-          inChorus = true;
-          inIntro = false;
-          const matchResult = line.match(/^(\*\*)??(Chorus|Cho|Kor|Korus|Ref|Refrain|Choros|Ant|Dend)(\s*\(.*?\))?\s*:(.*)$/i);
+        if (matchResult) {
+          const [, prefix = '', korusLabel = '', suffix = '', restOfLine = ''] = matchResult.map((m: string | undefined) => m ? m.trim() : '');
 
-          if (matchResult) {
-            const [, prefix = '', korusLabel = '', suffix = '', restOfLine = ''] = matchResult.map((m: string | undefined) => m ? m.trim() : '');
-
-            formattedLines.push(
-              // @ts-ignore
-              <View key={`chorus-container-${i}`} style={styles.chorusContainer}>
-                <Text style={[styles.lyrics, styles.chorusHeader, {
-                  fontSize: fontSize,
-                  lineHeight: fontSize * 1.5,
-                  fontWeight: 'bold',
-                  color: textColor
-                }]}>
-                  {prefix}{korusLabel}{suffix ? ` ${suffix}` : ''}:
-                </Text>
-
-                {restOfLine && (
-                  <Text style={[styles.lyrics, styles.chorusFirstLine, {
-                    fontSize: fontSize,
-                    lineHeight: fontSize * 1.5,
-                    fontWeight: 'bold',
-                    color: textColor
-                  }]}>
-                    {restOfLine}
-                  </Text>
-                )}
-              </View>
-            );
-          }
-          continue;
-        }
-
-        if (line.match(/^(\*\*)??(Intro|Int|Pengenalan)(\s*\(.*?\))?\s*:(.*)$/i)) {
-          inChorus = false;
-          inIntro = true;
-          const matchResult = line.match(/^(\*\*)??(Intro|Int|Pengenalan)(\s*\(.*?\))?\s*:(.*)$/i);
-
-          if (matchResult) {
-            const [, prefix = '', introLabel = '', suffix = '', restOfLine = ''] = matchResult.map((m: string | undefined) => m ? m.trim() : '');
-
-            formattedLines.push(
-              // @ts-ignore
-              <View key={`intro-container-${i}`} style={styles.chorusContainer}>
-                <Text style={[styles.lyrics, styles.chorusHeader, {
-                  fontSize: fontSize,
-                  lineHeight: fontSize * 1.5,
-                  fontWeight: 'bold',
-                  color: textColor
-                }]}>
-                  {prefix}{introLabel}{suffix ? ` ${suffix}` : ''}:
-                </Text>
-
-                {restOfLine && (
-                  <Text style={[styles.lyrics, styles.chorusFirstLine, {
-                    fontSize: fontSize,
-                    lineHeight: fontSize * 1.5,
-                    fontWeight: 'bold',
-                    color: textColor
-                  }]}>
-                    {restOfLine}
-                  </Text>
-                )}
-              </View>
-            );
-          }
-          continue;
-        }
-
-        if ((inChorus || inIntro) && line.trim() !== '') {
           formattedLines.push(
-            // @ts-ignore
-            <View key={`special-line-${i}`} style={styles.chorusLineContainer}>
-              <Text style={[styles.lyrics, styles.chorusLine, {
+            <View key={`chorus-container-${i}`} style={styles.chorusContainer}>
+              <Text style={[styles.lyrics, styles.chorusHeader, {
                 fontSize: fontSize,
                 lineHeight: fontSize * 1.5,
                 fontWeight: 'bold',
                 color: textColor
               }]}>
-                {line.trim()}
+                {prefix}{korusLabel}{suffix ? ` ${suffix}` : ''}:
               </Text>
+
+              {restOfLine && (
+                <Text style={[styles.lyrics, styles.chorusFirstLine, {
+                  fontSize: fontSize,
+                  lineHeight: fontSize * 1.5,
+                  fontWeight: 'bold',
+                  color: textColor
+                }]}>
+                  {restOfLine}
+                </Text>
+              )}
             </View>
           );
-          continue;
         }
-
-        // Support for bold lines using ** prefix (e.g. **Line Content**)
-        if (line.trim().startsWith('**')) {
-          const content = line.trim().replace(/^\*\*/, '').replace(/\*\*$/, '').trim();
-          formattedLines.push(
-            // @ts-ignore
-            <View key={`bold-line-${i}`} style={styles.boldLineContainer}>
-              <Text style={[styles.lyrics, styles.chorusLine, {
-                fontSize: fontSize,
-                lineHeight: fontSize * 1.5,
-                fontWeight: 'bold',
-                color: textColor
-              }]}>
-                {content}
-              </Text>
-            </View>
-          );
-          continue;
-        }
-
-        if ((inChorus || inIntro) && line.trim() === '') {
-          inChorus = false;
-          inIntro = false;
-          formattedLines.push(
-            // @ts-ignore
-            <View key={`empty-line-${i}`} style={{ height: 20 }}></View>
-          );
-          continue;
-        }
-
-        if (line.trim() !== '') {
-          formattedLines.push(
-            // @ts-ignore
-            <Text key={`line-${i}`} style={[styles.lyrics, {
-              fontSize: fontSize,
-              lineHeight: fontSize * 1.5,
-              marginBottom: 5,
-              color: textColor
-            }]}>
-              {line}
-            </Text>
-          );
-        } else {
-          formattedLines.push(
-            // @ts-ignore
-            <View key={`empty-line-${i}`} style={{ height: 20 }}></View>
-          );
-        }
+        continue;
       }
 
+      if (line.match(/^(\*\*)??(Intro|Int|Pengenalan)(\s*\(.*?\))?\s*:(.*)$/i)) {
+        inChorus = false;
+        inIntro = true;
+        const matchResult = line.match(/^(\*\*)??(Intro|Int|Pengenalan)(\s*\(.*?\))?\s*:(.*)$/i);
 
-      return formattedLines;
-    }, [fontSize, isDarkMode, song.lyrics]);
+        if (matchResult) {
+          const [, prefix = '', introLabel = '', suffix = '', restOfLine = ''] = matchResult.map((m: string | undefined) => m ? m.trim() : '');
+
+          formattedLines.push(
+            <View key={`intro-container-${i}`} style={styles.chorusContainer}>
+              <Text style={[styles.lyrics, styles.chorusHeader, {
+                fontSize: fontSize,
+                lineHeight: fontSize * 1.5,
+                fontWeight: 'bold',
+                color: textColor
+              }]}>
+                {prefix}{introLabel}{suffix ? ` ${suffix}` : ''}:
+              </Text>
+
+              {restOfLine && (
+                <Text style={[styles.lyrics, styles.chorusFirstLine, {
+                  fontSize: fontSize,
+                  lineHeight: fontSize * 1.5,
+                  fontWeight: 'bold',
+                  color: textColor
+                }]}>
+                  {restOfLine}
+                </Text>
+              )}
+            </View>
+          );
+        }
+        continue;
+      }
+
+      if ((inChorus || inIntro) && line.trim() !== '') {
+        formattedLines.push(
+          <View key={`special-line-${i}`} style={styles.chorusLineContainer}>
+            <Text style={[styles.lyrics, styles.chorusLine, {
+              fontSize: fontSize,
+              lineHeight: fontSize * 1.5,
+              fontWeight: 'bold',
+              color: textColor
+            }]}>
+              {line.trim()}
+            </Text>
+          </View>
+        );
+        continue;
+      }
+
+      // Support for bold lines using ** prefix (e.g. **Line Content**)
+      if (line.trim().startsWith('**')) {
+        const content = line.trim().replace(/^\*\*/, '').replace(/\*\*$/, '').trim();
+        formattedLines.push(
+          <View key={`bold-line-${i}`} style={styles.boldLineContainer}>
+            <Text style={[styles.lyrics, styles.chorusLine, {
+              fontSize: fontSize,
+              lineHeight: fontSize * 1.5,
+              fontWeight: 'bold',
+              color: textColor
+            }]}>
+              {content}
+            </Text>
+          </View>
+        );
+        continue;
+      }
+
+      if ((inChorus || inIntro) && line.trim() === '') {
+        inChorus = false;
+        inIntro = false;
+        formattedLines.push(
+          <View key={`empty-line-${i}`} style={{ height: 20 }}></View>
+        );
+        continue;
+      }
+
+      if (line.trim() !== '') {
+        formattedLines.push(
+          <Text key={`line-${i}`} style={[styles.lyrics, {
+            fontSize: fontSize,
+            lineHeight: fontSize * 1.5,
+            marginBottom: 5,
+            color: textColor
+          }]}>
+            {line}
+          </Text>
+        );
+      } else {
+        formattedLines.push(
+          <View key={`empty-line-${i}`} style={{ height: 20 }}></View>
+        );
+      }
+    }
+
+    return formattedLines;
   };
 
   const renderFullContent = () => {
