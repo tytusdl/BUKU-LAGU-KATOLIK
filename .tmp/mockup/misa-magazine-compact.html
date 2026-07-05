@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buku Lagu Katolik — Misa (Konsep D2: Magazine, Compact)</title>
+<style>
+  :root {
+    --bg: #faf8f4;
+    --surface: #ffffff;
+    --text: #1a1a1a;
+    --text-muted: #8a8a8a;
+    --text-secondary: #5a5a5a;
+    --border: #ece8e0;
+    --border-soft: #f3efe7;
+    --accent: #8b3a3a;
+    --dashes: #d4ccbb;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    background: #e8e4dc;
+    color: var(--text);
+    padding: 32px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  /* ============ Phone frame ============ */
+  .phone {
+    width: 100%;
+    max-width: 390px;
+    background: var(--bg);
+    border-radius: 44px;
+    padding: 12px;
+    box-shadow:
+      0 0 0 8px #1a1a1a,
+      0 0 0 10px #333,
+      0 30px 60px rgba(0,0,0,0.25);
+    overflow: hidden;
+  }
+
+  .screen {
+    background: var(--bg);
+    border-radius: 32px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Status bar */
+  .statusbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 28px 6px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .statusbar .icons { display: flex; gap: 6px; align-items: center; }
+  .statusbar .icons span {
+    width: 14px; height: 10px; border-radius: 2px; background: #1a1a1a;
+  }
+  .statusbar .icons span.wide { width: 22px; }
+
+  /* ============ Page header (compact) ============ */
+  .page-header {
+    padding: 8px 20px 12px;
+    position: relative;
+  }
+
+  .page-header .title {
+    font-family: "Georgia", "Times New Roman", serif;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.3px;
+    color: var(--text);
+    padding-right: 90px; /* leave room for actions */
+  }
+
+  .page-header .title em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+  }
+
+  .page-header .header-actions {
+    display: flex;
+    gap: 4px;
+    position: absolute;
+    top: 8px;
+    right: 20px;
+  }
+
+  .icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text);
+  }
+
+  .icon-btn svg { width: 18px; height: 18px; }
+
+  .header-divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--border) 20%, var(--border) 80%, transparent);
+    margin: 0 20px 10px;
+  }
+
+  /* ============ Body scroll area ============ */
+  .body {
+    padding: 0 20px 24px;
+  }
+
+  /* ============ Spread (each mass part) ============ */
+  .spread {
+    background: var(--surface);
+    border-radius: 14px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    box-shadow:
+      0 1px 0 var(--border-soft),
+      0 2px 8px rgba(0, 0, 0, 0.03);
+    position: relative;
+  }
+
+  /* Accent bar on the left */
+  .spread::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--accent);
+  }
+
+  .spread-header {
+    padding: 12px 14px 10px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  .spread-header .heading {
+    flex: 1;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .roman {
+    font-family: "Georgia", serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .part-title {
+    font-family: "Georgia", "Times New Roman", serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+    letter-spacing: -0.1px;
+  }
+
+  .count {
+    font-family: "Georgia", serif;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-style: italic;
+    font-weight: 400;
+    margin-left: 2px;
+  }
+
+  .add-more {
+    font-size: 10px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    padding: 5px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--accent);
+    flex-shrink: 0;
+  }
+
+  /* ============ Song row (compact) ============ */
+  .songs { padding: 0; }
+
+  .song-row {
+    padding: 10px 14px 10px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  .song-row:last-child { border-bottom: none; }
+  .song-row.draggable { cursor: grab; }
+
+  .drag-handle {
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .drag-handle svg { width: 12px; height: 12px; }
+
+  .song-id {
+    font-family: "Georgia", serif;
+    font-size: 10px;
+    letter-spacing: 1.2px;
+    color: var(--text-muted);
+    font-weight: 700;
+    min-width: 30px;
+    text-align: center;
+    padding: 3px 0;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: #faf8f4;
+    flex-shrink: 0;
+  }
+
+  .song-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .song-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.05px;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .key-chip {
+    background: #faf8f4;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 7px;
+    min-width: 34px;
+    text-align: center;
+    font-family: "Georgia", serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+    flex-shrink: 0;
+  }
+
+  .trash-btn {
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #b85450;
+    flex-shrink: 0;
+  }
+
+  .trash-btn svg { width: 14px; height: 14px; }
+
+  /* ============ Empty state (compact) ============ */
+  .empty {
+    padding: 10px 14px 12px;
+  }
+
+  .empty-box {
+    border: 1.5px dashed var(--dashes);
+    border-radius: 10px;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--text-muted);
+  }
+
+  .empty-box .plus {
+    font-size: 18px;
+    color: var(--accent);
+    font-weight: 300;
+    line-height: 1;
+  }
+
+  .empty-box .label {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  /* ============ Annotation legend ============ */
+  .legend {
+    max-width: 390px;
+    width: 100%;
+    margin: 28px 0 0;
+    background: #fff;
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 12px;
+    line-height: 1.55;
+    color: #333;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  }
+
+  .legend h3 {
+    font-family: "Georgia", serif;
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: var(--accent);
+  }
+
+  .legend .delta {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #eee;
+    color: #555;
+  }
+
+  .legend ul {
+    padding-left: 16px;
+  }
+
+  .legend li { margin-bottom: 3px; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="screen">
+
+    <!-- Status bar -->
+    <div class="statusbar">
+      <span>9:41</span>
+      <div class="icons">
+        <span></span>
+        <span></span>
+        <span class="wide"></span>
+      </div>
+    </div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="header-actions">
+        <div class="icon-btn" title="Share">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+            <polyline points="16 6 12 2 8 6"/>
+            <line x1="12" y1="2" x2="12" y2="15"/>
+          </svg>
+        </div>
+        <div class="icon-btn" title="Clear">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+            <path d="M10 11v6M14 11v6"/>
+            <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>
+          </svg>
+        </div>
+      </div>
+
+      <h1 class="title">Misa <em>Hari Ini</em></h1>
+    </div>
+
+    <div class="header-divider"></div>
+
+    <!-- Body -->
+    <div class="body">
+
+      <!-- I. PEMBUKAAN -->
+      <div class="spread">
+        <div class="spread-header">
+          <div class="heading">
+            <span class="roman">I.</span>
+            <span class="part-title">Lagu Pembukaan</span>
+            <span class="count">— 1 lagu</span>
+          </div>
+          <div class="add-more">+ Tambah</div>
+        </div>
+        <div class="songs">
+          <div class="song-row draggable">
+            <div class="drag-handle">
+              <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg>
+            </div>
+            <div class="song-id">A1</div>
+            <div class="song-info">
+              <div class="song-title">Ya Tuhan Kasihani</div>
+            </div>
+            <div class="key-chip">C</div>
+            <div class="trash-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- II. PUNGUTAN -->
+      <div class="spread">
+        <div class="spread-header">
+          <div class="heading">
+            <span class="roman">II.</span>
+            <span class="part-title">Lagu Punggutan</span>
+            <span class="count">— 1 lagu</span>
+          </div>
+          <div class="add-more">+ Tambah</div>
+        </div>
+        <div class="songs">
+          <div class="song-row draggable">
+            <div class="drag-handle">
+              <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg>
+            </div>
+            <div class="song-id">B7</div>
+            <div class="song-info">
+              <div class="song-title">Tuhan Engkaulah Gembala Kami</div>
+            </div>
+            <div class="key-chip">G</div>
+            <div class="trash-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- III. PERSEMBAHAN (empty) -->
+      <div class="spread">
+        <div class="spread-header">
+          <div class="heading">
+            <span class="roman">III.</span>
+            <span class="part-title">Lagu Persembahan</span>
+            <span class="count">— kosong</span>
+          </div>
+        </div>
+        <div class="empty">
+          <div class="empty-box">
+            <div class="plus">+</div>
+            <div class="label">Pilih Lagu</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- IV. KOMUNI -->
+      <div class="spread">
+        <div class="spread-header">
+          <div class="heading">
+            <span class="roman">IV.</span>
+            <span class="part-title">Lagu Komuni</span>
+            <span class="count">— 2 lagu</span>
+          </div>
+          <div class="add-more">+ Tambah</div>
+        </div>
+        <div class="songs">
+          <div class="song-row draggable">
+            <div class="drag-handle">
+              <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg>
+            </div>
+            <div class="song-id">C12</div>
+            <div class="song-info">
+              <div class="song-title">Tubuh Kristus</div>
+            </div>
+            <div class="key-chip">D</div>
+            <div class="trash-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+            </div>
+          </div>
+          <div class="song-row draggable">
+            <div class="drag-handle">
+              <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg>
+            </div>
+            <div class="song-id">LS</div>
+            <div class="song-info">
+              <div class="song-title">Lagu Tambahan Saya</div>
+            </div>
+            <div class="key-chip">—</div>
+            <div class="trash-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- V. KESYUKURAN (empty) -->
+      <div class="spread">
+        <div class="spread-header">
+          <div class="heading">
+            <span class="roman">V.</span>
+            <span class="part-title">Lagu Kesyukuran</span>
+            <span class="count">— kosong</span>
+          </div>
+        </div>
+        <div class="empty">
+          <div class="empty-box">
+            <div class="plus">+</div>
+            <div class="label">Pilih Lagu</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VI. PENUTUP (empty) -->
+      <div class="spread">
+        <div class="spread-header">
+          <div class="heading">
+            <span class="roman">VI.</span>
+            <span class="part-title">Lagu Penutup</span>
+            <span class="count">— kosong</span>
+          </div>
+        </div>
+        <div class="empty">
+          <div class="empty-box">
+            <div class="plus">+</div>
+            <div class="label">Pilih Lagu</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="legend">
+  <h3>Konsep D2 — Magazine, Compact</h3>
+  <ul>
+    <li><strong>Hero title 24pt</strong> (bukan 40pt), masih serif & ada italic merah</li>
+    <li><strong>Eyebrow & subtitle</strong> dibuang — jimat 60px vertical</li>
+    <li><strong>Roman + title inline</strong> satu baris, bukan stacked</li>
+    <li><strong>Spread padding 14px</strong> (bukan 22px)</li>
+    <li><strong>Song row padding 10px</strong> (bukan 18px), single-line ellipsis</li>
+    <li><strong>Drag handle 6-dot</strong> kat kiri lagu (untuk reorder)</li>
+    <li><strong>Empty state lebih nipis</strong> — dashed border, inline "+ Pilih Lagu"</li>
+    <li><strong>Tiada footer note</strong> kat bawah</li>
+  </ul>
+  <div class="delta">
+    <strong>Hasil:</strong> Semua 6 bahagian (4 dengan lagu + 2 kosong) muat dalam ~580px viewport. Sebelum tu ~1000px. Hampir 50% lebih pendek.
+  </div>
+</div>
+
+</body>
+</html>

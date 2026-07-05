@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Modal, FlatList, Platform, Alert, Share, ToastAndroid, Animated } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { useMass, MassSelection, MassSongSelection } from '../context/MassContext';
 import { songIndex } from '../data/songs/songIndex';
-import { Music, Search, X, Trash2, ChevronRight, Save, Info, Music2, Share as ShareIcon, PlayCircle, ChevronUp, ChevronDown, MessageSquare, Image as ImageIcon } from 'lucide-react-native';
+import { Music, Search, X, Trash2, ChevronRight, Save, Info, Music2, Share as ShareIcon, PlayCircle, ChevronUp, ChevronDown, MessageSquare, Image as ImageIcon, Eye } from 'lucide-react-native';
 import { useLanguage } from '../context/LanguageContext';
 import { useMySongs } from '../context/MySongsContext';
 import PageHeader from '../components/PageHeader';
@@ -29,22 +29,57 @@ export default function MisaScreen() {
     const [isCapturingImage, setIsCapturingImage] = useState(false);
     const [showShareModal, setShowShareModal] = useState(false);
     const [showClearDialog, setShowClearDialog] = useState(false);
+    const [isPreviewMode, setIsPreviewMode] = useState(false);
     const searchInputRef = useRef<TextInput>(null);
     const fullContentRef = useRef<View>(null);
+    const previewCaptureRef = useRef<View>(null);
     const scrollY = useRef(new Animated.Value(0)).current;
 
     const actionColor = isDarkMode
         ? (currentColorTheme.id === 'white' ? '#ffffff' : currentColorTheme.primary)
         : currentColorTheme.primary;
+    const insets = useSafeAreaInsets();
+    // Modal full-screen on iOS needs manual top padding — SafeAreaView doesn't reliably propagate
+    // safe-area insets through React Native's Modal. Use insets when non-zero (newer devices), else
+    // fall back to iOS standard status bar height (20pt for non-notch, 44pt for notch devices).
+    const previewTopPadding = Platform.OS === 'ios'
+        ? (insets.top > 0 ? insets.top + 4 : 20)
+        : 0;
 
-    const massParts: { id: MassPart; label: string }[] = [
-        { id: 'pembukaan', label: t('pembukaan') },
-        { id: 'punggutan', label: t('punggutan') },
-        { id: 'persembahan', label: t('persembahan') },
-        { id: 'komuni', label: t('komuni') },
-        { id: 'kesyukuran', label: t('kesyukuran') },
-        { id: 'penutup', label: t('penutup') },
+    // Stepper Timeline accent — follows the active color theme so it matches the rest of the app.
+    // Use theme `accent` (saturated) rather than `primary` (often pastel) for legible timeline marks.
+    const timelineAccent = isDarkMode
+        ? (currentColorTheme.id === 'white' ? '#e5e5e5' : currentColorTheme.primary)
+        : currentColorTheme.accent;
+    // Soft fill for the add pill — derived from accent alpha
+    const hexToRgba = (hex: string, alpha: number) => {
+        const clean = hex.replace('#', '');
+        const r = parseInt(clean.substring(0, 2), 16);
+        const g = parseInt(clean.substring(2, 4), 16);
+        const b = parseInt(clean.substring(4, 6), 16);
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    };
+    const timelineAccentSoft = isDarkMode
+        ? hexToRgba(timelineAccent, 0.18)
+        : hexToRgba(timelineAccent, 0.08);
+    const timelineText = isDarkMode ? '#e5e5e5' : '#1a1a1a';
+    const timelineMuted = isDarkMode ? '#a1a1aa' : '#71717a';
+    const timelineSurface = isDarkMode ? '#1c1c1e' : '#fafafa';
+    const timelineBorder = isDarkMode ? '#2a2a2c' : '#e4e4e7';
+    const timelineBorderSoft = isDarkMode ? '#232325' : '#f1f1f3';
+    const timelineLineColor = isDarkMode ? '#2a2a2c' : '#e4e4e7';
+
+    const massParts: { id: MassPart; label: string; numeral: string }[] = [
+        { id: 'pembukaan', label: t('pembukaan'), numeral: '1' },
+        { id: 'punggutan', label: t('punggutan'), numeral: '2' },
+        { id: 'persembahan', label: t('persembahan'), numeral: '3' },
+        { id: 'komuni', label: t('komuni'), numeral: '4' },
+        { id: 'kesyukuran', label: t('kesyukuran'), numeral: '5' },
+        { id: 'penutup', label: t('penutup'), numeral: '6' },
     ];
+
+    // Total songs across all parts — used to gate the preview button (only show if there's something to see).
+    const totalSongsCount = massParts.reduce((sum, p) => sum + (massSelection[p.id]?.length || 0), 0);
 
     const filteredSongs = useMemo(() => {
         const combined = [...songIndex, ...mySongs];
@@ -157,12 +192,17 @@ export default function MisaScreen() {
             setIsCapturingImage(true);
             await new Promise(resolve => setTimeout(resolve, 300)); // wait for UI update
 
-            if (!fullContentRef.current) {
+            // Pick the right ref based on which mode the share button was triggered from.
+            // Preview mode → use the new preview-styled capture container (matches what user sees).
+            // Edit mode → use the legacy hiddenCaptureContainer (preserves original share-image styling).
+            const targetRef = isPreviewMode ? previewCaptureRef.current : fullContentRef.current;
+
+            if (!targetRef) {
                 setIsCapturingImage(false);
                 return;
             }
 
-            const uri = await captureRef(fullContentRef.current, {
+            const uri = await captureRef(targetRef, {
                 format: 'png',
                 quality: 1,
                 result: 'tmpfile'
@@ -195,137 +235,163 @@ export default function MisaScreen() {
         return massParts.map((part) => {
             const selections = massSelection[part.id] || [];
             const hasSongs = selections.length > 0;
+            const isEmpty = selections.length === 0;
 
             return (
-                <View key={part.id} style={{ marginBottom: 24 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, paddingHorizontal: 4 }}>
-                        <Text style={[styles.sectionTitleAbove, { color: isDarkMode ? '#ddd' : '#333' }]}>
-                            {part.label.toUpperCase()}
-                        </Text>
-
-                        {hasSongs && !isCapturingImage && (
-                            <TouchableOpacity
-                                style={[styles.addMorePill, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : '#f2f2f7' }]}
-                                onPress={() => {
-                                    setActivePart(part.id);
-                                    setIsModalVisible(true);
-                                }}
-                            >
-                                <Text style={[styles.addMoreText, { color: isDarkMode ? '#fff' : '#000', fontWeight: 'bold' }]}>
-                                    {t('addMore').toUpperCase()}
-                                </Text>
-                            </TouchableOpacity>
-                        )}
+                <View key={part.id} style={styles.timelineItem}>
+                    {/* Dot column */}
+                    <View style={styles.timelineDotCol}>
+                        <View style={[
+                            styles.timelineDot,
+                            isEmpty && styles.timelineDotEmpty,
+                            { borderColor: timelineAccent }
+                        ]}>
+                            <Text style={[
+                                styles.timelineDotText,
+                                { color: timelineAccent },
+                                isEmpty && { color: timelineMuted }
+                            ]}>{part.numeral}</Text>
+                        </View>
                     </View>
 
-                    <View style={[
-                        styles.partCard,
-                        {
-                            backgroundColor: currentColorTheme.surface,
-                            borderColor: currentColorTheme.border,
-                            marginBottom: 0,
-                            padding: 0
-                        }
-                    ]}>
+                    {/* Content column */}
+                    <View style={styles.timelineContent}>
+                        <View style={styles.timelineHead}>
+                            <Text style={[styles.timelineName, { color: timelineText }]}>
+                                {part.label}
+                            </Text>
+                            <Text style={[styles.timelineCount, { color: timelineMuted }]}>
+                                {hasSongs
+                                    ? `${selections.length} ${selections.length === 1 ? 'lagu' : 'lagu'}`
+                                    : 'kosong'}
+                            </Text>
+                        </View>
 
-                        {hasSongs ? (
-                            <View style={styles.songsList}>
-                                {selections.map((selection, index) => {
-                                    const song = getSongById(selection.songId);
-                                    if (!song) return null;
+                        {/* Body box */}
+                        <View style={[
+                            styles.timelineBody,
+                            {
+                                backgroundColor: timelineSurface,
+                                borderColor: timelineBorder,
+                            }
+                        ]}>
+                            {hasSongs && (
+                                <View>
+                                    {selections.map((selection, index) => {
+                                        const song = getSongById(selection.songId);
+                                        if (!song) return null;
+                                        const isUserSong = song.id.length > 6 && !isNaN(Number(song.id));
 
-                                    return (
-                                        <View key={selection.songId} style={[
-                                            styles.selectionInfo,
-                                            index > 0 && styles.selectionBorder,
-                                            index > 0 && { borderTopColor: currentColorTheme.border }
-                                        ]}>
-                                            <View style={styles.songMainRow}>
-                                                {!isCapturingImage && (
-                                                    <TouchableOpacity
-                                                        style={styles.trashIconContainer}
-                                                        onPress={() => removeSongFromMassPart(part.id, song.id)}
-                                                    >
-                                                        <Trash2 size={18} color="#ef4444" />
-                                                    </TouchableOpacity>
-                                                )}
+                                        return (
+                                            <View
+                                                key={selection.songId}
+                                                style={[
+                                                    styles.timelineSongRow,
+                                                    index > 0 && { borderTopWidth: 1, borderTopColor: timelineBorderSoft },
+                                                ]}
+                                            >
+                                                <View style={[
+                                                    styles.timelineSongId,
+                                                    {
+                                                        backgroundColor: isDarkMode ? '#2a2a2c' : '#fff',
+                                                        borderColor: timelineBorder,
+                                                    }
+                                                ]}>
+                                                    <Text style={[styles.timelineSongIdText, { color: timelineAccent }]}>
+                                                        {isUserSong ? 'LS' : song.id}
+                                                    </Text>
+                                                </View>
 
                                                 <TouchableOpacity
-                                                    style={styles.songContentContainer}
+                                                    style={styles.timelineSongTitleWrap}
                                                     onPress={() => {
-                                                        const isUser = song.id.length > 6 && !isNaN(Number(song.id));
                                                         router.push({
                                                             pathname: "/song/[id]",
                                                             params: {
                                                                 id: song.id,
                                                                 fromMass: 'true',
-                                                                isUserSong: isUser ? 'true' : 'false'
+                                                                isUserSong: isUserSong ? 'true' : 'false'
                                                             }
                                                         });
                                                     }}
                                                 >
-                                                    <View style={[styles.songIdBadge, { backgroundColor: isDarkMode ? '#333' : '#f0f0f0' }]}>
-                                                        <Text style={[styles.songIdText, { color: isDarkMode ? '#fff' : '#555' }]}>
-                                                            {song.id.length > 6 && !isNaN(Number(song.id)) ? 'LS' : song.id}
-                                                        </Text>
-                                                    </View>
-                                                    <View style={styles.songTitleInfo}>
-                                                        <Text style={[styles.songTitle, { color: currentColorTheme.text }]}>{song.title}</Text>
-                                                        {!isCapturingImage && (
-                                                            <Text style={[styles.viewLyricsSmall, { color: '#888' }]}>{t('viewLyricsSmall').toUpperCase()}</Text>
-                                                        )}
-                                                    </View>
+                                                    <Text
+                                                        style={[styles.timelineSongTitle, { color: timelineText }]}
+                                                        numberOfLines={1}
+                                                    >
+                                                        {song.title}
+                                                    </Text>
                                                 </TouchableOpacity>
 
-                                                <View style={[styles.kodButtonContainer, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.08)' : '#f2f2f7', borderColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'transparent', borderWidth: 1 }]}>
-                                                    <Music2 size={13} color={isDarkMode ? '#aaa' : '#888'} style={{ marginRight: 4 }} />
-                                                    {!isCapturingImage ? (
-                                                        <TextInput
-                                                            style={[styles.kodInput, { color: currentColorTheme.text }]}
-                                                            placeholder={t('keyLabel').replace(':', '')}
-                                                            placeholderTextColor={isDarkMode ? '#666' : '#aaa'}
-                                                            value={selection.songKey || ''}
-                                                            onChangeText={(text) => handleUpdateKey(part.id, song.id, text.toUpperCase())}
-                                                            maxLength={8}
-                                                        />
-                                                    ) : (
-                                                        <Text style={[styles.kodTextStatic, { color: currentColorTheme.text }]}>{selection.songKey || '-'}</Text>
-                                                    )}
-                                                </View>
+                                                {/* Key input */}
+                                                {!isCapturingImage ? (
+                                                    <TextInput
+                                                        style={[
+                                                            styles.timelineKeyInput,
+                                                            {
+                                                                color: selection.songKey ? timelineText : timelineMuted,
+                                                                backgroundColor: isDarkMode ? '#2a2a2c' : '#fff',
+                                                                borderColor: timelineBorder,
+                                                            }
+                                                        ]}
+                                                        placeholder="—"
+                                                        placeholderTextColor={timelineMuted}
+                                                        value={selection.songKey || ''}
+                                                        onChangeText={(text) => handleUpdateKey(part.id, song.id, text.toUpperCase())}
+                                                        maxLength={6}
+                                                    />
+                                                ) : (
+                                                    <View style={[
+                                                        styles.timelineKeyInput,
+                                                        {
+                                                            backgroundColor: isDarkMode ? '#2a2a2c' : '#fff',
+                                                            borderColor: timelineBorder,
+                                                        }
+                                                    ]}>
+                                                        <Text style={{ color: selection.songKey ? timelineText : timelineMuted, fontWeight: '800', fontSize: 12 }}>
+                                                            {selection.songKey || '—'}
+                                                        </Text>
+                                                    </View>
+                                                )}
+
+                                                {/* Trash */}
+                                                {!isCapturingImage && (
+                                                    <TouchableOpacity
+                                                        style={styles.timelineTrash}
+                                                        onPress={() => removeSongFromMassPart(part.id, song.id)}
+                                                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                                                    >
+                                                        <X size={14} color="#dc2626" strokeWidth={2.5} />
+                                                    </TouchableOpacity>
+                                                )}
                                             </View>
-                                        </View>
-                                    );
-                                })}
-                            </View>
-                        ) : (
-                            !isCapturingImage && (
+                                        );
+                                    })}
+                                </View>
+                            )}
+
+                            {/* Add song pill — always visible */}
+                            {!isCapturingImage && (
                                 <TouchableOpacity
                                     style={[
-                                        styles.pilihLaguBox,
+                                        styles.timelineAddPill,
                                         {
-                                            borderColor: currentColorTheme.primary,
-                                            backgroundColor: isDarkMode
-                                                ? `${currentColorTheme.primary}1A`
-                                                : `${currentColorTheme.primary}0D`,
-                                        },
+                                            borderColor: timelineAccent,
+                                            backgroundColor: timelineAccentSoft,
+                                            marginTop: hasSongs ? 8 : 0,
+                                        }
                                     ]}
                                     onPress={() => {
                                         setActivePart(part.id);
                                         setIsModalVisible(true);
                                     }}
                                 >
-                                    <Music size={18} color={currentColorTheme.primary} />
-                                    <Text
-                                        style={[
-                                            styles.pilihLaguText,
-                                            { color: currentColorTheme.primary },
-                                        ]}
-                                    >
-                                        {t('selectSong')}
+                                    <Text style={[styles.timelineAddPillText, { color: timelineAccent }]}>
+                                        + {hasSongs ? t('addMore') : t('selectSong')}
                                     </Text>
                                 </TouchableOpacity>
-                            )
-                        )}
+                            )}
+                        </View>
                     </View>
                 </View>
             );
@@ -348,6 +414,15 @@ export default function MisaScreen() {
                 rightActions={
                     !isCapturingImage ? (
                         <>
+                            {totalSongsCount > 0 && !isPreviewMode && (
+                                <TouchableOpacity
+                                    onPress={() => setIsPreviewMode(true)}
+                                    style={[styles.clearButton, { marginRight: 12 }]}
+                                    accessibilityLabel={t('previewList')}
+                                >
+                                    <Eye size={22} color={actionColor} />
+                                </TouchableOpacity>
+                            )}
                             <TouchableOpacity onPress={handleShareOptions} style={[styles.clearButton, { marginRight: 15 }]}>
                                 <ShareIcon size={22} color={actionColor} />
                             </TouchableOpacity>
@@ -361,7 +436,7 @@ export default function MisaScreen() {
 
             <ScrollView
                 style={{ flex: 1 }}
-                contentContainerStyle={styles.scrollContent}
+                contentContainerStyle={[styles.scrollContent, { position: 'relative' }]}
                 showsVerticalScrollIndicator={false}
                 onScroll={Animated.event(
                     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
@@ -369,8 +444,86 @@ export default function MisaScreen() {
                 )}
                 scrollEventThrottle={16}
             >
+                {/* Vertical timeline line — spans first dot to last dot */}
+                <View
+                    pointerEvents="none"
+                    style={[
+                        styles.timelineLine,
+                        { backgroundColor: timelineLineColor },
+                    ]}
+                />
                 {renderPlanList()}
             </ScrollView>
+
+            {isCapturingImage && (
+                <View
+                    ref={previewCaptureRef}
+                    collapsable={false}
+                    style={[styles.previewCaptureContainer]}
+                >
+                    <View style={styles.previewContent}>
+                        <Text style={styles.previewBigTitle}>
+                            {t('previewTitle').toUpperCase()}
+                        </Text>
+                        <Text style={styles.previewDate}>
+                            {new Date().toLocaleDateString(
+                                currentLanguage === 'Melayu' ? 'ms-MY' : 'en-GB',
+                                { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }
+                            )}
+                            {' · '}
+                            {totalSongsCount} {totalSongsCount === 1 ? t('song') : t('songs')}
+                        </Text>
+
+                        {massParts.map((part) => {
+                            const selections = massSelection[part.id] || [];
+                            // Same hide-empty rule as visible preview
+                            if (selections.length === 0) return null;
+
+                            return (
+                                <View key={part.id} style={styles.previewSection}>
+                                    <Text style={[styles.previewSectionTitle, { color: timelineAccent }]}>
+                                        {part.numeral} · {part.label}
+                                    </Text>
+                                    <View style={styles.previewSectionSongs}>
+                                        {selections.map((selection) => {
+                                            const song = getSongById(selection.songId);
+                                            if (!song) return null;
+                                            const isUserSong = song.id.length > 6 && !isNaN(Number(song.id));
+                                            return (
+                                                <View key={selection.songId} style={styles.previewSongRow}>
+                                                    <Text style={styles.previewSongId}>
+                                                        {isUserSong ? 'LS' : song.id}
+                                                    </Text>
+                                                    <Text style={styles.previewSongTitle} numberOfLines={1}>
+                                                        {song.title}
+                                                    </Text>
+                                                    {selection.songKey && (
+                                                        <View style={styles.previewSongKeyWrap}>
+                                                            <Text style={styles.previewSongKeyLabel}>
+                                                                {t('keyLabel')}
+                                                            </Text>
+                                                            <Text style={[styles.previewSongKey, { color: timelineAccent }]}>
+                                                                {selection.songKey}
+                                                            </Text>
+                                                        </View>
+                                                    )}
+                                                </View>
+                                            );
+                                        })}
+                                    </View>
+                                </View>
+                            );
+                        })}
+
+                        {/* Footer for share image — matches preview footer */}
+                        <View style={[styles.previewFooter, { marginTop: 16, borderTopWidth: 1, borderTopColor: '#e4e4e7', borderRadius: 0, paddingVertical: 12, backgroundColor: '#fafafa' }]}>
+                            <Text style={styles.previewFooterText}>
+                                ✦ BUKU LAGU KATOLIK ✦
+                            </Text>
+                        </View>
+                    </View>
+                </View>
+            )}
 
             {isCapturingImage && (
                 <View
@@ -502,6 +655,127 @@ export default function MisaScreen() {
                 </View>
             </Modal>
 
+            {/* Preview Modal — full-screen print-style preview of selected songs */}
+            <Modal
+                visible={isPreviewMode}
+                animationType="slide"
+                presentationStyle="fullScreen"
+                onRequestClose={() => setIsPreviewMode(false)}
+            >
+                <SafeAreaView
+                    edges={['top', 'left', 'right', 'bottom']}
+                    style={[styles.container, { backgroundColor: '#ffffff' }]}
+                >
+                    <StatusBar style="dark" />
+
+                    {/* Print-style content area */}
+                    {totalSongsCount === 0 ? (
+                        // Empty state — no songs at all
+                        <View style={styles.previewEmptyContainer}>
+                            <View style={[styles.previewEmptyIcon, { backgroundColor: timelineAccentSoft }]}>
+                                <Info size={32} color={timelineAccent} strokeWidth={2} />
+                            </View>
+                            <Text style={styles.previewEmptyTitle}>
+                                {t('previewEmptyTitle')}
+                            </Text>
+                            <Text style={styles.previewEmptyHint}>
+                                {t('previewEmptyHint')}
+                            </Text>
+                        </View>
+                    ) : (
+                        <>
+                            {/* Fixed header block — title + date pinned above scroll area, padded by safe-area top inset so it never overlaps iPhone status bar / dynamic island */}
+                            <View style={[styles.previewHeaderBlock, { paddingTop: previewTopPadding }]}>
+                                <View style={styles.previewTitleRow}>
+                                    <Text style={styles.previewBigTitle}>
+                                        {t('previewTitle').toUpperCase()}
+                                    </Text>
+                                    <TouchableOpacity
+                                        style={styles.previewTitleCloseAbsolute}
+                                        onPress={() => setIsPreviewMode(false)}
+                                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                                    >
+                                        <X size={20} color="#1a1a1a" strokeWidth={2.5} />
+                                    </TouchableOpacity>
+                                </View>
+                                <Text style={styles.previewDate}>
+                                    {new Date().toLocaleDateString(
+                                        currentLanguage === 'Melayu' ? 'ms-MY' : 'en-GB',
+                                        { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }
+                                    )}
+                                    {' · '}
+                                    {totalSongsCount} {totalSongsCount === 1 ? t('song') : t('songs')}
+                                </Text>
+                            </View>
+                            <ScrollView
+                                style={{ flex: 1 }}
+                                contentContainerStyle={styles.previewContent}
+                                showsVerticalScrollIndicator={false}
+                            >
+                                {massParts.map((part) => {
+                                const selections = massSelection[part.id] || [];
+                                // Hide empty parts (per user's hide-empty rule)
+                                if (selections.length === 0) return null;
+
+                                return (
+                                    <View key={part.id} style={styles.previewSection}>
+                                        <Text style={[styles.previewSectionTitle, { color: timelineAccent }]}>
+                                            {part.numeral} · {part.label}
+                                        </Text>
+                                        <View style={styles.previewSectionSongs}>
+                                            {selections.map((selection) => {
+                                                const song = getSongById(selection.songId);
+                                                if (!song) return null;
+                                                const isUserSong = song.id.length > 6 && !isNaN(Number(song.id));
+                                                return (
+                                                    <View key={selection.songId} style={styles.previewSongRow}>
+                                                        <Text style={styles.previewSongId}>
+                                                            {isUserSong ? 'LS' : song.id}
+                                                        </Text>
+                                                        <Text style={styles.previewSongTitle} numberOfLines={1}>
+                                                            {song.title}
+                                                        </Text>
+                                                        {selection.songKey && (
+                                                            <View style={styles.previewSongKeyWrap}>
+                                                                <Text style={styles.previewSongKeyLabel}>
+                                                                    {t('keyLabel')}
+                                                                </Text>
+                                                                <Text style={[styles.previewSongKey, { color: timelineAccent }]}>
+                                                                    {selection.songKey}
+                                                                </Text>
+                                                            </View>
+                                                        )}
+                                                    </View>
+                                                );
+                                            })}
+                                        </View>
+                                    </View>
+                                );
+                            })}
+                        </ScrollView>
+                            </>
+                    )}
+
+                    {/* Footer */}
+                    <View style={styles.previewFooter}>
+                        <Text style={styles.previewFooterText}>
+                            ✦ BUKU LAGU KATOLIK ✦
+                        </Text>
+                    </View>
+
+                    {/* Floating share button — bottom-right above footer */}
+                    {totalSongsCount > 0 && (
+                        <TouchableOpacity
+                            style={[styles.previewFloatingShare, { backgroundColor: timelineAccent }]}
+                            onPress={() => setShowShareModal(true)}
+                            activeOpacity={0.85}
+                        >
+                            <ShareIcon size={20} color="#fff" strokeWidth={2.4} />
+                        </TouchableOpacity>
+                    )}
+                </SafeAreaView>
+            </Modal>
+
             <ShareBottomSheet
                 visible={showShareModal}
                 title={t('shareMassPlan')}
@@ -545,6 +819,296 @@ export default function MisaScreen() {
 }
 
 const styles = StyleSheet.create({
+    // Stepper timeline styles
+    timelineLine: {
+        position: 'absolute',
+        left: 32, // dot center (16 padding + 16 dot/2 = align with dot center)
+        top: 30,
+        bottom: 30,
+        width: 2,
+        zIndex: 0,
+    },
+    timelineItem: {
+        flexDirection: 'row',
+        marginBottom: 16,
+        position: 'relative',
+        zIndex: 1,
+    },
+    timelineDotCol: {
+        width: 36,
+        alignItems: 'center',
+        flexShrink: 0,
+        paddingTop: 0,
+    },
+    timelineDot: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        backgroundColor: '#fff',
+        borderWidth: 2,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    timelineDotEmpty: {
+        borderStyle: 'dashed',
+    },
+    timelineDotText: {
+        fontSize: 13,
+        fontWeight: '800',
+    },
+    timelineContent: {
+        flex: 1,
+        minWidth: 0,
+        paddingLeft: 8,
+    },
+    timelineHead: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'baseline',
+        marginBottom: 6,
+    },
+    timelineName: {
+        fontSize: 14,
+        fontWeight: '800',
+        letterSpacing: -0.1,
+    },
+    timelineCount: {
+        fontSize: 11,
+        fontWeight: '600',
+    },
+    timelineBody: {
+        borderRadius: 12,
+        padding: 8,
+        borderWidth: 1,
+    },
+    timelineSongRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 6,
+        paddingHorizontal: 6,
+        gap: 8,
+    },
+    timelineSongId: {
+        borderWidth: 1,
+        borderRadius: 5,
+        paddingHorizontal: 8,
+        paddingVertical: 3,
+        minWidth: 34,
+        alignItems: 'center',
+    },
+    timelineSongIdText: {
+        fontSize: 12,
+        fontWeight: '800',
+        letterSpacing: 0.8,
+    },
+    timelineSongTitleWrap: {
+        flex: 1,
+        minWidth: 0,
+    },
+    timelineSongTitle: {
+        fontSize: 13,
+        fontWeight: '700',
+    },
+    timelineKeyInput: {
+        fontSize: 12,
+        fontWeight: '800',
+        borderWidth: 1,
+        borderRadius: 5,
+        paddingVertical: 4,
+        paddingHorizontal: 6,
+        width: 44,
+        textAlign: 'center',
+        minHeight: 28,
+    },
+    timelineTrash: {
+        width: 24,
+        height: 24,
+        borderRadius: 4,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    timelineAddPill: {
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderStyle: 'dashed',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    timelineAddPillText: {
+        fontSize: 12,
+        fontWeight: '800',
+        letterSpacing: 0.3,
+    },
+    // Preview Modal (full-screen print style)
+    previewHeaderBlock: {
+        // Pinned header containing title + date + count. Background + bottom border so it covers
+        // scroll content passing under it and reads as a clear header section.
+        paddingBottom: 6,
+        paddingHorizontal: 24,
+        backgroundColor: '#ffffff',
+        borderBottomWidth: 1,
+        borderBottomColor: '#e4e4e7',
+    },
+    previewTitleRow: {
+        // Row is intentionally non-flex for the title — the title is full-width and centers itself,
+        // while the close button is absolutely positioned so it doesn't shift the title off-center.
+        marginBottom: 0,
+        paddingTop: 0,
+        paddingBottom: 0,
+        position: 'relative',
+    },
+    previewTitleClose: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#f4f4f5',
+    },
+    previewTitleCloseAbsolute: {
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#f4f4f5',
+    },
+    previewFloatingShare: {
+        position: 'absolute',
+        right: 20,
+        bottom: 56, // above previewFooter (~36px height) with breathing room
+        width: 52,
+        height: 52,
+        borderRadius: 26,
+        alignItems: 'center',
+        justifyContent: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.18,
+        shadowRadius: 8,
+        elevation: 6,
+    },
+    previewContent: {
+        paddingHorizontal: 24,
+        paddingTop: 16,
+        paddingBottom: 30,
+        backgroundColor: '#ffffff',
+    },
+    previewBigTitle: {
+        // No flex: 1 — title takes its natural width but text-align centers it within the row.
+        // Adjacent close button is absolutely positioned so it doesn't claim flex space.
+        width: '100%',
+        fontSize: 22,
+        fontWeight: '800',
+        textAlign: 'center',
+        color: '#1a1a1a',
+        letterSpacing: -0.3,
+    },
+    previewDate: {
+        fontSize: 11,
+        textAlign: 'center',
+        color: '#71717a',
+    },
+    previewSection: {
+        marginBottom: 16,
+    },
+    previewSectionTitle: {
+        fontSize: 12,
+        fontWeight: '900',
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+        marginBottom: 6,
+        borderLeftWidth: 3,
+        borderLeftColor: 'currentColor',
+        paddingLeft: 8,
+    },
+    previewSectionSongs: {
+        paddingLeft: 11,
+    },
+    previewSongRow: {
+        flexDirection: 'row',
+        alignItems: 'baseline',
+        paddingVertical: 4,
+        gap: 8,
+    },
+    previewSongId: {
+        fontSize: 13,
+        fontWeight: '800',
+        color: '#71717a',
+        letterSpacing: 0.8,
+        minWidth: 36,
+    },
+    previewSongTitle: {
+        flex: 1,
+        fontSize: 13,
+        fontWeight: '700',
+        color: '#1a1a1a',
+        textTransform: 'uppercase',
+        letterSpacing: 0.2,
+    },
+    previewSongKeyWrap: {
+        flexDirection: 'row',
+        alignItems: 'baseline',
+        gap: 4,
+    },
+    previewSongKeyLabel: {
+        fontSize: 9,
+        fontWeight: '700',
+        color: '#71717a',
+        letterSpacing: 0.5,
+    },
+    previewSongKey: {
+        fontSize: 12,
+        fontWeight: '800',
+        minWidth: 24,
+        textAlign: 'right',
+    },
+    previewEmptyContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: 32,
+    },
+    previewEmptyIcon: {
+        width: 72,
+        height: 72,
+        borderRadius: 36,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 16,
+    },
+    previewEmptyTitle: {
+        fontSize: 16,
+        fontWeight: '800',
+        color: '#1a1a1a',
+        marginBottom: 8,
+        textAlign: 'center',
+    },
+    previewEmptyHint: {
+        fontSize: 13,
+        color: '#71717a',
+        textAlign: 'center',
+        lineHeight: 1.6,
+        maxWidth: 280,
+    },
+    previewFooter: {
+        backgroundColor: '#fafafa',
+        borderTopWidth: 1,
+        borderTopColor: '#e4e4e7',
+        paddingVertical: 12,
+        alignItems: 'center',
+    },
+    previewFooterText: {
+        fontSize: 10,
+        fontWeight: '800',
+        letterSpacing: 3,
+        color: '#71717a',
+    },
     container: {
         flex: 1,
     },
@@ -600,6 +1164,16 @@ const styles = StyleSheet.create({
         borderColor: '#e0e0e0',
         zIndex: 9999,
         borderRadius: 16,
+    },
+    previewCaptureContainer: {
+        // Off-screen capture container for share-image (only mounted when isCapturingImage).
+        // Same visual styling as the live preview screen so the captured PNG matches what user saw.
+        position: 'absolute',
+        top: 0,
+        left: 10000, // off-screen but rendered, so captureRef can target it
+        width: 360,
+        backgroundColor: '#ffffff',
+        zIndex: 9999,
     },
     playStoreContainer: {
         flexDirection: 'row',

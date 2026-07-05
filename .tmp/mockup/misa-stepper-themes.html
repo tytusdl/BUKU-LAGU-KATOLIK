@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Misa Stepper — Preview Semua Theme</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    background: #1a1a1a;
+    color: #fff;
+    min-height: 100vh;
+  }
+
+  .header {
+    padding: 24px 20px;
+    border-bottom: 1px solid #2a2a2c;
+  }
+  .header h1 { font-size: 22px; margin-bottom: 4px; }
+  .header p { color: #a1a1aa; font-size: 13px; }
+
+  .grid {
+    padding: 24px 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .device {
+    background: #fafafa;
+    border-radius: 32px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    display: flex;
+    flex-direction: column;
+    height: 720px;
+    color: #1a1a1a;
+  }
+
+  .device-label {
+    background: #0d0d0d;
+    color: #fff;
+    padding: 10px 16px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .device-label .swatch {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    margin-right: 8px;
+    vertical-align: middle;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  /* Status bar */
+  .statusbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 28px 6px;
+    font-size: 14px;
+    font-weight: 600;
+    background: inherit;
+  }
+  .statusbar .icons { display: flex; gap: 6px; align-items: center; }
+  .statusbar .icons span {
+    width: 14px; height: 10px; border-radius: 2px; background: currentColor;
+  }
+  .statusbar .icons span.wide { width: 22px; }
+
+  /* Header */
+  .device-top {
+    padding: 10px 20px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+  .device-top h2 {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+  }
+  .device-top .actions { display: flex; gap: 4px; }
+  .icon-btn {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: inherit;
+  }
+  .icon-btn svg { width: 18px; height: 18px; }
+
+  /* Body */
+  .device-body {
+    flex: 1;
+    padding: 16px 16px 16px 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Timeline line */
+  .timeline-line {
+    position: absolute;
+    left: 30px;
+    top: 24px;
+    bottom: 24px;
+    width: 2px;
+    background: rgba(0,0,0,0.08);
+    z-index: 0;
+  }
+
+  .dark .timeline-line {
+    background: rgba(255,255,255,0.1);
+  }
+
+  /* Item */
+  .tl-item {
+    display: flex;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .tl-dot-col {
+    width: 36px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .tl-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  .tl-dot.empty {
+    border-style: dashed;
+    color: #71717a;
+    border-color: #d4d4d8;
+  }
+  .dark .tl-dot.empty { color: #71717a; border-color: #3f3f46; }
+
+  .tl-content {
+    flex: 1;
+    min-width: 0;
+    padding-left: 6px;
+  }
+
+  .tl-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 4px;
+  }
+
+  .tl-head .name {
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .tl-head .count {
+    font-size: 10px;
+    color: #71717a;
+    font-weight: 600;
+  }
+  .dark .tl-head .count { color: #a1a1aa; }
+
+  .tl-body {
+    background: #fafafa;
+    border: 1px solid #e4e4e7;
+    border-radius: 10px;
+    padding: 6px 8px;
+  }
+  .dark .tl-body { background: #1c1c1e; border-color: #2a2a2c; }
+
+  .tl-song {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 0;
+  }
+  .tl-song + .tl-song {
+    border-top: 1px solid #f1f1f3;
+  }
+  .dark .tl-song + .tl-song { border-top-color: #232325; }
+
+  .tl-id {
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--accent);
+    background: #fff;
+    border: 1px solid #e4e4e7;
+    padding: 1px 5px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+  .dark .tl-id { background: #2a2a2c; border-color: #3f3f46; }
+
+  .tl-title {
+    flex: 1;
+    font-size: 11px;
+    font-weight: 700;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tl-key {
+    font-size: 10px;
+    font-weight: 800;
+    color: #1a1a1a;
+    background: #fff;
+    border: 1px solid #e4e4e7;
+    border-radius: 4px;
+    padding: 2px 4px;
+    width: 28px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .dark .tl-key { background: #2a2a2c; border-color: #3f3f46; color: #e5e5e5; }
+  .tl-key.placeholder { color: #a1a1aa; }
+
+  .tl-x {
+    color: #dc2626;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .tl-x svg { width: 10px; height: 10px; }
+
+  .tl-add {
+    margin-top: 6px;
+    padding: 6px 8px;
+    border: 1px dashed var(--accent);
+    border-radius: 6px;
+    text-align: center;
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--accent);
+    background: var(--accent-soft);
+    letter-spacing: 0.3px;
+  }
+
+  /* Theme variables */
+  .theme-white { --accent: #333333; --accent-soft: rgba(51, 51, 51, 0.06); background: #fff; }
+  .theme-blue { --accent: #3b5998; --accent-soft: rgba(59, 89, 152, 0.08); background: #f0f4ff; }
+  .theme-green { --accent: #388E3C; --accent-soft: rgba(56, 142, 60, 0.08); background: #e8f5e8; }
+  .theme-purple { --accent: #7B1FA2; --accent-soft: rgba(123, 31, 162, 0.08); background: #f3e5f5; }
+  .theme-pink { --accent: #E91E63; --accent-soft: rgba(233, 30, 99, 0.08); background: #fce4ec; }
+  .theme-orange { --accent: #F57C00; --accent-soft: rgba(245, 124, 0, 0.08); background: #fff3e0; }
+  .theme-red { --accent: #C62828; --accent-soft: rgba(198, 40, 40, 0.08); background: #ffebee; }
+
+  /* Dark theme variants */
+  .dark.theme-white { --accent: #e5e5e5; --accent-soft: rgba(229, 229, 229, 0.15); background: #0d0d0d; color: #e5e5e5; }
+  .dark.theme-blue { --accent: #9AC2F0; --accent-soft: rgba(154, 194, 240, 0.15); background: #0a1428; color: #e5e5e5; }
+  .dark.theme-green { --accent: #96D99A; --accent-soft: rgba(150, 217, 154, 0.15); background: #0a1f0a; color: #e5e5e5; }
+  .dark.theme-purple { --accent: #C788D1; --accent-soft: rgba(199, 136, 209, 0.15); background: #1a0a1f; color: #e5e5e5; }
+  .dark.theme-pink { --accent: #F2A2C7; --accent-soft: rgba(242, 162, 199, 0.15); background: #1f0a14; color: #e5e5e5; }
+  .dark.theme-orange { --accent: #FFC975; --accent-soft: rgba(255, 201, 117, 0.15); background: #1f1408; color: #e5e5e5; }
+  .dark.theme-red { --accent: #F59393; --accent-soft: rgba(245, 147, 147, 0.15); background: #1f0808; color: #e5e5e5; }
+
+  .dark .device-top { border-bottom-color: rgba(255,255,255,0.08); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Misa Stepper Timeline — Preview Semua Theme</h1>
+  <p>7 color themes × light & dark = 14 kombinasi. Semua warna accent datang dari theme, bukan hardcoded.</p>
+</div>
+
+<div class="grid">
+  <!-- LIGHT THEMES -->
+  <div class="device theme-white">
+    <div class="device-label"><span class="swatch" style="background:#333"></span>WHITE — Light</div>
+    <div class="statusbar"><span>9:41</span><div class="icons"><span></span><span></span><span class="wide"></span></div></div>
+    <div class="device-top">
+      <h2>Misa Hari Ini</h2>
+      <div class="actions">
+        <div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div>
+        <div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></div>
+      </div>
+    </div>
+    <div class="device-body">
+      <div class="timeline-line"></div>
+      <!-- 6 items here, abbreviated -->
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">1</div></div><div class="tl-content"><div class="tl-head"><span class="name">Pembukaan</span><span class="count">2 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">A1</span><span class="tl-title">Ya Tuhan Kasihani</span><span class="tl-key">C</span><span class="tl-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><div class="tl-add">+ Tambah Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">2</div></div><div class="tl-content"><div class="tl-head"><span class="name">Punggutan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">3</div></div><div class="tl-content"><div class="tl-head"><span class="name">Persembahan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">4</div></div><div class="tl-content"><div class="tl-head"><span class="name">Komuni</span><span class="count">1 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">C12</span><span class="tl-title">Tubuh Kristus</span><span class="tl-key">D</span><span class="tl-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><div class="tl-add">+ Tambah Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">5</div></div><div class="tl-content"><div class="tl-head"><span class="name">Kesyukuran</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">6</div></div><div class="tl-content"><div class="tl-head"><span class="name">Penutup</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+    </div>
+  </div>
+
+  <div class="device theme-blue">
+    <div class="device-label"><span class="swatch" style="background:#3b5998"></span>BLUE — Light</div>
+    <div class="statusbar"><span>9:41</span><div class="icons"><span></span><span></span><span class="wide"></span></div></div>
+    <div class="device-top"><h2>Misa Hari Ini</h2><div class="actions"><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></div></div></div>
+    <div class="device-body">
+      <div class="timeline-line"></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">1</div></div><div class="tl-content"><div class="tl-head"><span class="name">Pembukaan</span><span class="count">2 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">A1</span><span class="tl-title">Ya Tuhan Kasihani</span><span class="tl-key">C</span><span class="tl-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><div class="tl-add">+ Tambah Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">2</div></div><div class="tl-content"><div class="tl-head"><span class="name">Punggutan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">3</div></div><div class="tl-content"><div class="tl-head"><span class="name">Persembahan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">4</div></div><div class="tl-content"><div class="tl-head"><span class="name">Komuni</span><span class="count">1 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">C12</span><span class="tl-title">Tubuh Kristus</span><span class="tl-key">D</span><span class="tl-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><div class="tl-add">+ Tambah Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">5</div></div><div class="tl-content"><div class="tl-head"><span class="name">Kesyukuran</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">6</div></div><div class="tl-content"><div class="tl-head"><span class="name">Penutup</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+    </div>
+  </div>
+
+  <div class="device theme-green">
+    <div class="device-label"><span class="swatch" style="background:#388E3C"></span>GREEN — Light</div>
+    <div class="statusbar"><span>9:41</span><div class="icons"><span></span><span></span><span class="wide"></span></div></div>
+    <div class="device-top"><h2>Misa Hari Ini</h2><div class="actions"><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></div></div></div>
+    <div class="device-body">
+      <div class="timeline-line"></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">1</div></div><div class="tl-content"><div class="tl-head"><span class="name">Pembukaan</span><span class="count">2 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">A1</span><span class="tl-title">Ya Tuhan Kasihani</span><span class="tl-key">C</span><span class="tl-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><div class="tl-add">+ Tambah Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">2</div></div><div class="tl-content"><div class="tl-head"><span class="name">Punggutan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">3</div></div><div class="tl-content"><div class="tl-head"><span class="name">Persembahan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">4</div></div><div class="tl-content"><div class="tl-head"><span class="name">Komuni</span><span class="count">1 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">C12</span><span class="tl-title">Tubuh Kristus</span><span class="tl-key">D</span><span class="tl-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><div class="tl-add">+ Tambah Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">5</div></div><div class="tl-content"><div class="tl-head"><span class="name">Kesyukuran</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">6</div></div><div class="tl-content"><div class="tl-head"><span class="name">Penutup</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+    </div>
+  </div>
+
+  <div class="device theme-purple">
+    <div class="device-label"><span class="swatch" style="background:#7B1FA2"></span>PURPLE — Light</div>
+    <div class="statusbar"><span>9:41</span><div class="icons"><span></span><span></span><span class="wide"></span></div></div>
+    <div class="device-top"><h2>Misa Hari Ini</h2><div class="actions"><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></div></div></div>
+    <div class="device-body">
+      <div class="timeline-line"></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">1</div></div><div class="tl-content"><div class="tl-head"><span class="name">Pembukaan</span><span class="count">2 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">A1</span><span class="tl-title">Ya Tuhan Kasihani</span><span class="tl-key">C</span><span class="tl-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><div class="tl-add">+ Tambah Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">2</div></div><div class="tl-content"><div class="tl-head"><span class="name">Punggutan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">3</div></div><div class="tl-content"><div class="tl-head"><span class="name">Persembahan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">4</div></div><div class="tl-content"><div class="tl-head"><span class="name">Komuni</span><span class="count">1 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">C12</span><span class="tl-title">Tubuh Kristus</span><span class="tl-key">D</span><span class="tl-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><div class="tl-add">+ Tambah Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">5</div></div><div class="tl-content"><div class="tl-head"><span class="name">Kesyukuran</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">6</div></div><div class="tl-content"><div class="tl-head"><span class="name">Penutup</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+    </div>
+  </div>
+
+  <div class="device theme-pink">
+    <div class="device-label"><span class="swatch" style="background:#E91E63"></span>PINK — Light</div>
+    <div class="statusbar"><span>9:41</span><div class="icons"><span></span><span></span><span class="wide"></span></div></div>
+    <div class="device-top"><h2>Misa Hari Ini</h2><div class="actions"><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></div></div></div>
+    <div class="device-body">
+      <div class="timeline-line"></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">1</div></div><div class="tl-content"><div class="tl-head"><span class="name">Pembukaan</span><span class="count">2 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">A1</span><span class="tl-title">Ya Tuhan Kasihani</span><span class="tl-key">C</span><span class="tl-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><div class="tl-add">+ Tambah Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">2</div></div><div class="tl-content"><div class="tl-head"><span class="name">Punggutan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">3</div></div><div class="tl-content"><div class="tl-head"><span class="name">Persembahan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">4</div></div><div class="tl-content"><div class="tl-head"><span class="name">Komuni</span><span class="count">1 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">C12</span><span class="tl-title">Tubuh Kristus</span><span class="tl-key">D</span><span class="tl-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><div class="tl-add">+ Tambah Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">5</div></div><div class="tl-content"><div class="tl-head"><span class="name">Kesyukuran</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">6</div></div><div class="tl-content"><div class="tl-head"><span class="name">Penutup</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+    </div>
+  </div>
+
+  <div class="device theme-orange">
+    <div class="device-label"><span class="swatch" style="background:#F57C00"></span>ORANGE — Light</div>
+    <div class="statusbar"><span>9:41</span><div class="icons"><span></span><span></span><span class="wide"></span></div></div>
+    <div class="device-top"><h2>Misa Hari Ini</h2><div class="actions"><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></div></div></div>
+    <div class="device-body">
+      <div class="timeline-line"></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">1</div></div><div class="tl-content"><div class="tl-head"><span class="name">Pembukaan</span><span class="count">2 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">A1</span><span class="tl-title">Ya Tuhan Kasihani</span><span class="tl-key">C</span><span class="tl-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><div class="tl-add">+ Tambah Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">2</div></div><div class="tl-content"><div class="tl-head"><span class="name">Punggutan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">3</div></div><div class="tl-content"><div class="tl-head"><span class="name">Persembahan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">4</div></div><div class="tl-content"><div class="tl-head"><span class="name">Komuni</span><span class="count">1 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">C12</span><span class="tl-title">Tubuh Kristus</span><span class="tl-key">D</span><span class="tl-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><div class="tl-add">+ Tambah Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">5</div></div><div class="tl-content"><div class="tl-head"><span class="name">Kesyukuran</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">6</div></div><div class="tl-content"><div class="tl-head"><span class="name">Penutup</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+    </div>
+  </div>
+
+  <div class="device theme-red">
+    <div class="device-label"><span class="swatch" style="background:#C62828"></span>RED — Light</div>
+    <div class="statusbar"><span>9:41</span><div class="icons"><span></span><span></span><span class="wide"></span></div></div>
+    <div class="device-top"><h2>Misa Hari Ini</h2><div class="actions"><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></div></div></div>
+    <div class="device-body">
+      <div class="timeline-line"></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">1</div></div><div class="tl-content"><div class="tl-head"><span class="name">Pembukaan</span><span class="count">2 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">A1</span><span class="tl-title">Ya Tuhan Kasihani</span><span class="tl-key">C</span><span class="tl-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><div class="tl-add">+ Tambah Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">2</div></div><div class="tl-content"><div class="tl-head"><span class="name">Punggutan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">3</div></div><div class="tl-content"><div class="tl-head"><span class="name">Persembahan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">4</div></div><div class="tl-content"><div class="tl-head"><span class="name">Komuni</span><span class="count">1 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">C12</span><span class="tl-title">Tubuh Kristus</span><span class="tl-key">D</span><span class="tl-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><div class="tl-add">+ Tambah Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">5</div></div><div class="tl-content"><div class="tl-head"><span class="name">Kesyukuran</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">6</div></div><div class="tl-content"><div class="tl-head"><span class="name">Penutup</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+    </div>
+  </div>
+
+  <!-- DARK THEMES -->
+  <div class="device dark theme-white">
+    <div class="device-label"><span class="swatch" style="background:#e5e5e5"></span>WHITE — Dark</div>
+    <div class="statusbar"><span style="color:#e5e5e5">9:41</span><div class="icons"><span style="background:#e5e5e5"></span><span style="background:#e5e5e5"></span><span class="wide" style="background:#e5e5e5"></span></div></div>
+    <div class="device-top"><h2>Misa Hari Ini</h2><div class="actions"><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></div></div></div>
+    <div class="device-body">
+      <div class="timeline-line"></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">1</div></div><div class="tl-content"><div class="tl-head"><span class="name">Pembukaan</span><span class="count">2 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">A1</span><span class="tl-title">Ya Tuhan Kasihani</span><span class="tl-key">C</span><span class="tl-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><div class="tl-add">+ Tambah Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">2</div></div><div class="tl-content"><div class="tl-head"><span class="name">Punggutan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">3</div></div><div class="tl-content"><div class="tl-head"><span class="name">Persembahan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">4</div></div><div class="tl-content"><div class="tl-head"><span class="name">Komuni</span><span class="count">1 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">C12</span><span class="tl-title">Tubuh Kristus</span><span class="tl-key">D</span><span class="tl-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><div class="tl-add">+ Tambah Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">5</div></div><div class="tl-content"><div class="tl-head"><span class="name">Kesyukuran</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">6</div></div><div class="tl-content"><div class="tl-head"><span class="name">Penutup</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+    </div>
+  </div>
+
+  <div class="device dark theme-blue">
+    <div class="device-label"><span class="swatch" style="background:#9AC2F0"></span>BLUE — Dark</div>
+    <div class="statusbar"><span style="color:#e5e5e5">9:41</span><div class="icons"><span style="background:#e5e5e5"></span><span style="background:#e5e5e5"></span><span class="wide" style="background:#e5e5e5"></span></div></div>
+    <div class="device-top"><h2>Misa Hari Ini</h2><div class="actions"><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></div></div></div>
+    <div class="device-body">
+      <div class="timeline-line"></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">1</div></div><div class="tl-content"><div class="tl-head"><span class="name">Pembukaan</span><span class="count">2 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">A1</span><span class="tl-title">Ya Tuhan Kasihani</span><span class="tl-key">C</span><span class="tl-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><div class="tl-add">+ Tambah Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">2</div></div><div class="tl-content"><div class="tl-head"><span class="name">Punggutan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">3</div></div><div class="tl-content"><div class="tl-head"><span class="name">Persembahan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">4</div></div><div class="tl-content"><div class="tl-head"><span class="name">Komuni</span><span class="count">1 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">C12</span><span class="tl-title">Tubuh Kristus</span><span class="tl-key">D</span><span class="tl-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><div class="tl-add">+ Tambah Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">5</div></div><div class="tl-content"><div class="tl-head"><span class="name">Kesyukuran</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">6</div></div><div class="tl-content"><div class="tl-head"><span class="name">Penutup</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+    </div>
+  </div>
+
+  <div class="device dark theme-green">
+    <div class="device-label"><span class="swatch" style="background:#96D99A"></span>GREEN — Dark</div>
+    <div class="statusbar"><span style="color:#e5e5e5">9:41</span><div class="icons"><span style="background:#e5e5e5"></span><span style="background:#e5e5e5"></span><span class="wide" style="background:#e5e5e5"></span></div></div>
+    <div class="device-top"><h2>Misa Hari Ini</h2><div class="actions"><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></div></div></div>
+    <div class="device-body">
+      <div class="timeline-line"></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">1</div></div><div class="tl-content"><div class="tl-head"><span class="name">Pembukaan</span><span class="count">2 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">A1</span><span class="tl-title">Ya Tuhan Kasihani</span><span class="tl-key">C</span><span class="tl-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><div class="tl-add">+ Tambah Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">2</div></div><div class="tl-content"><div class="tl-head"><span class="name">Punggutan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">3</div></div><div class="tl-content"><div class="tl-head"><span class="name">Persembahan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">4</div></div><div class="tl-content"><div class="tl-head"><span class="name">Komuni</span><span class="count">1 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">C12</span><span class="tl-title">Tubuh Kristus</span><span class="tl-key">D</span><span class="tl-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><div class="tl-add">+ Tambah Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">5</div></div><div class="tl-content"><div class="tl-head"><span class="name">Kesyukuran</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">6</div></div><div class="tl-content"><div class="tl-head"><span class="name">Penutup</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+    </div>
+  </div>
+
+  <div class="device dark theme-purple">
+    <div class="device-label"><span class="swatch" style="background:#C788D1"></span>PURPLE — Dark</div>
+    <div class="statusbar"><span style="color:#e5e5e5">9:41</span><div class="icons"><span style="background:#e5e5e5"></span><span style="background:#e5e5e5"></span><span class="wide" style="background:#e5e5e5"></span></div></div>
+    <div class="device-top"><h2>Misa Hari Ini</h2><div class="actions"><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></div></div></div>
+    <div class="device-body">
+      <div class="timeline-line"></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">1</div></div><div class="tl-content"><div class="tl-head"><span class="name">Pembukaan</span><span class="count">2 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">A1</span><span class="tl-title">Ya Tuhan Kasihani</span><span class="tl-key">C</span><span class="tl-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><div class="tl-add">+ Tambah Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">2</div></div><div class="tl-content"><div class="tl-head"><span class="name">Punggutan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">3</div></div><div class="tl-content"><div class="tl-head"><span class="name">Persembahan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">4</div></div><div class="tl-content"><div class="tl-head"><span class="name">Komuni</span><span class="count">1 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">C12</span><span class="tl-title">Tubuh Kristus</span><span class="tl-key">D</span><span class="tl-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><div class="tl-add">+ Tambah Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">5</div></div><div class="tl-content"><div class="tl-head"><span class="name">Kesyukuran</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">6</div></div><div class="tl-content"><div class="tl-head"><span class="name">Penutup</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+    </div>
+  </div>
+
+  <div class="device dark theme-pink">
+    <div class="device-label"><span class="swatch" style="background:#F2A2C7"></span>PINK — Dark</div>
+    <div class="statusbar"><span style="color:#e5e5e5">9:41</span><div class="icons"><span style="background:#e5e5e5"></span><span style="background:#e5e5e5"></span><span class="wide" style="background:#e5e5e5"></span></div></div>
+    <div class="device-top"><h2>Misa Hari Ini</h2><div class="actions"><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></div></div></div>
+    <div class="device-body">
+      <div class="timeline-line"></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">1</div></div><div class="tl-content"><div class="tl-head"><span class="name">Pembukaan</span><span class="count">2 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">A1</span><span class="tl-title">Ya Tuhan Kasihani</span><span class="tl-key">C</span><span class="tl-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><div class="tl-add">+ Tambah Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">2</div></div><div class="tl-content"><div class="tl-head"><span class="name">Punggutan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">3</div></div><div class="tl-content"><div class="tl-head"><span class="name">Persembahan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">4</div></div><div class="tl-content"><div class="tl-head"><span class="name">Komuni</span><span class="count">1 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">C12</span><span class="tl-title">Tubuh Kristus</span><span class="tl-key">D</span><span class="tl-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><div class="tl-add">+ Tambah Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">5</div></div><div class="tl-content"><div class="tl-head"><span class="name">Kesyukuran</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">6</div></div><div class="tl-content"><div class="tl-head"><span class="name">Penutup</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+    </div>
+  </div>
+
+  <div class="device dark theme-orange">
+    <div class="device-label"><span class="swatch" style="background:#FFC975"></span>ORANGE — Dark</div>
+    <div class="statusbar"><span style="color:#e5e5e5">9:41</span><div class="icons"><span style="background:#e5e5e5"></span><span style="background:#e5e5e5"></span><span class="wide" style="background:#e5e5e5"></span></div></div>
+    <div class="device-top"><h2>Misa Hari Ini</h2><div class="actions"><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></div></div></div>
+    <div class="device-body">
+      <div class="timeline-line"></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">1</div></div><div class="tl-content"><div class="tl-head"><span class="name">Pembukaan</span><span class="count">2 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">A1</span><span class="tl-title">Ya Tuhan Kasihani</span><span class="tl-key">C</span><span class="tl-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><div class="tl-add">+ Tambah Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">2</div></div><div class="tl-content"><div class="tl-head"><span class="name">Punggutan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">3</div></div><div class="tl-content"><div class="tl-head"><span class="name">Persembahan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">4</div></div><div class="tl-content"><div class="tl-head"><span class="name">Komuni</span><span class="count">1 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">C12</span><span class="tl-title">Tubuh Kristus</span><span class="tl-key">D</span><span class="tl-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><div class="tl-add">+ Tambah Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">5</div></div><div class="tl-content"><div class="tl-head"><span class="name">Kesyukuran</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">6</div></div><div class="tl-content"><div class="tl-head"><span class="name">Penutup</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+    </div>
+  </div>
+
+  <div class="device dark theme-red">
+    <div class="device-label"><span class="swatch" style="background:#F59393"></span>RED — Dark</div>
+    <div class="statusbar"><span style="color:#e5e5e5">9:41</span><div class="icons"><span style="background:#e5e5e5"></span><span style="background:#e5e5e5"></span><span class="wide" style="background:#e5e5e5"></span></div></div>
+    <div class="device-top"><h2>Misa Hari Ini</h2><div class="actions"><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></div></div></div>
+    <div class="device-body">
+      <div class="timeline-line"></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">1</div></div><div class="tl-content"><div class="tl-head"><span class="name">Pembukaan</span><span class="count">2 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">A1</span><span class="tl-title">Ya Tuhan Kasihani</span><span class="tl-key">C</span><span class="tl-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><div class="tl-add">+ Tambah Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">2</div></div><div class="tl-content"><div class="tl-head"><span class="name">Punggutan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">3</div></div><div class="tl-content"><div class="tl-head"><span class="name">Persembahan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">4</div></div><div class="tl-content"><div class="tl-head"><span class="name">Komuni</span><span class="count">1 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">C12</span><span class="tl-title">Tubuh Kristus</span><span class="tl-key">D</span><span class="tl-x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></div><div class="tl-add">+ Tambah Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">5</div></div><div class="tl-content"><div class="tl-head"><span class="name">Kesyukuran</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+      <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">6</div></div><div class="tl-content"><div class="tl-head"><span class="name">Penutup</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

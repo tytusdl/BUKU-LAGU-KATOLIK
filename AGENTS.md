@@ -84,6 +84,41 @@ components/                 AnimatedSplash.tsx (root splash animation)
 src/translations.ts         i18n strings keyed by 'Melayu' | 'English'
 ```
 
+## CRITICAL: Scope discipline (READ FIRST before any change)
+
+**Do exactly what the user asked. Nothing more, nothing less.**
+
+- **If the user describes a SYMPTOM** ("title overlaps status bar", "X is broken",
+  "this looks wrong"), fix THAT symptom with the **minimal change**. Don't
+  restructure surrounding layout, don't move other UI elements, don't add
+  new sections, don't reorganize existing components the user already approved.
+- **If the user describes a CHANGE they want** ("move X to here", "add button
+  with label Y"), do EXACTLY that — don't infer additional changes from
+  surrounding context.
+- **Before making ANY change beyond the literal request, ask first.** Use a
+  short ask_user popup or a single-sentence inline question. Do not silently
+  expand scope because you think it would "look better" or "be more
+  consistent".
+- **This applies to: layout, copy, colors, navigation, file structure,
+  dependencies, refactors. All of it.**
+- **Repeated violation pattern from past sessions:** user asks to remove
+  something → agent also moves other elements around without asking →
+  user gets angry. Avoid this. If unsure, ASK, don't act.
+
+Examples of CORRECT minimal-fix scope:
+- User: "X bertindih dengan status bar" → Fix: add invisible spacer with
+  `height: insets.top` at top of content. NOT: create a dedicated top bar
+  that moves the title and X button.
+- User: "Buang ayat pratonton" → Fix: delete that one piece of UI. NOT:
+  also restructure the whole toolbar / move other buttons.
+- User: "Ubah kod lagu supaya ada label KOD" → Fix: prefix the existing
+  text with "KOD: ". NOT: redesign the song row or restyle adjacent
+  components.
+
+**Always re-read this section before touching a file when the user reports
+a bug or asks for a specific change.** It is the single most-violated rule
+in this repo.
+
 ## Conventions
 
 - **Language model is bilingual**: every user-facing string must exist in
@@ -98,6 +133,13 @@ src/translations.ts         i18n strings keyed by 'Melayu' | 'English'
 - **Persistence**: one AsyncStorage key per feature, namespaced in the
   context that owns it (see `MY_SONGS_STORAGE_KEY`,
   `THEME_STORAGE_KEY`, `COLOR_THEME_STORAGE_KEY`).
+- **Safe areas (iOS notch + Android gesture bar)**: every Modal or
+  full-screen surface MUST account for top + bottom safe-area insets. Wrap
+  in `SafeAreaView` from `react-native-safe-area-context` with
+  `edges={['top','left','right','bottom']}` for full-screen modals, or use
+  `useSafeAreaInsets()` to apply padding to top/bottom bars individually.
+  Don't trust `presentationStyle="fullScreen"` to auto-handle the notch —
+  it doesn't. See gotcha entries below for specific patterns.
 - **Routing**: typed routes are enabled (`experiments.typedRoutes` in
   `app.json`). Use `router.navigate` / `router.replace` from
   `expo-router`, not `Link` to literal paths when a typed route exists.
@@ -133,6 +175,17 @@ src/translations.ts         i18n strings keyed by 'Melayu' | 'English'
   pill button — it eats vertical space and forces a fixed maxHeight. Tap
   outside the modal or the X are the only dismiss affordances. Reference
   style: `supporterCloseX` in `app/(tabs)/setting.tsx`.
+- **Full-screen modals on iPhone MUST absorb `useSafeAreaInsets().top` — never
+  let content touch the status bar / Dynamic Island.** Symptom: title or
+  big text overlaps the iOS clock, signal, battery icons at the top of the
+  screen. Fix pattern: render an **invisible spacer** at the very top of
+  the Modal content (before any other UI): `<View style={{ height: insets.top }} />`.
+  This pushes the existing layout down by the safe-area inset without
+  restructuring anything. DO NOT move the title or close button into a
+  separate top bar — that changes the layout the user already approved.
+  `presentationStyle="fullScreen"` does NOT auto-reserve the notch area;
+  you have to handle the inset yourself. Reference: preview modal in
+  `app/(tabs)/misa.tsx` (share-image preview).
 - **Splash race**: `SplashScreen.preventAutoHideAsync()` is set, then
   fonts + main banner preload in `RootLayout.prepare()`. Hide only after
   `AnimatedSplash.onAnimationFinish` fires — see `app/_layout.tsx`.
@@ -179,6 +232,10 @@ src/translations.ts         i18n strings keyed by 'Melayu' | 'English'
 
 ## When in doubt
 
+- **Re-read the "CRITICAL: Scope discipline" section above before
+  acting.** The single most common mistake in this repo is expanding scope
+  beyond what the user asked. When unsure whether to do X, ask via
+  `ask_user` instead of acting.
 - Look at the neighboring file for the pattern before adding a new one.
 - Reuse the existing Contexts; do not introduce a new global store.
 - Bilingual copy is non-negotiable.

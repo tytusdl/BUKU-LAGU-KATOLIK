@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Misa Preview — Updated (Hide Empty)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    background: #e4e4e7;
+    color: #1a1a1a;
+    min-height: 100vh;
+  }
+
+  .header {
+    background: #1a1a1a;
+    color: #fff;
+    padding: 20px;
+  }
+  .header h1 { font-size: 20px; margin-bottom: 4px; }
+  .header p { color: #a1a1aa; font-size: 13px; margin-bottom: 6px; }
+  .header .rule {
+    color: #10b981;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .grid {
+    padding: 28px 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .option {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .option-label {
+    background: #1a1a1a;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+  .option-label .name {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+  .option-label .scenario {
+    font-size: 11px;
+    color: #a1a1aa;
+    font-weight: 500;
+  }
+
+  .phone {
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto;
+    background: #fafafa;
+    border-radius: 36px;
+    padding: 10px;
+    box-shadow:
+      0 0 0 6px #1a1a1a,
+      0 0 0 8px #333,
+      0 20px 50px rgba(0,0,0,0.2);
+  }
+
+  .screen {
+    background: #fafafa;
+    border-radius: 26px;
+    overflow: hidden;
+    height: 740px;
+    position: relative;
+  }
+
+  /* Status bar */
+  .statusbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px 6px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .statusbar .icons { display: flex; gap: 5px; align-items: center; }
+  .statusbar .icons span {
+    width: 12px; height: 9px; border-radius: 2px; background: #1a1a1a;
+  }
+  .statusbar .icons span.wide { width: 20px; }
+
+  /* Header */
+  .misa-header {
+    padding: 8px 16px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e4e4e7;
+  }
+  .misa-header h1 {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+  }
+  .actions { display: flex; gap: 2px; }
+  .icon-btn {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: #1a1a1a;
+  }
+  .icon-btn svg { width: 17px; height: 17px; }
+
+  /* Body */
+  .body {
+    padding: 14px 14px;
+    position: relative;
+    height: calc(100% - 110px);
+    overflow: hidden;
+  }
+
+  /* ============================================================ */
+  /* PRINT SCREEN (Option B updated)                               */
+  /* ============================================================ */
+  .print-screen {
+    position: absolute;
+    inset: 0;
+    background: #ffffff;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .print-toolbar {
+    background: #10b981;
+    color: #fff;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .print-toolbar .x {
+    width: 28px; height: 28px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+  }
+  .print-toolbar .x svg { width: 14px; height: 14px; }
+  .print-toolbar .ttl {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+  }
+  .print-toolbar .badge-preview {
+    font-size: 9px;
+    background: rgba(255,255,255,0.2);
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .print-content {
+    flex: 1;
+    overflow: hidden;
+    padding: 20px 24px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .print-content .big-title {
+    font-size: 22px;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 4px;
+    color: #1a1a1a;
+    letter-spacing: -0.3px;
+  }
+  .print-content .date {
+    text-align: center;
+    font-size: 11px;
+    color: #71717a;
+    margin-bottom: 18px;
+    border-bottom: 2px solid #10b981;
+    padding-bottom: 10px;
+  }
+
+  .print-section {
+    margin-bottom: 14px;
+  }
+  .print-section .sec-title {
+    font-size: 11px;
+    font-weight: 900;
+    color: #10b981;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    border-left: 3px solid #10b981;
+    padding-left: 6px;
+  }
+  .print-section .sec-songs {
+    padding-left: 9px;
+  }
+  .print-song {
+    font-size: 12px;
+    color: #1a1a1a;
+    padding: 3px 0;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+  .print-song .id {
+    font-size: 9px;
+    font-weight: 800;
+    color: #71717a;
+    letter-spacing: 0.5px;
+    min-width: 26px;
+  }
+  .print-song .ttl {
+    flex: 1;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.2px;
+  }
+  .print-song .k {
+    font-size: 10px;
+    color: #10b981;
+    font-weight: 800;
+  }
+
+  /* Empty state for preview */
+  .preview-empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 20px;
+  }
+  .preview-empty .icon-circle {
+    width: 64px; height: 64px;
+    border-radius: 32px;
+    background: rgba(16, 185, 129, 0.1);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 14px;
+  }
+  .preview-empty .icon-circle svg {
+    width: 28px; height: 28px;
+    color: #10b981;
+  }
+  .preview-empty .title {
+    font-size: 14px;
+    font-weight: 800;
+    color: #1a1a1a;
+    margin-bottom: 6px;
+  }
+  .preview-empty .sub {
+    font-size: 11px;
+    color: #71717a;
+    line-height: 1.5;
+    max-width: 220px;
+  }
+
+  .print-footer {
+    background: #fafafa;
+    border-top: 1px solid #e4e4e7;
+    padding: 10px;
+    text-align: center;
+    font-size: 9px;
+    color: #71717a;
+    font-weight: 800;
+    letter-spacing: 2px;
+    flex-shrink: 0;
+  }
+  .print-footer .ornament {
+    color: #10b981;
+    margin: 0 6px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Print Preview — Updated Rule</h1>
+  <p>Empty parts (no songs) disembunyikan dari preview. Kalau semua 6 kosong, tunjuk empty state.</p>
+  <div class="rule">✓ RULE: Hanya bahagian dengan lagu muncul · Kosong = hide</div>
+</div>
+
+<div class="grid">
+
+  <!-- ============== SCENARIO 1: Partial filled ============== -->
+  <div class="option">
+    <div class="option-label">
+      <span class="name">Senario 1 · Sebahagian diisi</span>
+      <span class="scenario">2 bahagian ada lagu, 4 kosong → hanya 2 muncul dalam preview</span>
+    </div>
+    <div class="phone">
+      <div class="screen">
+
+        <div class="print-screen">
+          <div class="print-toolbar">
+            <div class="x">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <div class="ttl">PREVIEW SENARAI</div>
+            <div class="badge-preview">PRATONTON</div>
+          </div>
+          <div class="print-content">
+            <div class="big-title">SENARAI LAGU MISA</div>
+            <div class="date">Ahad, 5 Julai 2026 · 4 lagu</div>
+
+            <!-- HIDE: Persembahan (kosong) -->
+            <!-- SHOW: Pembukaan -->
+            <div class="print-section">
+              <div class="sec-title">I · Pembukaan</div>
+              <div class="sec-songs">
+                <div class="print-song"><span class="id">A1</span><span class="ttl">Ya Tuhan Kasihani</span><span class="k">C</span></div>
+                <div class="print-song"><span class="id">A4</span><span class="ttl">Marilah Kita Menyembah</span><span class="k">F</span></div>
+              </div>
+            </div>
+
+            <!-- SHOW: Punggutan -->
+            <div class="print-section">
+              <div class="sec-title">II · Punggutan</div>
+              <div class="sec-songs">
+                <div class="print-song"><span class="id">B7</span><span class="ttl">Tuhan Engkaulah Gembala</span><span class="k">G</span></div>
+              </div>
+            </div>
+
+            <!-- HIDE: Persembahan (kosong) -->
+            <!-- HIDE: Komuni -->
+            <!-- SHOW: Komuni -->
+            <div class="print-section">
+              <div class="sec-title">IV · Komuni</div>
+              <div class="sec-songs">
+                <div class="print-song"><span class="id">C12</span><span class="ttl">Tubuh Kristus</span><span class="k">D</span></div>
+              </div>
+            </div>
+
+            <!-- HIDE: Kesyukuran, Penutup -->
+
+          </div>
+          <div class="print-footer">
+            <span class="ornament">✦</span>
+            BUKU LAGU KATOLIK
+            <span class="ornament">✦</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ============== SCENARIO 2: All filled ============== -->
+  <div class="option">
+    <div class="option-label">
+      <span class="name">Senario 2 · Semua diisi</span>
+      <span class="scenario">Semua 6 bahagian ada lagu → preview penuh macam biasa</span>
+    </div>
+    <div class="phone">
+      <div class="screen">
+
+        <div class="print-screen">
+          <div class="print-toolbar">
+            <div class="x">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <div class="ttl">PREVIEW SENARAI</div>
+            <div class="badge-preview">PRATONTON</div>
+          </div>
+          <div class="print-content">
+            <div class="big-title">SENARAI LAGU MISA</div>
+            <div class="date">Ahad, 5 Julai 2026 · 8 lagu</div>
+
+            <div class="print-section">
+              <div class="sec-title">I · Pembukaan</div>
+              <div class="sec-songs">
+                <div class="print-song"><span class="id">A1</span><span class="ttl">Ya Tuhan Kasihani</span><span class="k">C</span></div>
+                <div class="print-song"><span class="id">A4</span><span class="ttl">Marilah Kita Menyembah</span><span class="k">F</span></div>
+              </div>
+            </div>
+            <div class="print-section">
+              <div class="sec-title">II · Punggutan</div>
+              <div class="sec-songs">
+                <div class="print-song"><span class="id">B7</span><span class="ttl">Tuhan Engkaulah Gembala</span><span class="k">G</span></div>
+              </div>
+            </div>
+            <div class="print-section">
+              <div class="sec-title">III · Persembahan</div>
+              <div class="sec-songs">
+                <div class="print-song"><span class="id">C3</span><span class="ttl">Persembahan Kami</span><span class="k">D</span></div>
+              </div>
+            </div>
+            <div class="print-section">
+              <div class="sec-title">IV · Komuni</div>
+              <div class="sec-songs">
+                <div class="print-song"><span class="id">C12</span><span class="ttl">Tubuh Kristus</span><span class="k">D</span></div>
+              </div>
+            </div>
+            <div class="print-section">
+              <div class="sec-title">V · Kesyukuran</div>
+              <div class="sec-songs">
+                <div class="print-song"><span class="id">E5</span><span class="ttl">Terima Kasih Tuhan</span><span class="k">G</span></div>
+              </div>
+            </div>
+            <div class="print-section">
+              <div class="sec-title">VI · Penutup</div>
+              <div class="sec-songs">
+                <div class="print-song"><span class="id">F1</span><span class="ttl">Tuhan Berkati</span><span class="k">C</span></div>
+              </div>
+            </div>
+
+          </div>
+          <div class="print-footer">
+            <span class="ornament">✦</span>
+            BUKU LAGU KATOLIK
+            <span class="ornament">✦</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ============== SCENARIO 3: All empty ============== -->
+  <div class="option">
+    <div class="option-label">
+      <span class="name">Senario 3 · Semua kosong</span>
+      <span class="scenario">0 lagu dipilih → preview tunjuk empty state dengan icon</span>
+    </div>
+    <div class="phone">
+      <div class="screen">
+
+        <div class="print-screen">
+          <div class="print-toolbar">
+            <div class="x">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <div class="ttl">PREVIEW SENARAI</div>
+            <div class="badge-preview">PRATONTON</div>
+          </div>
+          <div class="print-content">
+            <div class="big-title">SENARAI LAGU MISA</div>
+            <div class="date">Ahad, 5 Julai 2026</div>
+
+            <div class="preview-empty">
+              <div class="icon-circle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="8" x2="12" y2="12"/>
+                  <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+              </div>
+              <div class="title">Belum ada lagu dipilih</div>
+              <div class="sub">Tambah lagu untuk mana-mana bahagian Misa, kemudian buka preview ini semula.</div>
+            </div>
+
+          </div>
+          <div class="print-footer">
+            <span class="ornament">✦</span>
+            BUKU LAGU KATOLIK
+            <span class="ornament">✦</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

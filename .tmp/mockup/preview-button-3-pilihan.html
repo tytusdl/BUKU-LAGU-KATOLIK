@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Misa — 3 Pilihan Preview Button</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    background: #e4e4e7;
+    color: #1a1a1a;
+    min-height: 100vh;
+    padding-bottom: 60px;
+  }
+
+  .header {
+    background: #1a1a1a;
+    color: #fff;
+    padding: 20px;
+  }
+  .header h1 { font-size: 22px; margin-bottom: 4px; }
+  .header p { color: #a1a1aa; font-size: 13px; }
+
+  .options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+    gap: 24px;
+    padding: 32px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .option {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .option-label {
+    background: #1a1a1a;
+    color: #fff;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+  .option-label .name {
+    display: block;
+    font-size: 15px;
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+  }
+  .option-label .icon {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+  .option-label.A .icon { background: #3b82f6; }
+  .option-label.B .icon { background: #10b981; }
+  .option-label.C .icon { background: #f59e0b; }
+
+  .option-desc {
+    background: #fff;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #52525b;
+    border-left: 3px solid #d4d4d8;
+  }
+
+  .phone {
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto;
+    background: #fafafa;
+    border-radius: 36px;
+    padding: 10px;
+    box-shadow:
+      0 0 0 6px #1a1a1a,
+      0 0 0 8px #333,
+      0 20px 50px rgba(0,0,0,0.2);
+  }
+
+  .screen {
+    background: #fafafa;
+    border-radius: 26px;
+    overflow: hidden;
+    height: 720px;
+    position: relative;
+  }
+
+  /* Status bar */
+  .statusbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px 6px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .statusbar .icons { display: flex; gap: 5px; align-items: center; }
+  .statusbar .icons span {
+    width: 12px; height: 9px; border-radius: 2px; background: #1a1a1a;
+  }
+  .statusbar .icons span.wide { width: 20px; }
+
+  /* Header */
+  .misa-header {
+    padding: 8px 16px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e4e4e7;
+  }
+  .misa-header h1 {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+  }
+  .actions {
+    display: flex;
+    gap: 2px;
+  }
+  .icon-btn {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: #1a1a1a;
+  }
+  .icon-btn svg { width: 17px; height: 17px; }
+  .icon-btn.new {
+    background: #3b82f6;
+    color: #fff;
+    position: relative;
+  }
+  .icon-btn.A .new { background: #3b82f6; }
+  .icon-btn.B .new { background: #10b981; }
+  .icon-btn.C .new { background: #f59e0b; }
+
+  /* Pulse ring to indicate new */
+  .icon-btn.new::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border: 2px solid currentColor;
+    border-radius: 10px;
+    opacity: 0.4;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.4; }
+    50% { transform: scale(1.08); opacity: 0; }
+  }
+
+  /* Body with timeline */
+  .body {
+    padding: 14px 14px;
+    position: relative;
+    height: calc(100% - 110px);
+    overflow: hidden;
+  }
+  .timeline-line {
+    position: absolute;
+    left: 28px;
+    top: 18px;
+    bottom: 18px;
+    width: 2px;
+    background: #e4e4e7;
+  }
+  .tl-item {
+    display: flex;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 1;
+  }
+  .tl-dot-col {
+    width: 32px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 2px;
+    flex-shrink: 0;
+  }
+  .tl-dot {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #3b82f6;
+    color: #3b82f6;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 800;
+    flex-shrink: 0;
+  }
+  .tl-dot.empty {
+    border-style: dashed;
+    color: #71717a;
+    border-color: #d4d4d8;
+  }
+  .tl-content { flex: 1; min-width: 0; padding-left: 6px; }
+  .tl-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 3px;
+  }
+  .tl-head .name { font-size: 11px; font-weight: 800; }
+  .tl-head .count { font-size: 9px; color: #71717a; font-weight: 600; }
+  .tl-body {
+    background: #fff;
+    border: 1px solid #e4e4e7;
+    border-radius: 8px;
+    padding: 4px 6px;
+  }
+  .tl-song {
+    display: flex; align-items: center; gap: 5px;
+    padding: 3px 0;
+    font-size: 10px;
+  }
+  .tl-song + .tl-song { border-top: 1px solid #f1f1f3; }
+  .tl-id {
+    font-size: 8px; font-weight: 800;
+    color: #3b82f6;
+    background: #fff;
+    border: 1px solid #e4e4e7;
+    padding: 1px 4px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .tl-title {
+    flex: 1; font-weight: 700;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .tl-key {
+    font-size: 9px; font-weight: 800;
+    background: #fff;
+    border: 1px solid #e4e4e7;
+    border-radius: 3px;
+    padding: 1px 4px;
+    width: 22px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .tl-key.placeholder { color: #a1a1aa; }
+  .tl-add {
+    margin-top: 4px;
+    padding: 4px 6px;
+    border: 1px dashed #3b82f6;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 9px; font-weight: 800;
+    color: #3b82f6;
+    background: rgba(59, 130, 246, 0.06);
+  }
+
+  /* ============================================================ */
+  /* OPTION A: Mini Modal Preview                                  */
+  /* ============================================================ */
+  .modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 50;
+  }
+
+  .modal-card {
+    background: #fff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 320px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  }
+
+  .modal-card-header {
+    background: #3b82f6;
+    color: #fff;
+    padding: 12px 14px 14px;
+  }
+  .modal-card-header .eyebrow {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.85;
+    margin-bottom: 4px;
+  }
+  .modal-card-header .title {
+    font-size: 16px;
+    font-weight: 800;
+    margin-bottom: 2px;
+  }
+  .modal-card-header .sub {
+    font-size: 10px;
+    opacity: 0.85;
+  }
+
+  .modal-card-body {
+    padding: 10px 14px;
+    max-height: 360px;
+    overflow: hidden;
+  }
+
+  .preview-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f4f4f5;
+  }
+  .preview-line:last-child { border-bottom: none; }
+  .preview-line .badge {
+    font-size: 8px;
+    font-weight: 800;
+    color: #3b82f6;
+    background: rgba(59, 130, 246, 0.08);
+    padding: 2px 5px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+    width: 28px;
+    text-align: center;
+  }
+  .preview-line .label {
+    font-size: 10px;
+    color: #71717a;
+    font-weight: 700;
+    width: 60px;
+    flex-shrink: 0;
+  }
+  .preview-line .song {
+    flex: 1;
+    font-size: 11px;
+    font-weight: 700;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .preview-line .key {
+    font-size: 9px;
+    font-weight: 800;
+    background: #f4f4f5;
+    border-radius: 3px;
+    padding: 1px 4px;
+    flex-shrink: 0;
+  }
+  .preview-line.empty {
+    opacity: 0.45;
+  }
+  .preview-line.empty .song {
+    font-style: italic;
+    color: #a1a1aa;
+    font-weight: 500;
+  }
+
+  .modal-card-footer {
+    padding: 10px 14px;
+    border-top: 1px solid #f4f4f5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .modal-card-footer .stat {
+    font-size: 10px;
+    color: #71717a;
+    font-weight: 600;
+  }
+  .modal-card-footer .stat strong {
+    color: #3b82f6;
+    font-weight: 800;
+  }
+  .modal-card-footer .close {
+    background: #3b82f6;
+    color: #fff;
+    border: none;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 6px 14px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ============================================================ */
+  /* OPTION B: Print Preview Screen                                */
+  /* ============================================================ */
+  .print-screen {
+    position: absolute;
+    inset: 0;
+    background: #ffffff;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .print-toolbar {
+    background: #10b981;
+    color: #fff;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .print-toolbar .x {
+    width: 28px; height: 28px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+  }
+  .print-toolbar .x svg { width: 14px; height: 14px; }
+  .print-toolbar .ttl {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+  }
+  .print-toolbar .badge-preview {
+    font-size: 9px;
+    background: rgba(255,255,255,0.2);
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .print-content {
+    flex: 1;
+    overflow: hidden;
+    padding: 20px 24px;
+    background: #fff;
+  }
+
+  .print-content .big-title {
+    font-size: 22px;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 4px;
+    color: #1a1a1a;
+    letter-spacing: -0.3px;
+  }
+  .print-content .date {
+    text-align: center;
+    font-size: 11px;
+    color: #71717a;
+    margin-bottom: 18px;
+    border-bottom: 2px solid #10b981;
+    padding-bottom: 10px;
+  }
+
+  .print-section {
+    margin-bottom: 14px;
+  }
+  .print-section .sec-title {
+    font-size: 11px;
+    font-weight: 900;
+    color: #10b981;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    border-left: 3px solid #10b981;
+    padding-left: 6px;
+  }
+  .print-section .sec-songs {
+    padding-left: 9px;
+  }
+  .print-song {
+    font-size: 12px;
+    color: #1a1a1a;
+    padding: 3px 0;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+  .print-song .id {
+    font-size: 9px;
+    font-weight: 800;
+    color: #71717a;
+    letter-spacing: 0.5px;
+    min-width: 26px;
+  }
+  .print-song .ttl {
+    flex: 1;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.2px;
+  }
+  .print-song .k {
+    font-size: 10px;
+    color: #10b981;
+    font-weight: 800;
+  }
+
+  .print-footer {
+    background: #fafafa;
+    border-top: 1px solid #e4e4e7;
+    padding: 10px;
+    text-align: center;
+    font-size: 9px;
+    color: #71717a;
+    font-weight: 800;
+    letter-spacing: 2px;
+  }
+  .print-footer .ornament {
+    color: #10b981;
+    margin: 0 6px;
+  }
+
+  /* ============================================================ */
+  /* OPTION C: Read-Only Mode (replace content)                    */
+  /* ============================================================ */
+  .readonly-bar {
+    background: #f59e0b;
+    color: #fff;
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+  }
+  .readonly-bar .x {
+    width: 24px; height: 24px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .readonly-bar .x svg { width: 12px; height: 12px; }
+  .readonly-bar .lbl {
+    flex: 1;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+  .readonly-bar .edit-btn {
+    background: #fff;
+    color: #f59e0b;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>3 Pilihan Button Preview (Sebelah Share)</h1>
+  <p>Semua menggunakan ikon mata (<b>Eye</b>) kat sebelah Share. Pilih satu dan saya implement.</p>
+</div>
+
+<div class="options">
+
+  <!-- ============== OPTION A ============== -->
+  <div class="option">
+    <div class="option-label A"><span class="icon"></span><span class="name">A · Mini Modal</span>Popup ringkas atas skrin Misa — terus nampak summary.</div>
+    <div class="option-desc">
+      <strong>Konsep:</strong> Tap ikon mata → modal kecil center-screen dengan ringkasan semua 6 bahagian. Sesuai untuk "cek sekali imbas" tanpa tinggal skrin.<br><br>
+      <strong>Kelebihan:</strong> Pantas, tak tinggal context, senang dismiss (tap luar).<br>
+      <strong>Kelemahan:</strong> Limited info — tiada key penuh, tiada navigate.
+    </div>
+    <div class="phone">
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><div class="icons"><span></span><span></span><span class="wide"></span></div></div>
+        <div class="misa-header">
+          <h1>Misa Hari Ini</h1>
+          <div class="actions">
+            <div class="icon-btn new A">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </div>
+            <div class="icon-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                <polyline points="16 6 12 2 8 6"/>
+                <line x1="12" y1="2" x2="12" y2="15"/>
+              </svg>
+            </div>
+            <div class="icon-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="body">
+          <div class="timeline-line"></div>
+          <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">1</div></div><div class="tl-content"><div class="tl-head"><span class="name">Pembukaan</span><span class="count">2 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">A1</span><span class="tl-title">Ya Tuhan Kasihani</span><span class="tl-key">C</span></div><div class="tl-song"><span class="tl-id">A4</span><span class="tl-title">Marilah Menyembah</span><span class="tl-key">F</span></div><div class="tl-add">+ Tambah</div></div></div></div>
+          <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">2</div></div><div class="tl-content"><div class="tl-head"><span class="name">Punggutan</span><span class="count">1 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">B7</span><span class="tl-title">Tuhan Engkaulah Gembala</span><span class="tl-key">G</span></div><div class="tl-add">+ Tambah</div></div></div></div>
+          <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">3</div></div><div class="tl-content"><div class="tl-head"><span class="name">Persembahan</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+          <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">4</div></div><div class="tl-content"><div class="tl-head"><span class="name">Komuni</span><span class="count">1 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">C12</span><span class="tl-title">Tubuh Kristus</span><span class="tl-key">D</span></div><div class="tl-add">+ Tambah</div></div></div></div>
+          <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">5</div></div><div class="tl-content"><div class="tl-head"><span class="name">Kesyukuran</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+          <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">6</div></div><div class="tl-content"><div class="tl-head"><span class="name">Penutup</span><span class="count">kosong</span></div><div class="tl-body"><div class="tl-add">+ Pilih Lagu</div></div></div></div>
+        </div>
+
+        <!-- MODAL OVERLAY -->
+        <div class="modal-backdrop">
+          <div class="modal-card">
+            <div class="modal-card-header">
+              <div class="eyebrow">Senarai Ringkas</div>
+              <div class="title">Misa Hari Ini</div>
+              <div class="sub">4 lagu · 2 bahagian masih kosong</div>
+            </div>
+            <div class="modal-card-body">
+              <div class="preview-line">
+                <div class="badge">01</div>
+                <div class="label">Pembukaan</div>
+                <div class="song">Ya Tuhan Kasihani</div>
+                <div class="key">C</div>
+              </div>
+              <div class="preview-line">
+                <div class="badge">01</div>
+                <div class="label">&nbsp;</div>
+                <div class="song">Marilah Menyembah</div>
+                <div class="key">F</div>
+              </div>
+              <div class="preview-line">
+                <div class="badge">02</div>
+                <div class="label">Punggutan</div>
+                <div class="song">Engkaulah Gembala</div>
+                <div class="key">G</div>
+              </div>
+              <div class="preview-line empty">
+                <div class="badge">03</div>
+                <div class="label">Persembahan</div>
+                <div class="song">— belum dipilih —</div>
+              </div>
+              <div class="preview-line">
+                <div class="badge">04</div>
+                <div class="label">Komuni</div>
+                <div class="song">Tubuh Kristus</div>
+                <div class="key">D</div>
+              </div>
+              <div class="preview-line empty">
+                <div class="badge">05</div>
+                <div class="label">Kesyukuran</div>
+                <div class="song">— belum dipilih —</div>
+              </div>
+              <div class="preview-line empty">
+                <div class="badge">06</div>
+                <div class="label">Penutup</div>
+                <div class="song">— belum dipilih —</div>
+              </div>
+            </div>
+            <div class="modal-card-footer">
+              <div class="stat">Jumlah: <strong>4 lagu</strong> · <strong>2 kosong</strong></div>
+              <button class="close">TUTUP</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ============== OPTION B ============== -->
+  <div class="option">
+    <div class="option-label B"><span class="icon"></span><span class="name">B · Print Preview Screen</span>Full-screen putih macam nak share — tapi belum share.</div>
+    <div class="option-desc">
+      <strong>Konsep:</strong> Tap ikon mata → skrin putih penuh macam dokumen printable/WhatsApp share. User nampak exactly macam mana hasilnya nanti kalau dia share.<br><br>
+      <strong>Kelebihan:</strong> Preview exactly macam share-image, senang baca besar.<br>
+      <strong>Kelemahan:</strong> Tinggal context skrin Misa (tapi boleh close).
+    </div>
+    <div class="phone">
+      <div class="screen">
+
+        <!-- Print screen overlay -->
+        <div class="print-screen">
+          <div class="print-toolbar">
+            <div class="x">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <div class="ttl">PREVIEW SENARAI</div>
+            <div class="badge-preview">PRATONTON</div>
+          </div>
+          <div class="print-content">
+            <div class="big-title">SENARAI LAGU MISA</div>
+            <div class="date">Ahad, 5 Julai 2026</div>
+
+            <div class="print-section">
+              <div class="sec-title">I · Pembukaan</div>
+              <div class="sec-songs">
+                <div class="print-song"><span class="id">A1</span><span class="ttl">Ya Tuhan Kasihani</span><span class="k">C</span></div>
+                <div class="print-song"><span class="id">A4</span><span class="ttl">Marilah Kita Menyembah</span><span class="k">F</span></div>
+              </div>
+            </div>
+
+            <div class="print-section">
+              <div class="sec-title">II · Punggutan</div>
+              <div class="sec-songs">
+                <div class="print-song"><span class="id">B7</span><span class="ttl">Tuhan Engkaulah Gembala</span><span class="k">G</span></div>
+              </div>
+            </div>
+
+            <div class="print-section" style="opacity:0.35;">
+              <div class="sec-title">III · Persembahan</div>
+              <div class="sec-songs">
+                <div class="print-song" style="font-style:italic; color:#a1a1aa;">— belum dipilih —</div>
+              </div>
+            </div>
+
+            <div class="print-section">
+              <div class="sec-title">IV · Komuni</div>
+              <div class="sec-songs">
+                <div class="print-song"><span class="id">C12</span><span class="ttl">Tubuh Kristus</span><span class="k">D</span></div>
+              </div>
+            </div>
+
+            <div class="print-section" style="opacity:0.35;">
+              <div class="sec-title">V · Kesyukuran</div>
+              <div class="sec-songs">
+                <div class="print-song" style="font-style:italic; color:#a1a1aa;">— belum dipilih —</div>
+              </div>
+            </div>
+
+            <div class="print-section" style="opacity:0.35;">
+              <div class="sec-title">VI · Penutup</div>
+              <div class="sec-songs">
+                <div class="print-song" style="font-style:italic; color:#a1a1aa;">— belum dipilih —</div>
+              </div>
+            </div>
+          </div>
+          <div class="print-footer">
+            <span class="ornament">✦</span>
+            BUKU LAGU KATOLIK
+            <span class="ornament">✦</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div style="text-align:center; font-size:11px; color:#52525b; margin-top:8px;">
+      (Skrin Misa di belakang — preview overlay tutup sepenuhnya)
+    </div>
+  </div>
+
+  <!-- ============== OPTION C ============== -->
+  <div class="option">
+    <div class="option-label C"><span class="icon"></span><span class="name">C · Read-Only Mode</span>Skrin Misa tapi disable semua edit controls.</div>
+    <div class="option-desc">
+      <strong>Konsep:</strong> Tap ikon mata → skrin Misa jadi read-only. Tiada trash, tiada add pill, tiada key input — semua edit controls disembunyikan. Sesuai untuk tunjuk ke orang lain / masa Misa.<br><br>
+      <strong>Kelebihan:</strong> Full context, semua lagu + kod nampak dengan jelas.<br>
+      <strong>Kelemahan:</strong> Same content dengan mode edit (kurang efficient).
+    </div>
+    <div class="phone">
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><div class="icons"><span></span><span></span><span class="wide"></span></div></div>
+
+        <!-- Read-only banner -->
+        <div class="readonly-bar">
+          <div class="x">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </div>
+          <div class="lbl">Mode Pratonton — baca sahaja</div>
+          <button class="edit-btn">SUNting</button>
+        </div>
+
+        <div class="misa-header">
+          <h1>Misa Hari Ini</h1>
+        </div>
+
+        <div class="body">
+          <div class="timeline-line"></div>
+          <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">1</div></div><div class="tl-content"><div class="tl-head"><span class="name">Pembukaan</span><span class="count">2 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">A1</span><span class="tl-title">Ya Tuhan Kasihani</span><span class="tl-key">C</span></div><div class="tl-song"><span class="tl-id">A4</span><span class="tl-title">Marilah Menyembah</span><span class="tl-key">F</span></div></div></div></div>
+          <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">2</div></div><div class="tl-content"><div class="tl-head"><span class="name">Punggutan</span><span class="count">1 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">B7</span><span class="tl-title">Tuhan Engkaulah Gembala</span><span class="tl-key">G</span></div></div></div></div>
+          <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">3</div></div><div class="tl-content"><div class="tl-head"><span class="name">Persembahan</span><span class="count">kosong</span></div><div class="tl-body" style="padding:6px 8px; color:#a1a1aa; font-size:9px; font-style:italic;">Belum dipilih</div></div></div>
+          <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot">4</div></div><div class="tl-content"><div class="tl-head"><span class="name">Komuni</span><span class="count">1 lagu</span></div><div class="tl-body"><div class="tl-song"><span class="tl-id">C12</span><span class="tl-title">Tubuh Kristus</span><span class="tl-key">D</span></div></div></div></div>
+          <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">5</div></div><div class="tl-content"><div class="tl-head"><span class="name">Kesyukuran</span><span class="count">kosong</span></div><div class="tl-body" style="padding:6px 8px; color:#a1a1aa; font-size:9px; font-style:italic;">Belum dipilih</div></div></div>
+          <div class="tl-item"><div class="tl-dot-col"><div class="tl-dot empty">6</div></div><div class="tl-content"><div class="tl-head"><span class="name">Penutup</span><span class="count">kosong</span></div><div class="tl-body" style="padding:6px 8px; color:#a1a1aa; font-size:9px; font-style:italic;">Belum dipilih</div></div></div></div>
+        </div>
+
+      </div>
+    </div>
+    <div style="text-align:center; font-size:11px; color:#52525b; margin-top:8px;">
+      (Tiada trash / add pill — tap <b>Sunting</b> untuk balik edit mode)
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Misa Preview — Section Dividers</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    background: #e4e4e7;
+    color: #1a1a1a;
+    min-height: 100vh;
+    padding: 24px 16px;
+  }
+
+  .header {
+    background: #1a1a1a;
+    color: #fff;
+    padding: 16px 20px;
+    border-radius: 12px;
+    max-width: 380px;
+    margin: 0 auto 20px;
+  }
+  .header h1 { font-size: 16px; margin-bottom: 4px; }
+  .header p { color: #a1a1aa; font-size: 12px; }
+
+  .phone {
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto;
+    background: #fafafa;
+    border-radius: 36px;
+    padding: 10px;
+    box-shadow:
+      0 0 0 6px #1a1a1a,
+      0 0 0 8px #333,
+      0 20px 50px rgba(0,0,0,0.2);
+  }
+
+  .screen {
+    background: #fafafa;
+    border-radius: 26px;
+    overflow: hidden;
+    height: 760px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .print-content {
+    flex: 1;
+    padding: 16px 24px 20px;
+    background: #fff;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .big-title {
+    font-size: 22px;
+    font-weight: 800;
+    text-align: center;
+    color: #1a1a1a;
+    letter-spacing: -0.3px;
+    margin-bottom: 4px;
+  }
+
+  .date {
+    font-size: 11px;
+    text-align: center;
+    color: #71717a;
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e5e5e5;
+  }
+
+  /* ==== SECTION with numbered title + divider rule ==== */
+  .section {
+    margin-bottom: 14px;
+  }
+
+  .section-head {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 8px;
+    gap: 8px;
+  }
+
+  .section-num {
+    font-family: "Georgia", serif;
+    font-size: 14px;
+    font-weight: 900;
+    color: #71717a;
+    min-width: 22px;
+    padding: 3px 6px;
+    background: #f4f4f5;
+    border-radius: 4px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-size: 13px;
+    font-weight: 900;
+    color: #1a1a1a;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+
+  .section-rule {
+    flex: 1;
+    height: 1px;
+    background: #d4d4d8;
+    margin-left: 4px;
+  }
+
+  .section-songs {
+    padding-left: 30px;
+  }
+
+  .song-row {
+    flex-direction: row;
+    align-items: baseline;
+    padding: 4px 0;
+    gap: 8px;
+  }
+
+  .song-id {
+    font-size: 11px;
+    font-weight: 800;
+    color: #71717a;
+    letter-spacing: 0.5px;
+    min-width: 32px;
+    flex-shrink: 0;
+  }
+
+  .song-title {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1a1a1a;
+    text-transform: uppercase;
+    letter-spacing: 0.2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .song-key-wrap {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .song-key-label {
+    font-size: 9px;
+    font-weight: 700;
+    color: #71717a;
+    letter-spacing: 0.5px;
+  }
+  .song-key {
+    font-size: 12px;
+    font-weight: 800;
+    color: #71717a;
+    min-width: 24px;
+    text-align: right;
+  }
+
+  /* Empty placeholder (dashed, subtle) for hide-empty consistency */
+  .empty-section {
+    margin-bottom: 14px;
+    padding: 12px 14px;
+    border: 1.5px dashed #d4d4d8;
+    border-radius: 8px;
+    text-align: center;
+    color: #a1a1aa;
+    font-size: 11px;
+    font-style: italic;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  .footer {
+    background: #fafafa;
+    border-top: 1px solid #e4e4e7;
+    padding: 10px;
+    text-align: center;
+    font-size: 10px;
+    color: #71717a;
+    font-weight: 800;
+    letter-spacing: 2px;
+    flex-shrink: 0;
+  }
+  .footer .ornament {
+    color: #71717a;
+    margin: 0 6px;
+  }
+
+  /* Floating share */
+  .fab-share {
+    position: absolute;
+    right: 20px;
+    bottom: 56px;
+    width: 52px;
+    height: 52px;
+    border-radius: 26px;
+    background: #1a1a1a;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+    display: flex;
+  }
+  .fab-share svg {
+    width: 20px;
+    height: 20px;
+    color: #fff;
+  }
+
+  .x-close {
+    position: absolute;
+    top: 10px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    border-radius: 18px;
+    background: #f4f4f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+  .x-close svg {
+    width: 20px;
+    height: 20px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Preview dengan Section Dividers</h1>
+  <p>Setiap bahagian ada: number badge (kotak kecil) + title uppercase + horizontal rule yang extend sampai hujung. Senang nampak sempadan antara bahagian.</p>
+</div>
+
+<div class="phone">
+  <div class="screen">
+
+    <div class="x-close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </div>
+
+    <div class="print-content">
+
+      <div class="big-title">SENARAI LAGU MISA</div>
+      <div class="date">Ahad, 5 Julai 2026 · 4 lagu</div>
+
+      <!-- I. PEMBUKAAN -->
+      <div class="section">
+        <div class="section-head">
+          <div class="section-num">1</div>
+          <div class="section-title">Lagu Pembukaan</div>
+          <div class="section-rule"></div>
+        </div>
+        <div class="section-songs">
+          <div class="song-row">
+            <span class="song-id">A1</span>
+            <span class="song-title">Ya Tuhan Kasihani</span>
+            <div class="song-key-wrap">
+              <span class="song-key-label">KOD:</span>
+              <span class="song-key">C</span>
+            </div>
+          </div>
+          <div class="song-row">
+            <span class="song-id">A4</span>
+            <span class="song-title">Marilah Menyembah</span>
+            <div class="song-key-wrap">
+              <span class="song-key-label">KOD:</span>
+              <span class="song-key">F</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- II. PUNGUTAN -->
+      <div class="section">
+        <div class="section-head">
+          <div class="section-num">2</div>
+          <div class="section-title">Lagu Punggutan</div>
+          <div class="section-rule"></div>
+        </div>
+        <div class="section-songs">
+          <div class="song-row">
+            <span class="song-id">B7</span>
+            <span class="song-title">Tuhan Engkaulah Gembala</span>
+            <div class="song-key-wrap">
+              <span class="song-key-label">KOD:</span>
+              <span class="song-key">G</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- III. PERSEMBAHAN (empty) -->
+      <div class="empty-section">
+        — 3. Lagu Persembahan belum dipilih —
+      </div>
+
+      <!-- IV. KOMUNI -->
+      <div class="section">
+        <div class="section-head">
+          <div class="section-num">4</div>
+          <div class="section-title">Lagu Komuni</div>
+          <div class="section-rule"></div>
+        </div>
+        <div class="section-songs">
+          <div class="song-row">
+            <span class="song-id">C12</span>
+            <span class="song-title">Tubuh Kristus</span>
+            <div class="song-key-wrap">
+              <span class="song-key-label">KOD:</span>
+              <span class="song-key">D</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- V. KESYUKURAN (empty) -->
+      <div class="empty-section">
+        — 5. Lagu Kesyukuran belum dipilih —
+      </div>
+
+      <!-- VI. PENUTUP (empty) -->
+      <div class="empty-section">
+        — 6. Lagu Penutup belum dipilih —
+      </div>
+
+    </div>
+
+    <div class="footer">
+      ✦ BUKU LAGU KATOLIK ✦
+    </div>
+
+    <div class="fab-share">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+        <polyline points="16 6 12 2 8 6"/>
+        <line x1="12" y1="2" x2="12" y2="15"/>
+      </svg>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

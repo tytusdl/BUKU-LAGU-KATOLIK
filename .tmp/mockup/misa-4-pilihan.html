@@ -1,0 +1,1856 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Misa — 4 Pilihan UI</title>
+<style>
+  :root {
+    --bg: #f4f4f5;
+    --surface: #ffffff;
+    --text: #1a1a1a;
+    --text-muted: #71717a;
+    --text-secondary: #52525b;
+    --border: #e4e4e7;
+    --border-soft: #f1f1f3;
+    --accent: #2563eb;
+    --accent-soft: rgba(37, 99, 235, 0.08);
+    --danger: #dc2626;
+    --success: #16a34a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    background: #e4e4e7;
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ============ Top tabs ============ */
+  .tabs {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #1a1a1a;
+    padding: 14px 20px;
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+  }
+
+  .tab {
+    padding: 8px 14px;
+    border-radius: 8px;
+    background: transparent;
+    color: #a1a1aa;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: inherit;
+  }
+
+  .tab.active {
+    background: #ffffff;
+    color: #1a1a1a;
+  }
+
+  .tab:hover:not(.active) {
+    background: rgba(255,255,255,0.08);
+    color: #ffffff;
+  }
+
+  .tab-info {
+    color: #71717a;
+    font-size: 12px;
+    padding: 8px 14px;
+    background: #27272a;
+    border-radius: 8px;
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  /* ============ Page layout ============ */
+  .page {
+    display: none;
+    padding: 32px 16px;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .page.active { display: flex; }
+
+  /* ============ Phone frame ============ */
+  .phone-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .phone-label {
+    background: #1a1a1a;
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .phone {
+    width: 100%;
+    max-width: 390px;
+    background: var(--bg);
+    border-radius: 44px;
+    padding: 12px;
+    box-shadow:
+      0 0 0 8px #1a1a1a,
+      0 0 0 10px #333,
+      0 30px 60px rgba(0,0,0,0.25);
+    overflow: hidden;
+  }
+
+  .screen {
+    background: var(--bg);
+    border-radius: 32px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Status bar (shared) */
+  .statusbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 28px 6px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .statusbar .icons { display: flex; gap: 6px; align-items: center; }
+  .statusbar .icons span {
+    width: 14px; height: 10px; border-radius: 2px; background: #1a1a1a;
+  }
+  .statusbar .icons span.wide { width: 22px; }
+
+  /* ============ ANNOTATION NOTES (right side) ============ */
+  .notes {
+    max-width: 320px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 18px 20px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    align-self: flex-start;
+    position: sticky;
+    top: 80px;
+  }
+
+  .notes h3 {
+    font-size: 15px;
+    margin-bottom: 8px;
+    color: #1a1a1a;
+    border-bottom: 2px solid #1a1a1a;
+    padding-bottom: 6px;
+  }
+
+  .notes h4 {
+    font-size: 12px;
+    margin-top: 14px;
+    margin-bottom: 4px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+  }
+
+  .notes ul { padding-left: 18px; }
+  .notes li { margin-bottom: 4px; }
+
+  .notes .key-list {
+    background: #f4f4f5;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #52525b;
+  }
+
+  /* ============================================================ */
+  /* ============== OPTION 1: OUTLINED LIST ==================== */
+  /* ============================================================ */
+  #page-1 { --accent: #0f172a; --accent-soft: #f8fafc; }
+
+  #page-1 .screen { background: #ffffff; }
+
+  #page-1 .topbar {
+    padding: 8px 20px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+
+  #page-1 .topbar h1 {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+  }
+
+  #page-1 .topbar .actions {
+    display: flex;
+    gap: 2px;
+  }
+
+  #page-1 .icon-btn {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: #1a1a1a;
+  }
+  #page-1 .icon-btn svg { width: 18px; height: 18px; }
+
+  #page-1 .body {
+    padding: 0;
+  }
+
+  #page-1 .part-row {
+    display: flex;
+    align-items: stretch;
+    border-bottom: 1px solid var(--border);
+  }
+
+  #page-1 .part-row:last-child {
+    border-bottom: none;
+  }
+
+  #page-1 .part-label {
+    width: 110px;
+    flex-shrink: 0;
+    padding: 16px 12px 16px 20px;
+    border-right: 1px solid var(--border);
+    background: #fafafa;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  #page-1 .part-label .num {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  #page-1 .part-label .name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.25;
+  }
+
+  #page-1 .part-label .count {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  #page-1 .part-content {
+    flex: 1;
+    padding: 10px 14px 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  #page-1 .song-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+  }
+
+  #page-1 .song-num {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-weight: 700;
+    width: 14px;
+    text-align: center;
+  }
+
+  #page-1 .song-id-tag {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1px 5px;
+    background: #fff;
+    flex-shrink: 0;
+  }
+
+  #page-1 .song-title {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  #page-1 .key-input {
+    font-size: 11px;
+    font-weight: 700;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 6px;
+    width: 38px;
+    text-align: center;
+    color: var(--text);
+    background: #fff;
+    font-family: inherit;
+    flex-shrink: 0;
+  }
+
+  #page-1 .trash-mini {
+    width: 22px; height: 22px;
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--danger);
+    flex-shrink: 0;
+  }
+  #page-1 .trash-mini svg { width: 12px; height: 12px; }
+
+  #page-1 .add-line {
+    padding: 8px 10px;
+    border: 1px dashed #d4d4d8;
+    border-radius: 6px;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    margin-top: 2px;
+  }
+
+  #page-1 .add-line .plus {
+    color: var(--accent);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1;
+  }
+
+  /* ============================================================ */
+  /* ============== OPTION 2: CHIP ROWS ======================== */
+  /* ============================================================ */
+  #page-2 { --accent: #7c3aed; --accent-soft: rgba(124, 58, 237, 0.06); }
+
+  #page-2 .screen { background: #fafafa; }
+
+  #page-2 .topbar {
+    padding: 10px 20px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  #page-2 .topbar h1 {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+
+  #page-2 .topbar .subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  #page-2 .topbar .actions {
+    display: flex;
+    gap: 4px;
+  }
+
+  #page-2 .icon-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text);
+  }
+  #page-2 .icon-btn svg { width: 18px; height: 18px; }
+
+  #page-2 .body {
+    padding: 4px 14px 24px;
+  }
+
+  #page-2 .part-block {
+    background: #fff;
+    border-radius: 16px;
+    padding: 12px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 0 var(--border), 0 2px 6px rgba(0,0,0,0.03);
+  }
+
+  #page-2 .part-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding: 0 4px;
+  }
+
+  #page-2 .part-head .label {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  #page-2 .part-head .meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  #page-2 .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+
+  #page-2 .song-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--accent-soft);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 6px 10px 6px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  #page-2 .song-chip .chip-id {
+    font-size: 9px;
+    font-weight: 800;
+    background: #fff;
+    color: var(--accent);
+    padding: 2px 5px;
+    border-radius: 999px;
+    letter-spacing: 0.5px;
+  }
+
+  #page-2 .song-chip .chip-key {
+    font-family: "Georgia", serif;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--accent);
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 5px;
+    min-width: 22px;
+    text-align: center;
+  }
+
+  #page-2 .song-chip .chip-trash {
+    color: var(--danger);
+    display: flex;
+    align-items: center;
+    margin-left: 2px;
+  }
+  #page-2 .song-chip .chip-trash svg { width: 11px; height: 11px; }
+
+  #page-2 .add-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #fff;
+    border: 1px dashed #d4d4d8;
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+
+  #page-2 .add-chip .plus {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1;
+  }
+
+  /* ============================================================ */
+  /* ============== OPTION 3: STEPPER TIMELINE ================= */
+  /* ============================================================ */
+  #page-3 { --accent: #0d9488; --accent-soft: rgba(13, 148, 136, 0.06); }
+
+  #page-3 .screen { background: #ffffff; }
+
+  #page-3 .topbar {
+    padding: 10px 20px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+
+  #page-3 .topbar h1 {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+  }
+
+  #page-3 .topbar .actions { display: flex; gap: 2px; }
+  #page-3 .icon-btn {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text);
+  }
+  #page-3 .icon-btn svg { width: 18px; height: 18px; }
+
+  #page-3 .body {
+    padding: 20px 20px 30px;
+    position: relative;
+  }
+
+  /* Vertical timeline line */
+  #page-3 .body::before {
+    content: "";
+    position: absolute;
+    left: 38px;
+    top: 30px;
+    bottom: 30px;
+    width: 2px;
+    background: var(--border);
+    z-index: 0;
+  }
+
+  #page-3 .timeline-item {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 18px;
+    position: relative;
+  }
+
+  #page-3 .timeline-item:last-child { margin-bottom: 0; }
+
+  #page-3 .dot-col {
+    width: 36px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  #page-3 .dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  #page-3 .timeline-item.empty .dot {
+    background: #fff;
+    border-style: dashed;
+    color: var(--text-muted);
+    border-color: var(--border);
+  }
+
+  #page-3 .timeline-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  #page-3 .timeline-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+  }
+
+  #page-3 .timeline-head .name {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.1px;
+  }
+
+  #page-3 .timeline-head .count {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  #page-3 .timeline-body {
+    background: #fafafa;
+    border-radius: 10px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+  }
+
+  #page-3 .song-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  #page-3 .song-pill:last-child { border-bottom: none; }
+  #page-3 .song-pill:first-child { padding-top: 0; }
+  #page-3 .song-pill:last-child { padding-bottom: 0; }
+
+  #page-3 .song-pill .id {
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--accent);
+    background: #fff;
+    border: 1px solid var(--border);
+    padding: 1px 5px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+
+  #page-3 .song-pill .title {
+    flex: 1;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  #page-3 .song-pill .key {
+    font-family: "Georgia", serif;
+    font-size: 11px;
+    font-weight: 800;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 5px;
+    background: #fff;
+    width: 28px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  #page-3 .song-pill .x {
+    color: var(--danger);
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  #page-3 .song-pill .x svg { width: 11px; height: 11px; }
+
+  #page-3 .add-mini {
+    margin-top: 6px;
+    padding: 6px;
+    text-align: center;
+    border: 1px dashed #d4d4d8;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+  }
+
+  #page-3 .timeline-item.empty .add-mini {
+    display: block;
+  }
+  #page-3 .timeline-item.has-songs .add-mini {
+    display: block;
+  }
+
+  /* ============================================================ */
+  /* ============== OPTION 4: CARD GRID 2-COL ================== */
+  /* ============================================================ */
+  #page-4 { --accent: #ea580c; --accent-soft: rgba(234, 88, 12, 0.06); }
+
+  #page-4 .screen { background: #fafaf9; }
+
+  #page-4 .topbar {
+    padding: 10px 20px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  #page-4 .topbar h1 {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+  }
+
+  #page-4 .topbar .actions { display: flex; gap: 2px; }
+  #page-4 .icon-btn {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text);
+  }
+  #page-4 .icon-btn svg { width: 18px; height: 18px; }
+
+  #page-4 .body {
+    padding: 4px 14px 30px;
+  }
+
+  #page-4 .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  #page-4 .tile {
+    background: #fff;
+    border-radius: 14px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    position: relative;
+    min-height: 130px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #page-4 .tile::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 14px;
+    right: 14px;
+    height: 3px;
+    background: var(--accent);
+    border-radius: 0 0 3px 3px;
+  }
+
+  #page-4 .tile.empty::before {
+    background: #d4d4d8;
+  }
+
+  #page-4 .tile-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    margin-top: 4px;
+  }
+
+  #page-4 .tile-head .num {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-weight: 800;
+    letter-spacing: 1px;
+  }
+
+  #page-4 .tile-head .count {
+    font-size: 10px;
+    color: var(--accent);
+    font-weight: 800;
+    background: var(--accent-soft);
+    padding: 2px 6px;
+    border-radius: 999px;
+  }
+
+  #page-4 .tile-head .count.zero {
+    color: var(--text-muted);
+    background: #f4f4f5;
+  }
+
+  #page-4 .tile-name {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.25;
+    margin-bottom: 8px;
+  }
+
+  #page-4 .song-stack {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  #page-4 .mini-song {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 4px;
+    background: #fafafa;
+    border-radius: 5px;
+  }
+
+  #page-4 .mini-song .id {
+    font-size: 8px;
+    font-weight: 800;
+    color: var(--text-muted);
+    letter-spacing: 0.3px;
+    width: 22px;
+    flex-shrink: 0;
+  }
+
+  #page-4 .mini-song .t {
+    flex: 1;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  #page-4 .mini-song .k {
+    font-family: "Georgia", serif;
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--accent);
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0 4px;
+    flex-shrink: 0;
+  }
+
+  #page-4 .more-pill {
+    text-align: center;
+    font-size: 9px;
+    color: var(--text-muted);
+    font-weight: 700;
+    padding: 2px 0;
+    margin-top: 2px;
+  }
+
+  #page-4 .tile-add {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px dashed #d4d4d8;
+    border-radius: 8px;
+    margin-top: 2px;
+    min-height: 50px;
+  }
+
+  #page-4 .tile-add-btn {
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  #page-4 .tile-add-btn .plus {
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1;
+  }
+
+  /* ============================================================ */
+  /* ============== MODAL PREVIEW (in option 1) ================ */
+  /* ============================================================ */
+  .modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 50;
+    border-radius: 32px;
+    overflow: hidden;
+  }
+
+  .modal-sheet {
+    background: #fff;
+    width: 100%;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    padding: 14px 18px 20px;
+    max-height: 80%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .modal-handle {
+    width: 40px;
+    height: 4px;
+    background: #d4d4d8;
+    border-radius: 4px;
+    margin: 0 auto 12px;
+  }
+
+  .modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .modal-head .title {
+    font-size: 16px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .modal-close {
+    width: 32px; height: 32px;
+    border-radius: 16px;
+    background: #f4f4f5;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .modal-close svg { width: 16px; height: 16px; }
+
+  .search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f4f4f5;
+    border-radius: 10px;
+    padding: 9px 12px;
+    margin-bottom: 10px;
+  }
+
+  .search-box svg { width: 16px; height: 16px; color: var(--text-muted); flex-shrink: 0; }
+  .search-box input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    outline: none;
+    font-family: inherit;
+    color: var(--text);
+  }
+
+  .result-list {
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .result-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .result-row:last-child { border-bottom: none; }
+
+  .result-id {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--accent);
+    width: 40px;
+    flex-shrink: 0;
+  }
+
+  .result-title {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="tabs">
+  <button class="tab active" data-target="page-1">1. Outlined List</button>
+  <button class="tab" data-target="page-2">2. Chip Rows</button>
+  <button class="tab" data-target="page-3">3. Stepper Timeline</button>
+  <button class="tab" data-target="page-4">4. Card Grid 2-Col</button>
+  <div class="tab-info">Klik tab untuk swap · 4 mockup</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE 1: OUTLINED LIST                                       -->
+<!-- ============================================================ -->
+<div class="page active" id="page-1">
+  <div class="phone-wrap">
+    <div class="phone-label">Pilihan 1 — Outlined List</div>
+    <div class="phone">
+      <div class="screen">
+
+        <div class="statusbar">
+          <span>9:41</span>
+          <div class="icons"><span></span><span></span><span class="wide"></span></div>
+        </div>
+
+        <div class="topbar">
+          <h1>SUSUNAN MISA</h1>
+          <div class="actions">
+            <div class="icon-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                <polyline points="16 6 12 2 8 6"/>
+                <line x1="12" y1="2" x2="12" y2="15"/>
+              </svg>
+            </div>
+            <div class="icon-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="body">
+
+          <!-- I. PEMBUKAAN -->
+          <div class="part-row">
+            <div class="part-label">
+              <div class="num">01</div>
+              <div class="name">Pembukaan</div>
+              <div class="count">4 lagu</div>
+            </div>
+            <div class="part-content">
+              <div class="song-line">
+                <span class="song-num">1</span>
+                <span class="song-id-tag">A1</span>
+                <span class="song-title">Ya Tuhan Kasihani</span>
+                <input class="key-input" value="C">
+                <div class="trash-mini">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                </div>
+              </div>
+              <div class="song-line">
+                <span class="song-num">2</span>
+                <span class="song-id-tag">A4</span>
+                <span class="song-title">Marilah Kita Menyembah</span>
+                <input class="key-input" value="F">
+                <div class="trash-mini">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                </div>
+              </div>
+              <div class="song-line">
+                <span class="song-num">3</span>
+                <span class="song-id-tag">B2</span>
+                <span class="song-title">Bapa Kami Yang Ada Di Surga</span>
+                <input class="key-input" value="G">
+                <div class="trash-mini">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                </div>
+              </div>
+              <div class="song-line">
+                <span class="song-num">4</span>
+                <span class="song-id-tag">LS</span>
+                <span class="song-title">Lagu Tambahan Saya (Lagu Saya)</span>
+                <input class="key-input" value="">
+                <div class="trash-mini">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                </div>
+              </div>
+              <div class="add-line">
+                <span class="plus">+</span> Tambah lagu
+              </div>
+            </div>
+          </div>
+
+          <!-- II. PUNGUTAN -->
+          <div class="part-row">
+            <div class="part-label">
+              <div class="num">02</div>
+              <div class="name">Punggutan</div>
+              <div class="count">1 lagu</div>
+            </div>
+            <div class="part-content">
+              <div class="song-line">
+                <span class="song-num">1</span>
+                <span class="song-id-tag">B7</span>
+                <span class="song-title">Tuhan Engkaulah Gembala</span>
+                <input class="key-input" value="G">
+                <div class="trash-mini">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                </div>
+              </div>
+              <div class="add-line">
+                <span class="plus">+</span> Tambah lagu
+              </div>
+            </div>
+          </div>
+
+          <!-- III. PERSEMBAHAN (empty) -->
+          <div class="part-row">
+            <div class="part-label">
+              <div class="num">03</div>
+              <div class="name">Persembahan</div>
+              <div class="count">kosong</div>
+            </div>
+            <div class="part-content">
+              <div class="add-line">
+                <span class="plus">+</span> Tambah lagu
+              </div>
+            </div>
+          </div>
+
+          <!-- IV. KOMUNI -->
+          <div class="part-row">
+            <div class="part-label">
+              <div class="num">04</div>
+              <div class="name">Komuni</div>
+              <div class="count">2 lagu</div>
+            </div>
+            <div class="part-content">
+              <div class="song-line">
+                <span class="song-num">1</span>
+                <span class="song-id-tag">C12</span>
+                <span class="song-title">Tubuh Kristus</span>
+                <input class="key-input" value="D">
+                <div class="trash-mini">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                </div>
+              </div>
+              <div class="song-line">
+                <span class="song-num">2</span>
+                <span class="song-id-tag">D5</span>
+                <span class="song-title">Anak Domba Allah</span>
+                <input class="key-input" value="Em">
+                <div class="trash-mini">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                </div>
+              </div>
+              <div class="add-line">
+                <span class="plus">+</span> Tambah lagu
+              </div>
+            </div>
+          </div>
+
+          <!-- V. KESYUKURAN -->
+          <div class="part-row">
+            <div class="part-label">
+              <div class="num">05</div>
+              <div class="name">Kesyukuran</div>
+              <div class="count">kosong</div>
+            </div>
+            <div class="part-content">
+              <div class="add-line">
+                <span class="plus">+</span> Tambah lagu
+              </div>
+            </div>
+          </div>
+
+          <!-- VI. PENUTUP -->
+          <div class="part-row">
+            <div class="part-label">
+              <div class="num">06</div>
+              <div class="name">Penutup</div>
+              <div class="count">kosong</div>
+            </div>
+            <div class="part-content">
+              <div class="add-line">
+                <span class="plus">+</span> Tambah lagu
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <h3>Pilihan 1 — Outlined List</h3>
+    <p><strong>Konsep:</strong> Flat list dengan part label kat tepi kiri macam column table. Tiada card besar — setiap bahagian satu row panjang dengan horizontal divider. Sangat ringkas dan formal.</p>
+    <h4>Fungsi</h4>
+    <ul>
+      <li><strong>Tambah:</strong> "+ Tambah lagu" dashed line kat bawah setiap bahagian → modal search</li>
+      <li><strong>Padam:</strong> ikon X merah kecik kat hujung setiap lagu</li>
+      <li><strong>Kod lagu:</strong> kotak input 38px lebar inline, tekan untuk tulis (C, D, G, F, Em, Am...)</li>
+      <li><strong>Susun:</strong> nombor kecil 1,2,3,4 kat kiri lagu (susunan visual, drag handle boleh ditambah)</li>
+      <li><strong>Kosong:</strong> terus render "+ Tambah lagu" — tiada card besar</li>
+      <li><strong>Header:</strong> Share & Clear icon kat kanan</li>
+    </ul>
+    <div class="key-list">
+      <strong>✓ Multi-song OK:</strong> Pembukaan tunjuk 4 lagu dengan kod C / F / G / kosong.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE 2: CHIP ROWS                                            -->
+<!-- ============================================================ -->
+<div class="page" id="page-2">
+  <div class="phone-wrap">
+    <div class="phone-label">Pilihan 2 — Chip Rows</div>
+    <div class="phone">
+      <div class="screen">
+
+        <div class="statusbar">
+          <span>9:41</span>
+          <div class="icons"><span></span><span></span><span class="wide"></span></div>
+        </div>
+
+        <div class="topbar">
+          <div>
+            <h1>Misa Hari Ini</h1>
+            <div class="subtitle">6 bahagian · 7 lagu</div>
+          </div>
+          <div class="actions">
+            <div class="icon-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                <polyline points="16 6 12 2 8 6"/>
+                <line x1="12" y1="2" x2="12" y2="15"/>
+              </svg>
+            </div>
+            <div class="icon-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="body">
+
+          <!-- I. PEMBUKAAN -->
+          <div class="part-block">
+            <div class="part-head">
+              <div class="label">I · Pembukaan</div>
+              <div class="meta">4 lagu</div>
+            </div>
+            <div class="chip-row">
+              <div class="song-chip">
+                <span class="chip-id">A1</span>
+                <span>Ya Tuhan Kasihani</span>
+                <span class="chip-key">C</span>
+                <span class="chip-trash">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                </span>
+              </div>
+              <div class="song-chip">
+                <span class="chip-id">A4</span>
+                <span>Marilah Menyembah</span>
+                <span class="chip-key">F</span>
+                <span class="chip-trash">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                </span>
+              </div>
+              <div class="song-chip">
+                <span class="chip-id">B2</span>
+                <span>Bapa Kami</span>
+                <span class="chip-key">G</span>
+                <span class="chip-trash">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                </span>
+              </div>
+              <div class="song-chip">
+                <span class="chip-id">LS</span>
+                <span>Lagu Tambahan</span>
+                <span class="chip-key" style="color:#a1a1aa; border-color:#e4e4e7;">—</span>
+                <span class="chip-trash">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                </span>
+              </div>
+              <div class="add-chip">
+                <span class="plus">+</span> Tambah
+              </div>
+            </div>
+          </div>
+
+          <!-- II. PUNGUTAN -->
+          <div class="part-block">
+            <div class="part-head">
+              <div class="label">II · Punggutan</div>
+              <div class="meta">1 lagu</div>
+            </div>
+            <div class="chip-row">
+              <div class="song-chip">
+                <span class="chip-id">B7</span>
+                <span>Tuhan Engkaulah Gembala</span>
+                <span class="chip-key">G</span>
+                <span class="chip-trash">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                </span>
+              </div>
+              <div class="add-chip">
+                <span class="plus">+</span> Tambah
+              </div>
+            </div>
+          </div>
+
+          <!-- III. PERSEMBAHAN (empty) -->
+          <div class="part-block">
+            <div class="part-head">
+              <div class="label">III · Persembahan</div>
+              <div class="meta">kosong</div>
+            </div>
+            <div class="chip-row">
+              <div class="add-chip">
+                <span class="plus">+</span> Tambah lagu
+              </div>
+            </div>
+          </div>
+
+          <!-- IV. KOMUNI -->
+          <div class="part-block">
+            <div class="part-head">
+              <div class="label">IV · Komuni</div>
+              <div class="meta">2 lagu</div>
+            </div>
+            <div class="chip-row">
+              <div class="song-chip">
+                <span class="chip-id">C12</span>
+                <span>Tubuh Kristus</span>
+                <span class="chip-key">D</span>
+                <span class="chip-trash">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                </span>
+              </div>
+              <div class="song-chip">
+                <span class="chip-id">D5</span>
+                <span>Anak Domba Allah</span>
+                <span class="chip-key">Em</span>
+                <span class="chip-trash">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                </span>
+              </div>
+              <div class="add-chip">
+                <span class="plus">+</span> Tambah
+              </div>
+            </div>
+          </div>
+
+          <!-- V. KESYUKURAN -->
+          <div class="part-block">
+            <div class="part-head">
+              <div class="label">V · Kesyukuran</div>
+              <div class="meta">kosong</div>
+            </div>
+            <div class="chip-row">
+              <div class="add-chip">
+                <span class="plus">+</span> Tambah lagu
+              </div>
+            </div>
+          </div>
+
+          <!-- VI. PENUTUP -->
+          <div class="part-block">
+            <div class="part-head">
+              <div class="label">VI · Penutup</div>
+              <div class="meta">kosong</div>
+            </div>
+            <div class="chip-row">
+              <div class="add-chip">
+                <span class="plus">+</span> Tambah lagu
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <h3>Pilihan 2 — Chip Rows</h3>
+    <p><strong>Konsep:</strong> Setiap lagu jadi pill/chip kecil dengan semua info (ID, title, key, trash) inline. Lagu banyak pun muat sebab wrap ke baris baru automatik. Sangat compact & playful.</p>
+    <h4>Fungsi</h4>
+    <ul>
+      <li><strong>Tambah:</strong> chip "+ Tambah" ungu di hujung setiap row</li>
+      <li><strong>Padam:</strong> X merah kecik dalam chip lagu</li>
+      <li><strong>Kod lagu:</strong> kotak kecik dengan border kat dalam chip</li>
+      <li><strong>Susun:</strong> chips kekal mengikut order dalam flex-wrap (long-press untuk swap boleh)</li>
+      <li><strong>Kosong:</strong> satu chip "+ Tambah lagu" — tiada card tambahan</li>
+    </ul>
+    <div class="key-list">
+      <strong>✓ Multi-song OK:</strong> 4 lagu dalam Pembukaan, wrap automatik ke 2 baris.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE 3: STEPPER TIMELINE                                     -->
+<!-- ============================================================ -->
+<div class="page" id="page-3">
+  <div class="phone-wrap">
+    <div class="phone-label">Pilihan 3 — Stepper Timeline</div>
+    <div class="phone">
+      <div class="screen">
+
+        <div class="statusbar">
+          <span>9:41</span>
+          <div class="icons"><span></span><span></span><span class="wide"></span></div>
+        </div>
+
+        <div class="topbar">
+          <h1>Misa Hari Ini</h1>
+          <div class="actions">
+            <div class="icon-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                <polyline points="16 6 12 2 8 6"/>
+                <line x1="12" y1="2" x2="12" y2="15"/>
+              </svg>
+            </div>
+            <div class="icon-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="body">
+
+          <!-- I. PEMBUKAAN -->
+          <div class="timeline-item has-songs">
+            <div class="dot-col">
+              <div class="dot">1</div>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-head">
+                <div class="name">Pembukaan</div>
+                <div class="count">4 lagu</div>
+              </div>
+              <div class="timeline-body">
+                <div class="song-pill">
+                  <span class="id">A1</span>
+                  <span class="title">Ya Tuhan Kasihani</span>
+                  <span class="key">C</span>
+                  <span class="x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+                </div>
+                <div class="song-pill">
+                  <span class="id">A4</span>
+                  <span class="title">Marilah Kita Menyembah</span>
+                  <span class="key">F</span>
+                  <span class="x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+                </div>
+                <div class="song-pill">
+                  <span class="id">B2</span>
+                  <span class="title">Bapa Kami Yang Ada Di Surga</span>
+                  <span class="key">G</span>
+                  <span class="x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+                </div>
+                <div class="song-pill">
+                  <span class="id">LS</span>
+                  <span class="title">Lagu Tambahan Saya</span>
+                  <span class="key" style="color:#a1a1aa;">—</span>
+                  <span class="x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+                </div>
+                <div class="add-mini">+ Tambah lagu</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- II. PUNGUTAN -->
+          <div class="timeline-item has-songs">
+            <div class="dot-col">
+              <div class="dot">2</div>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-head">
+                <div class="name">Punggutan</div>
+                <div class="count">1 lagu</div>
+              </div>
+              <div class="timeline-body">
+                <div class="song-pill">
+                  <span class="id">B7</span>
+                  <span class="title">Tuhan Engkaulah Gembala</span>
+                  <span class="key">G</span>
+                  <span class="x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+                </div>
+                <div class="add-mini">+ Tambah lagu</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- III. PERSEMBAHAN -->
+          <div class="timeline-item empty">
+            <div class="dot-col">
+              <div class="dot">3</div>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-head">
+                <div class="name">Persembahan</div>
+                <div class="count">kosong</div>
+              </div>
+              <div class="timeline-body">
+                <div class="add-mini">+ Tambah lagu</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- IV. KOMUNI -->
+          <div class="timeline-item has-songs">
+            <div class="dot-col">
+              <div class="dot">4</div>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-head">
+                <div class="name">Komuni</div>
+                <div class="count">2 lagu</div>
+              </div>
+              <div class="timeline-body">
+                <div class="song-pill">
+                  <span class="id">C12</span>
+                  <span class="title">Tubuh Kristus</span>
+                  <span class="key">D</span>
+                  <span class="x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+                </div>
+                <div class="song-pill">
+                  <span class="id">D5</span>
+                  <span class="title">Anak Domba Allah</span>
+                  <span class="key">Em</span>
+                  <span class="x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+                </div>
+                <div class="add-mini">+ Tambah lagu</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- V. KESYUKURAN -->
+          <div class="timeline-item empty">
+            <div class="dot-col">
+              <div class="dot">5</div>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-head">
+                <div class="name">Kesyukuran</div>
+                <div class="count">kosong</div>
+              </div>
+              <div class="timeline-body">
+                <div class="add-mini">+ Tambah lagu</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- VI. PENUTUP -->
+          <div class="timeline-item empty">
+            <div class="dot-col">
+              <div class="dot">6</div>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-head">
+                <div class="name">Penutup</div>
+                <div class="count">kosong</div>
+              </div>
+              <div class="timeline-body">
+                <div class="add-mini">+ Tambah lagu</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <h3>Pilihan 3 — Stepper Timeline</h3>
+    <p><strong>Konsep:</strong> Vertical timeline dengan dot bernombor kat tepi kiri, line penyambung antara step. Macam progress tracker. Body box kecil untuk lagu.</p>
+    <h4>Fungsi</h4>
+    <ul>
+      <li><strong>Tambah:</strong> "+ Tambah lagu" kecik kat bawah body box</li>
+      <li><strong>Padam:</strong> X kecik kat hujung setiap lagu</li>
+      <li><strong>Kod lagu:</strong> kotak 28px dengan border, inline kat kanan</li>
+      <li><strong>Susun:</strong> songs kekal dalam order timeline (drag untuk swap boleh)</li>
+      <li><strong>Kosong:</strong> dot jadi dashed, body box tunjuk "+ Tambah lagu" je</li>
+      <li><strong>Visual progress:</strong> nampak flow 1→6 macam checklist</li>
+    </ul>
+    <div class="key-list">
+      <strong>✓ Multi-song OK:</strong> Pembukaan ada 4 lagu, body expand ikut ketinggian.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE 4: CARD GRID 2-COL                                      -->
+<!-- ============================================================ -->
+<div class="page" id="page-4">
+  <div class="phone-wrap">
+    <div class="phone-label">Pilihan 4 — Card Grid 2-Col</div>
+    <div class="phone">
+      <div class="screen">
+
+        <div class="statusbar">
+          <span>9:41</span>
+          <div class="icons"><span></span><span></span><span class="wide"></span></div>
+        </div>
+
+        <div class="topbar">
+          <h1>Misa Hari Ini</h1>
+          <div class="actions">
+            <div class="icon-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                <polyline points="16 6 12 2 8 6"/>
+                <line x1="12" y1="2" x2="12" y2="15"/>
+              </svg>
+            </div>
+            <div class="icon-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="body">
+
+          <div class="grid">
+
+            <!-- I. PEMBUKAAN -->
+            <div class="tile">
+              <div class="tile-head">
+                <div class="num">01</div>
+                <div class="count">4</div>
+              </div>
+              <div class="tile-name">Pembukaan</div>
+              <div class="song-stack">
+                <div class="mini-song">
+                  <span class="id">A1</span>
+                  <span class="t">Ya Tuhan Kasihani</span>
+                  <span class="k">C</span>
+                </div>
+                <div class="mini-song">
+                  <span class="id">A4</span>
+                  <span class="t">Marilah Menyembah</span>
+                  <span class="k">F</span>
+                </div>
+                <div class="mini-song">
+                  <span class="id">B2</span>
+                  <span class="t">Bapa Kami</span>
+                  <span class="k">G</span>
+                </div>
+                <div class="mini-song">
+                  <span class="id">LS</span>
+                  <span class="t">Tambahan</span>
+                  <span class="k" style="color:#a1a1aa;">—</span>
+                </div>
+                <div class="more-pill">+ tambah lagi</div>
+              </div>
+            </div>
+
+            <!-- II. PUNGUTAN -->
+            <div class="tile">
+              <div class="tile-head">
+                <div class="num">02</div>
+                <div class="count">1</div>
+              </div>
+              <div class="tile-name">Punggutan</div>
+              <div class="song-stack">
+                <div class="mini-song">
+                  <span class="id">B7</span>
+                  <span class="t">Engkaulah Gembala</span>
+                  <span class="k">G</span>
+                </div>
+              </div>
+              <div class="tile-add">
+                <div class="tile-add-btn">
+                  <span class="plus">+</span>
+                  <span>Tambah</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- III. PERSEMBAHAN -->
+            <div class="tile empty">
+              <div class="tile-head">
+                <div class="num">03</div>
+                <div class="count zero">0</div>
+              </div>
+              <div class="tile-name">Persembahan</div>
+              <div class="tile-add">
+                <div class="tile-add-btn">
+                  <span class="plus">+</span>
+                  <span>Tambah</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- IV. KOMUNI -->
+            <div class="tile">
+              <div class="tile-head">
+                <div class="num">04</div>
+                <div class="count">2</div>
+              </div>
+              <div class="tile-name">Komuni</div>
+              <div class="song-stack">
+                <div class="mini-song">
+                  <span class="id">C12</span>
+                  <span class="t">Tubuh Kristus</span>
+                  <span class="k">D</span>
+                </div>
+                <div class="mini-song">
+                  <span class="id">D5</span>
+                  <span class="t">Anak Domba Allah</span>
+                  <span class="k">Em</span>
+                </div>
+              </div>
+              <div class="tile-add">
+                <div class="tile-add-btn">
+                  <span class="plus">+</span>
+                  <span>Tambah</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- V. KESYUKURAN -->
+            <div class="tile empty">
+              <div class="tile-head">
+                <div class="num">05</div>
+                <div class="count zero">0</div>
+              </div>
+              <div class="tile-name">Kesyukuran</div>
+              <div class="tile-add">
+                <div class="tile-add-btn">
+                  <span class="plus">+</span>
+                  <span>Tambah</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- VI. PENUTUP -->
+            <div class="tile empty">
+              <div class="tile-head">
+                <div class="num">06</div>
+                <div class="count zero">0</div>
+              </div>
+              <div class="tile-name">Penutup</div>
+              <div class="tile-add">
+                <div class="tile-add-btn">
+                  <span class="plus">+</span>
+                  <span>Tambah</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <h3>Pilihan 4 — Card Grid 2-Col</h3>
+    <p><strong>Konsep:</strong> 6 bahagian Misa disusun dalam grid 2 lajur (3 baris × 2). Setiap bahagian satu tile kompak. Nampak macam "menu grid" — banyak info dalam satu skrin.</p>
+    <h4>Fungsi</h4>
+    <ul>
+      <li><strong>Tambah:</strong> "+ Tambah" box dashed dalam tile, atau "+ tambah lagi" pill bawah</li>
+      <li><strong>Padam:</strong> long-press pada lagu (icon boleh ditambah)</li>
+      <li><strong>Kod lagu:</strong> key chip kecik kat hujung setiap mini-song</li>
+      <li><strong>Susun:</strong> tap tile → masuk full view untuk reorder</li>
+      <li><strong>Kosong:</strong> tile dotted top, "+ Tambah" besar kat tengah</li>
+    </ul>
+    <div class="key-list">
+      <strong>✓ Multi-song OK:</strong> Pembukaan tile ada 4 lagu, "+ tambah lagi" pill tunjuk masih boleh tambah.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- MODAL DEMO (separate, untuk reference)                       -->
+<!-- ============================================================ -->
+<div style="background:#1a1a1a; padding:30px 20px;">
+  <div style="max-width:1200px; margin:0 auto; color:#fff;">
+    <h2 style="margin-bottom:8px;">Modal "Pilih Lagu" — preview untuk semua pilihan</h2>
+    <p style="color:#a1a1aa; font-size:13px; margin-bottom:20px;">Modal yang sama untuk semua 4 pilihan. Search box + list lagu dari pustaka + Lagu Saya.</p>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
+
+      <!-- Modal v1 -->
+      <div style="background:#fff; border-radius:18px; overflow:hidden; max-width:360px;">
+        <div style="padding:12px 18px 14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <div style="font-size:14px; font-weight:800; text-transform:uppercase; letter-spacing:1px;">PILIH LAGU</div>
+            <div style="width:28px; height:28px; border-radius:14px; background:#f4f4f5; display:flex; align-items:center; justify-content:center; color:#71717a; font-size:16px;">×</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; background:#f4f4f5; border-radius:10px; padding:8px 12px; margin-bottom:8px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2" style="width:14px; height:14px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span style="font-size:13px; color:#71717a;">Cari lagu...</span>
+          </div>
+          <div style="font-size:11px; color:#52525b; padding:10px 0 4px; border-bottom:1px solid #f4f4f5;">
+            <span style="color:#2563eb; font-weight:800;">A1</span> &nbsp; YA TUHAN KASIHANI
+          </div>
+          <div style="font-size:11px; color:#52525b; padding:10px 0 4px; border-bottom:1px solid #f4f4f5;">
+            <span style="color:#2563eb; font-weight:800;">A4</span> &nbsp; MARILAH KITA MENYEMBAH
+          </div>
+          <div style="font-size:11px; color:#52525b; padding:10px 0 4px; border-bottom:1px solid #f4f4f5;">
+            <span style="color:#2563eb; font-weight:800;">A7</span> &nbsp; KEMULIAAN KEPADA YESUS
+          </div>
+          <div style="font-size:11px; color:#52525b; padding:10px 0 4px; border-bottom:1px solid #f4f4f5;">
+            <span style="color:#16a34a; font-weight:800;">LS</span> &nbsp; LAGU TAMBAHAN SAYA
+          </div>
+          <div style="font-size:11px; color:#52525b; padding:10px 0 4px;">
+            <span style="color:#2563eb; font-weight:800;">B2</span> &nbsp; BAPA KAMI YANG ADA DI SURGA
+          </div>
+        </div>
+      </div>
+
+      <div style="max-width:360px; color:#d4d4d8; font-size:13px; line-height:1.6;">
+        <strong style="color:#fff;">Apa yang ada dalam modal:</strong>
+        <ul style="margin-top:8px; padding-left:20px;">
+          <li>Search box (filter dari songIndex + mySongs)</li>
+          <li>Close button bulat kat kanan atas</li>
+          <li>List lagu dengan ID (warna biru) + title uppercase</li>
+          <li>Tap mana-mana row → masuk ke bahagian aktif & tutup modal</li>
+          <li>"LS" badge untuk lagu dari Lagu Saya (warna hijau)</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      const target = document.getElementById(btn.dataset.target);
+      if (target) target.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
