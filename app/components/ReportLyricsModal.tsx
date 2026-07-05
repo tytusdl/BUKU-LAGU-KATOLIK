@@ -11,12 +11,11 @@ import {
   Alert,
   ToastAndroid,
   KeyboardAvoidingView,
-} from 'react-native';
+ Linking } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useLyricsReports, LyricsReportType } from '../context/LyricsReportContext';
 import { X, AlertCircle, Check } from 'lucide-react-native';
-import { Linking } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface ReportLyricsModalProps {

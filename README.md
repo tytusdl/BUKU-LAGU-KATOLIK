@@ -198,7 +198,120 @@ run it manually when you add new artwork.
 
 ---
 
+## 🏗️ Build Flow / Aliran Build
+
+Semua build dijalankan melalui **Expo Application Services (EAS)** — tak perlu
+install Xcode atau Android Studio untuk produce release artifact. EAS run build
+atas cloud server, kau boleh trigger dari CLI.
+
+### Prerequisites / Prasyarat
+- **EAS CLI** (untuk submit command): `npm install -g eas-cli`
+- **Expo account**: daftar di [expo.dev](https://expo.dev/signup) dan link ke
+  project ini (`eas login`).
+- Project ID dah dikonfig: `e7ba5e9f-7429-4986-8ab7-a42245d0d561` (lihat
+  `app.json` → `extra.eas.projectId`).
+
+### Build profiles / Profil Build
+
+Profil didefinisikan dalam `eas.json`:
+
+| Profile       | Distribution | Output                              | Kegunaan                        |
+| ------------- | ------------ | ----------------------------------- | ------------------------------- |
+| `development` | internal     | Dev client (debug-enabled)          | Local development dengan native |
+| `preview`     | internal     | Android `.apk` + iOS `.ipa` (ad-hoc)| QA testing, internal review     |
+| `production`  | store        | Android `.aab` + iOS `.ipa` (release)| Submit ke Play Store / App Store |
+
+### Android Build / Build Android
+
+#### Preview (APK untuk testing dalaman)
+```bash
+eas build --platform android --profile preview
+```
+Output: `.apk` file. Boleh install terus ke device Android (sideload) tanpa
+Play Store. Sesuai untuk uji kat device sendiri atau share dengan testers
+melalui WhatsApp / Google Drive.
+
+#### Production (AAB untuk Play Store)
+```bash
+eas build --platform android --profile production
+```
+Output: `.aab` (Android App Bundle). Wajib format ni untuk upload ke
+**Google Play Console**. EAS akan auto-increment `versionCode` sebab config
+`autoIncrement: true` dalam `eas.json`.
+
+#### Submit ke Play Store
+```bash
+eas submit --platform android --latest
+```
+Kena setup **service account JSON** dulu dalam
+[EAS dashboard](https://expo.dev/accounts/[account]/projects/lagu_pozoo/settings/submissions)
+sebelum submit command boleh auto-upload. Ikut
+[panduan Play Store API](https://docs.expo.dev/submit/android/) untuk setup.
+
+### iOS Build / Build iOS
+
+#### Preview (untuk internal testing)
+```bash
+eas build --platform ios --profile preview
+```
+Output: `.ipa` file. Untuk install ke iPhone sebenar, device kena
+**daftarkan UDID** dulu dalam Apple Developer account. EAS handle auto
+register kalau kau pass `--auto-submit-with-profile` atau configure
+`eas.json:build.preview.ios.distributionCertificate`.
+
+Atau alternatif lebih senang untuk testing — guna **TestFlight**:
+```bash
+eas build --platform ios --profile production
+eas submit --platform ios --latest
+```
+Upload ke App Store Connect, kemudian add testers dalam TestFlight app.
+
+#### Production (untuk App Store)
+```bash
+eas build --platform ios --profile production
+```
+Output: `.ipa` signed dengan distribution certificate. Submit command:
+```bash
+eas submit --platform ios --latest
+```
+`appVersionSource: "remote"` dalam `eas.json` bermaksud EAS akan
+auto-increment `buildNumber` dari server. App Store Connect App ID dah
+dikonfig: `6759234151` (lihat `eas.json:submit.production.ios.ascAppId`).
+
+#### Certificate & provisioning
+Kali pertama je perlu setup — EAS ada wizard interaktif:
+```bash
+eas credentials:configure --platform ios
+```
+Sama ada guna **credentials auto-managed** (EAS handle semua cert +
+provisioning profile untuk kau, recommended) atau upload cert manual.
+
+### Tips / Tip Berguna
+
+- **Build pertama memang lambat** (~10-20 minit untuk iOS sebab EAS perlu
+  download + cache semua dependency). Build kedua dan seterusnya akan
+  lebih cepat sebab cache.
+- **Local build** guna `expo run:android` / `expo run:ios` dalam `package.json`
+  scripts — tapi ni perlukan Xcode/Android Studio locally dan hanya untuk
+  development, tak sesuai untuk release artifact.
+- **Auto-increment version**: `production` profile dah set
+  `autoIncrement: true` untuk Android, jadi jangan manual edit
+  `versionCode` dalam `app.json` — biar EAS handle.
+- **Check status**: `eas build:list` untuk tengok semua build history
+  dan download artifact link.
+
+---
+
 ## 🚢 Release Flow / Aliran Release
+
+> ⚠️ **WAJIB: Push `version.json` ke `master` setiap release.**
+> App ni fetch `version.json` dari
+> `https://raw.githubusercontent.com/tytusdl/BUKU-LAGU-KATOLIK/master/version.json`
+> setiap kali user buka app. Kalau repo private (atau file tak push),
+> fetch return 404 dan **in-app update prompt mati senyap** — user v1.8.0
+> ke bawah langsung tak tahu v1.9.0 dah keluar. Lepas push, check URL
+> tu boleh akses (HTTP 200, bukan 404). Jangan skip step ni untuk
+> release kecik-kecik sekali.
 
 1. Bump `version` in `package.json`, `app.json` (and `ios.buildNumber`).
 2. Edit `app/data/changelog.ts` — add a new entry at the top of `changelogData`
@@ -206,7 +319,11 @@ run it manually when you add new artwork.
 3. Edit the root `version.json` — bump `version`, add `releaseNotes` in both
    languages, decide `forceUpdate` and `minVersion`.
 4. Run `npx tsc --noEmit` and `npm run lint`; both must pass.
-5. Commit on a branch, push, then:
+5. **Commit AND push `version.json` to `master` on the public repo.**
+   Verify with: `curl -sI https://raw.githubusercontent.com/tytusdl/BUKU-LAGU-KATOLIK/master/version.json`
+   — must return `HTTP/2 200`, not 404. Without this push, users on the
+   previous version never see the in-app update modal.
+6. Commit on a branch, push, then:
    ```bash
    eas build --profile preview    # internal testing
    eas build --profile production # store release

@@ -209,6 +209,16 @@ in this repo.
   English-only `Alert`s in new code.
 - **Update modal**: store check (raw `version.json`) runs first, then OTA
   via `expo-updates`. Set `DEBUG_FORCE_SHOW_UPDATE` to preview locally.
+- **`version.json` fetch silently fails if the repo is private.** The
+  store-version check in `_layout.tsx` fetches
+  `https://raw.githubusercontent.com/tytusdl/BUKU-LAGU-KATOLIK/master/version.json`
+  on every app launch. If the repo is private (or the branch is renamed),
+  GitHub returns 404, the code logs `[UpdateCheck] Store version check
+  skipped or failed` and falls through. **Users on older versions never
+  see the update modal** until the repo is public again — Play Store's
+  own update nag is gradual and misses many users. Always verify the URL
+  is reachable (HTTP 200) after any repo visibility / branch rename,
+  otherwise the in-app update prompt silently dies.
 - **.bak files**: `*.bak.tsx` are excluded from `tsconfig`; leave them
   alone unless you are actively restoring from one.
 - **Song DB size**: `songs.ts` is ~6.5k lines because lyrics are inlined.
@@ -220,6 +230,21 @@ in this repo.
 
 ## Release flow (when bumping version)
 
+> **HARD RULE: `version.json` MUST be committed and pushed to `master`
+> on the public GitHub repo (`tytusdl/BUKU-LAGU-KATOLIK`) as part of
+> every release. Without this push, the in-app update prompt silently
+> dies — `raw.githubusercontent.com` returns 404 for a private repo
+> and the fetch in `app/_layout.tsx` falls through. Never skip this
+> step, even for "small" releases. After pushing, verify with:
+>
+> ```
+> curl -sI https://raw.githubusercontent.com/tytusdl/BUKU-LAGU-KATOLIK/master/version.json
+> ```
+>
+> Expect `HTTP/2 200`. A `404` means the prompt won't work for users on
+> older versions — fix the repo visibility before announcing the
+> release.
+
 1. Bump `version` in `package.json` and `app.json` (and `ios.buildNumber`).
 2. Edit `app/data/changelog.ts` — add a new entry at the top of
    `changelogData` with bilingual `text` per change.
@@ -227,8 +252,100 @@ in this repo.
    bump `version`, add `releaseNotes` in both languages, decide
    `forceUpdate` and `minVersion`.
 4. Run `npx tsc --noEmit` and `npm run lint`; both must pass.
-5. Commit on a branch, push, then `eas build --profile preview` (or
+5. **Commit AND push `version.json` to `master` on the public repo.**
+   This is what the in-app updater reads on launch — a missed push
+   means every user still on the previous build will never see the
+   update prompt. After pushing, sanity-check
+   `https://raw.githubusercontent.com/tytusdl/BUKU-LAGU-KATOLIK/master/version.json`
+   returns the new version (not 404, not the old version).
+6. Commit on a branch, push, then `eas build --profile preview` (or
    `production` for store).
+
+## Build flow (EAS Build)
+
+All release artifacts are produced via **Expo Application Services (EAS)**
+in the cloud. No Xcode or Android Studio install needed locally — only
+the EAS CLI plus an Expo account.
+
+### Required tooling / Tooling diperlukan
+- `npm install -g eas-cli` — submit / build / credential commands.
+- `eas login` — link to the Expo account that owns the project
+  (`e7ba5e9f-7429-4986-8ab7-a42245d0d561` in `app.json`).
+- Existing `eas.json` defines three profiles:
+  - `development` — dev client (debug-enabled), internal distribution.
+  - `preview` — Android `.apk`, iOS `.ipa` (ad-hoc), internal testing.
+  - `production` — Android `.aab`, iOS `.ipa` (release), store-bound;
+    `autoIncrement: true` so versionCode / buildNumber bumps
+    automatically from the EAS server.
+
+### Android
+
+```bash
+# Preview — APK for sideloading / internal testers
+eas build --platform android --profile preview
+
+# Production — AAB for Google Play
+eas build --platform android --profile production
+
+# Submit to Play Store (after build finishes)
+eas submit --platform android --latest
+```
+
+`eas submit --platform android` requires a **service-account JSON** from
+Google Play Console configured in EAS dashboard
+(`https://expo.dev/accounts/[account]/projects/lagu_pozoo/settings/submissions`).
+Without this, the submit command fails — agent should surface this to
+the user before assuming `eas submit` "just works". See
+https://docs.expo.dev/submit/android/.
+
+### iOS
+
+```bash
+# Preview — IPA for internal testing (TestFlight or ad-hoc)
+eas build --platform ios --profile preview
+
+# Production — IPA for App Store
+eas build --platform ios --profile production
+
+# Submit to App Store Connect
+eas submit --platform ios --latest
+```
+
+`ascAppId` is hard-coded in `eas.json:submit.production.ios` to
+`6759234151`. First-time iOS setup needs `eas credentials:configure
+--platform ios` — prefer the **EAS-managed credentials** option (EAS
+generates + holds the distribution certificate and provisioning
+profile, free of charge). Manual cert upload is supported but is a
+maintenance burden for a solo dev — agent should default to managed.
+
+### Gotchas
+
+- **First EAS build is slow** (~10-20 min, downloads + caches every
+  native dep on the EAS worker). Subsequent builds reuse the cache and
+  finish in 2-5 min. Don't trigger `--clear-cache` unless the user
+  reports a Gradle / pod install mismatch.
+- **Don't run `eas build` and `expo run:android` / `expo run:ios`
+  back-to-back.** Local builds modify `android/` and `ios/` folders in
+  place and may collide with the next EAS build's native cache. Use
+  one or the other per session.
+- **`autoIncrement` only updates `versionCode` / `buildNumber` on the
+  EAS server.** It does NOT modify `app.json` locally. Don't manually
+  bump `versionCode` in `app.json` for production builds — EAS will
+  overwrite anyway and the manual bump will be lost next commit.
+- **`appVersionSource: "remote"`** is set in `eas.json` for the same
+  reason: iOS build numbers must come from the EAS server, not from
+  `app.json`. Treat `app.json:ios.buildNumber` as a hint, not a hard
+  truth — the canonical build number for store submission is whatever
+  EAS produced last.
+- **Internal distribution for iOS** needs at least one device UDID
+  registered on the Apple Developer account before the `.ipa` can be
+  installed. EAS handles auto-registration IF configured — otherwise
+  the user has to manually register UDIDs through App Store Connect
+  for each tester device.
+- **`eas build:list`** lists every build with status, profile, and a
+  download URL for the artifact. Use this to verify a build finished
+  successfully and grab the URL — never trust the in-progress spinner
+  alone.
 
 ## When in doubt
 

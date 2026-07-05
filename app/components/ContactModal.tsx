@@ -7,11 +7,11 @@ import {
   TouchableOpacity,
   Platform,
   Alert,
-} from 'react-native';
+ Linking } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { X, Mail, AlertCircle, ChevronRight } from 'lucide-react-native';
-import { Linking } from 'react-native';
+
 
 interface ContactModalProps {
   visible: boolean;

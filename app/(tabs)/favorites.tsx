@@ -5,14 +5,14 @@ import { useFavorites } from '../context/FavoritesContext';
 import { useTheme } from '../context/ThemeContext';
 import { useMySongs, UserSong } from '../context/MySongsContext';
 import { songIndex, SongIndex } from '../data/songs/songIndex';
-
-type FavoriteSongItem = (SongIndex | UserSong) & { isUserSong: boolean };
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useLanguage } from '../context/LanguageContext';
 import PageHeader from '../components/PageHeader';
+
+type FavoriteSongItem = (SongIndex | UserSong) & { isUserSong: boolean };
 
 export default function FavoritesScreen() {
   const { favorites } = useFavorites();

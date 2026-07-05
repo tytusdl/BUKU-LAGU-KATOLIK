@@ -42,7 +42,7 @@ Object.keys(bannerImages).forEach(key => {
 });
 
 // Fungsi untuk pra-memuatkan aset imej
-export async function cacheImages(images: Array<string | number>): Promise<any[]> {
+export async function cacheImages(images: (string | number)[]): Promise<any[]> {
   // Jika tiada imej, tidak perlu diproses
   if (images.length === 0) return [];
   

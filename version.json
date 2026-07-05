@@ -8,13 +8,15 @@
       "Ciri Baru - Lapor Lirik: Kini anda boleh melaporkan masalah lirik lagu (salah ejaan, baris hilang, dll) terus dari halaman detail lagu. Laporan akan dihantar melalui emel kepada pembangun dan disimpan dalam peranti.",
       "Tetapan - Senarai Laporan: Bahagian 'Laporan Lirik' baru di Tetapan untuk melihat semua laporan yang dihantar dari peranti ini, dengan pilihan eksport atau padam.",
       "Metadata Lagu Automatik: Laporan menyertakan ID lagu, tajuk, jenis masalah, dan versi aplikasi supaya pembangun mudah kenal pasti dan membaiki.",
-      "Hubungi Saya Dipermudahkan: Menu 'Hubungi Saya' gabungan — pilih 'Pertanyaan Umum' untuk emel biasa atau 'Lapor Lirik' untuk panduan."
+      "Hubungi Saya Dipermudahkan: Menu 'Hubungi Saya' gabungan — pilih 'Pertanyaan Umum' untuk emel biasa atau 'Lapor Lirik' untuk panduan.",
+      "Pembaikan & Kestabilan: Memperbaiki beberapa pepijat kecil dan menambahbaikan kod aplikasi untuk pengalaman yang lebih lancar."
     ],
     "English": [
       "New Feature - Lyrics Report: You can now report song lyrics issues (spelling errors, missing lines, etc.) directly from the song detail page. Reports are sent to the developer via email and also saved on this device.",
       "Settings - Reports List: A new 'Lyrics Reports' section in Settings to view all reports submitted from this device, with options to export or delete.",
       "Automatic Song Metadata: Each report includes the song ID, title, issue type, and app version so the developer can quickly identify and fix problems.",
-      "Simplified Contact: 'Contact Me' menu is now combined — choose 'General Inquiry' for regular email, or 'Report Lyrics' for guidance."
+      "Simplified Contact: 'Contact Me' menu is now combined — choose 'General Inquiry' for regular email, or 'Report Lyrics' for guidance.",
+      "Fixes & Stability: Fixed several minor bugs and improved the codebase for a smoother experience."
     ]
   },
   "forceUpdate": false

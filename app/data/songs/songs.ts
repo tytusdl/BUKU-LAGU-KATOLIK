@@ -1,3 +1,5 @@
+import songsR from './songsR';
+
 export interface Song {
   id: string;
   title: string;
@@ -8,8 +10,6 @@ export interface Song {
   verified?: boolean;
   songNumber?: string;
 }
-
-import songsR from './songsR';
 
 export const songs: Song[] = [
   {

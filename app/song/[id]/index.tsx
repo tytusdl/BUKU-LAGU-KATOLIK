@@ -1,11 +1,11 @@
-import React from 'react';
-import { useLocalSearchParams } from 'expo-router';
+import React, { useState, useEffect, useMemo, Fragment, useRef, useCallback } from 'react';
+import { useLocalSearchParams , router } from 'expo-router';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, FlatList, Share, /*ActivityIndicator,*/ TouchableHighlight, Alert, Platform, ToastAndroid, Modal } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft, Minus, Plus, Type, Heart, Share as ShareIcon, Menu, X, Edit, Trash2, ChevronLeft, ChevronRight, Link2, Image as ImageIcon, PlayCircle, Music, Music2, AlertCircle } from 'lucide-react-native';
-import { router } from 'expo-router';
+
 import { songs as defaultSongs, songs as allSongs, Song } from '../../data/songs';
-import { useState, useEffect, useMemo, Fragment, useRef, useCallback } from 'react';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFavorites } from '../../context/FavoritesContext';
 import { useTheme } from '../../context/ThemeContext';

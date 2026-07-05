@@ -1,8 +1,8 @@
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams , router } from 'expo-router';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft } from 'lucide-react-native';
-import { router } from 'expo-router';
+
 import { songIndex } from '../../data/songs/songIndex';
 import { useTheme } from '../../context/ThemeContext';
 import { StatusBar } from 'expo-status-bar';

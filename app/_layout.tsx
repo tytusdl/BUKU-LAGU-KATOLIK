@@ -1,21 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Stack } from 'expo-router';
+import { Stack , router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { enableScreens } from 'react-native-screens';
 import { LogBox, View, Text, StyleSheet, Image, Appearance, Alert, Linking, Platform } from 'react-native';
-
-// Cap Android system font scaling. Otherwise devices with large system font
-// setting would multiply our lyrics/UI sizes and break layouts across phones.
-if ((Text as any).defaultProps == null) {
-  (Text as any).defaultProps = {};
-}
-(Text as any).defaultProps.maxFontSizeMultiplier = 1.3;
 import { FavoritesProvider } from './context/FavoritesContext';
 import ThemeProvider, { useTheme } from './context/ThemeContext';
 import { MySongsProvider, useMySongs, UserSong } from './context/MySongsContext';
 import { MassProvider } from './context/MassContext';
 import { LyricsReportProvider } from './context/LyricsReportContext';
-import { router } from 'expo-router';
+
 import { Asset } from 'expo-asset';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as SystemUI from 'expo-system-ui';
@@ -32,6 +25,13 @@ import { parseSongShareLink } from './utils/songLink';
 import packages from '../package.json';
 import { bannerImages, cacheImages } from './utils/imageCache';
 import { useFonts, Inter_400Regular, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
+
+// Cap Android system font scaling. Otherwise devices with large system font
+// setting would multiply our lyrics/UI sizes and break layouts across phones.
+if ((Text as any).defaultProps == null) {
+  (Text as any).defaultProps = {};
+}
+(Text as any).defaultProps.maxFontSizeMultiplier = 1.3;
 
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.

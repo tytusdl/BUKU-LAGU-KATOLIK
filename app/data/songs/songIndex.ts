@@ -1,4 +1,4 @@
-﻿export interface SongIndex {
+export interface SongIndex {
   id: string;
   title: string;
   songNumber?: string;

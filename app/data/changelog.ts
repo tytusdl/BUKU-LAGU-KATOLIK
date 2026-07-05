@@ -41,6 +41,12 @@ export const changelogData: ChangelogEntry[] = [
                     Melayu: "Hubungi Saya Dipermudahkan: Menu 'Hubungi Saya' kini gabungan — pilih 'Pertanyaan Umum' untuk emel biasa atau 'Lapor Lirik' untuk panduan melaporkan masalah lirik dari halaman lagu.",
                     English: "Simplified Contact: 'Contact Me' menu is now combined — choose 'General Inquiry' for regular email, or 'Report Lyrics' for guidance on reporting lyrics issues from the song page."
                 }
+            },
+            {
+                text: {
+                    Melayu: "Pembaikan & Kestabilan: Memperbaiki beberapa pepijat kecil dan menambahbaikan kod aplikasi untuk pengalaman yang lebih lancar.",
+                    English: "Fixes & Stability: Fixed several minor bugs and improved the codebase for a smoother experience."
+                }
             }
         ]
     },
