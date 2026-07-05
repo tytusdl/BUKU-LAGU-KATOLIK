@@ -124,6 +124,15 @@ src/translations.ts         i18n strings keyed by 'Melayu' | 'English'
   not enough on Android — the bottom nav bar is taller. Required on any
   new bottom-sheet style modal (e.g. `LyricsReportsListModal`,
   `ShareBottomSheet`, `ContactModal`, `ReportLyricsModal`).
+- **Modal close button convention: X top-right, NOT bottom "Tutup" pill.**
+  All new modals MUST use a circular X button positioned absolute top-right
+  (32x32, `rgba(0,0,0,0.06)` background, `X` icon from `lucide-react-native`
+  at 20pt, `strokeWidth: 2.4`, `hitSlop: {top:12, bottom:12, left:12, right:12}`).
+  Wrap modal body in a `ScrollView` with `contentContainerStyle: { paddingTop: 36 }`
+  so content doesn't sit under the X. Do NOT add a bottom "Tutup" / "Close"
+  pill button — it eats vertical space and forces a fixed maxHeight. Tap
+  outside the modal or the X are the only dismiss affordances. Reference
+  style: `supporterCloseX` in `app/(tabs)/setting.tsx`.
 - **Splash race**: `SplashScreen.preventAutoHideAsync()` is set, then
   fonts + main banner preload in `RootLayout.prepare()`. Hide only after
   `AnimatedSplash.onAnimationFinish` fires — see `app/_layout.tsx`.

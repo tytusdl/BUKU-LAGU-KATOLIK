@@ -2,8 +2,8 @@ import { useFocusEffect } from 'expo-router';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, StyleSheet, Switch, ScrollView, TouchableOpacity, Modal, Alert, Linking, Animated } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { ChevronRight, Moon, Globe, HelpCircle, Check, Palette, Heart, ChevronUp, Sparkles, Mail, HandHeart } from 'lucide-react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ChevronRight, Moon, Globe, HelpCircle, Check, Palette, Heart, ChevronUp, Sparkles, Mail, HandHeart, X } from 'lucide-react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme, colorThemes, darkColorThemes } from '../context/ThemeContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
@@ -35,6 +35,7 @@ export default function SettingScreen() {
   const [showContactModal, setShowContactModal] = useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
   const { reports: lyricsReports } = useLyricsReports();
+  const insets = useSafeAreaInsets();
 
   // Auto-collapse changelog when leaving the screen
   useFocusEffect(
@@ -146,7 +147,7 @@ export default function SettingScreen() {
           >
             <View style={styles.rowContent}>
               <View style={[styles.iconContainer, { backgroundColor: isDarkMode ? 'rgba(175,82,222,0.18)' : 'rgba(175,82,222,0.12)' }]}>
-                <Sparkles size={20} color={isDarkMode ? "#C68FE8" : "#AF52DE"} strokeWidth={2.2} />
+                <Sparkles size={17} color={isDarkMode ? "#C68FE8" : "#AF52DE"} strokeWidth={2.2} />
               </View>
               <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('newUpdate')}</Text>
             </View>
@@ -232,7 +233,7 @@ export default function SettingScreen() {
           >
             <View style={styles.rowContent}>
               <View style={[styles.iconContainer, { backgroundColor: isDarkMode ? 'rgba(72,114,244,0.18)' : 'rgba(72,114,244,0.12)' }]}>
-                <Globe size={20} color={isDarkMode ? "#7BA0FF" : "#4872F4"} strokeWidth={2.2} />
+                <Globe size={17} color={isDarkMode ? "#7BA0FF" : "#4872F4"} strokeWidth={2.2} />
               </View>
               <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('language')}</Text>
             </View>
@@ -257,7 +258,7 @@ export default function SettingScreen() {
           <View style={[styles.row, isDarkMode && styles.darkRow]}>
             <View style={styles.rowContent}>
               <View style={[styles.iconContainer, { backgroundColor: isDarkMode ? 'rgba(120,120,128,0.24)' : 'rgba(120,120,128,0.14)' }]}>
-                <Moon size={20} color={isDarkMode ? "#C7C7CC" : "#48484A"} strokeWidth={2.2} />
+                <Moon size={17} color={isDarkMode ? "#C7C7CC" : "#48484A"} strokeWidth={2.2} />
               </View>
               <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('darkMode')}</Text>
             </View>
@@ -274,7 +275,7 @@ export default function SettingScreen() {
           <TouchableOpacity style={[styles.row, isDarkMode && styles.darkRow]} onPress={toggleColorThemeModal} activeOpacity={0.7}>
             <View style={styles.rowContent}>
               <View style={[styles.iconContainer, { backgroundColor: isDarkMode ? 'rgba(255,159,10,0.18)' : 'rgba(255,159,10,0.14)' }]}>
-                <Palette size={20} color={isDarkMode ? "#FFB340" : "#FF9F0A"} strokeWidth={2.2} />
+                <Palette size={17} color={isDarkMode ? "#FFB340" : "#FF9F0A"} strokeWidth={2.2} />
               </View>
               <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('colorTheme')}</Text>
             </View>
@@ -298,52 +299,22 @@ export default function SettingScreen() {
             <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>{t('help')}</Text>
           </View>
 
-          <TouchableOpacity style={[styles.row, isDarkMode && styles.darkRow, { borderTopWidth: 0 }]} onPress={() => openInfoModal('help')} activeOpacity={0.7}>
+          <TouchableOpacity style={[styles.row, isDarkMode && styles.darkRow, { borderTopWidth: 0 }]} onPress={toggleContributorsModal} activeOpacity={0.7}>
             <View style={styles.rowContent}>
-              <View style={[styles.iconContainer, { backgroundColor: isDarkMode ? 'rgba(72,114,244,0.18)' : 'rgba(72,114,244,0.12)' }]}>
-                <HelpCircle size={20} color={isDarkMode ? "#7BA0FF" : "#4872F4"} strokeWidth={2.2} />
+              <View style={[styles.iconContainer, { backgroundColor: isDarkMode ? 'rgba(255,69,58,0.18)' : 'rgba(255,69,58,0.12)' }]}>
+                <Heart size={17} color={isDarkMode ? "#FF7A6B" : "#FF453A"} strokeWidth={2.2} />
               </View>
-              <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('helpCenter')}</Text>
+              <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('contributors')}</Text>
             </View>
             <ChevronRight size={18} color={isDarkMode ? "#666" : "#999"} />
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.supportCard, isDarkMode && styles.darkSupportCard]}
-            onPress={async () => {
-              try {
-                await WebBrowser.openBrowserAsync('https://sites.google.com/view/bukulagukatolik/home');
-              } catch (error) {
-                console.error('Failed to open web browser:', error);
-                Linking.openURL('https://sites.google.com/view/bukulagukatolik/home');
-              }
-            }}
-            activeOpacity={0.85}
-          >
-            <View style={styles.supportCardInner}>
-              <View style={[styles.supportIconWrap, isDarkMode && styles.darkSupportIconWrap]}>
-                <HandHeart size={22} color="#fff" strokeWidth={2.2} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={[styles.supportTitle, isDarkMode && { color: '#fff' }]}>
-                  {t('catholicSongbookWeb')}
-                </Text>
-                <Text style={[styles.supportSubtitle, isDarkMode && { color: 'rgba(255,255,255,0.75)' }]}>
-                  {currentLanguage === 'Melayu'
-                    ? 'Laman web rasmi Buku Lagu Katolik'
-                    : 'Official Catholic Songbook website'}
-                </Text>
-              </View>
-              <ChevronRight size={18} color="rgba(255,255,255,0.85)" />
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={[styles.row, isDarkMode && styles.darkRow]} onPress={toggleContributorsModal} activeOpacity={0.7}>
+          <TouchableOpacity style={[styles.row, isDarkMode && styles.darkRow]} onPress={() => openInfoModal('help')} activeOpacity={0.7}>
             <View style={styles.rowContent}>
-              <View style={[styles.iconContainer, { backgroundColor: isDarkMode ? 'rgba(255,69,58,0.18)' : 'rgba(255,69,58,0.12)' }]}>
-                <Heart size={20} color={isDarkMode ? "#FF7A6B" : "#FF453A"} strokeWidth={2.2} />
+              <View style={[styles.iconContainer, { backgroundColor: isDarkMode ? 'rgba(72,114,244,0.18)' : 'rgba(72,114,244,0.12)' }]}>
+                <HelpCircle size={17} color={isDarkMode ? "#7BA0FF" : "#4872F4"} strokeWidth={2.2} />
               </View>
-              <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('contributors')}</Text>
+              <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('helpCenter')}</Text>
             </View>
             <ChevronRight size={18} color={isDarkMode ? "#666" : "#999"} />
           </TouchableOpacity>
@@ -355,7 +326,7 @@ export default function SettingScreen() {
           >
             <View style={styles.rowContent}>
               <View style={[styles.iconContainer, { backgroundColor: isDarkMode ? 'rgba(52,199,89,0.18)' : 'rgba(52,199,89,0.12)' }]}>
-                <Mail size={20} color={isDarkMode ? "#5DD879" : "#34C759"} strokeWidth={2.2} />
+                <Mail size={17} color={isDarkMode ? "#5DD879" : "#34C759"} strokeWidth={2.2} />
               </View>
               <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('helpContact')}</Text>
             </View>
@@ -369,7 +340,7 @@ export default function SettingScreen() {
           >
             <View style={styles.rowContent}>
               <View style={[styles.iconContainer, { backgroundColor: isDarkMode ? 'rgba(175,82,222,0.18)' : 'rgba(175,82,222,0.12)' }]}>
-                <Sparkles size={20} color={isDarkMode ? "#C68FE8" : "#AF52DE"} strokeWidth={2.2} />
+                <Sparkles size={17} color={isDarkMode ? "#C68FE8" : "#AF52DE"} strokeWidth={2.2} />
               </View>
               <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('reportViewAll')}</Text>
             </View>
@@ -474,7 +445,16 @@ export default function SettingScreen() {
       >
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, isDarkMode && styles.darkModalContent, { paddingVertical: 20 }]}>
-            <Text style={[styles.modalTitle, isDarkMode && styles.darkText]}>{t('chooseColorTheme')}</Text>
+            {/* ─── Close X button (top-right) ─── */}
+            <TouchableOpacity
+              style={styles.supporterCloseX}
+              onPress={toggleColorThemeModal}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            >
+              <X size={20} color={isDarkMode ? '#AEAEB2' : '#666'} strokeWidth={2.4} />
+            </TouchableOpacity>
+
+            <Text style={[styles.modalTitle, isDarkMode && styles.darkText, { marginTop: 8 }]}>{t('chooseColorTheme')}</Text>
 
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', paddingTop: 15, paddingBottom: 5 }}>
               {colorThemes.map((theme, index) => {
@@ -526,21 +506,6 @@ export default function SettingScreen() {
                 );
               })}
             </View>
-
-            <TouchableOpacity
-              style={[
-                styles.closeButton,
-                {
-                  position: 'relative',
-                  bottom: 0,
-                  marginTop: 20,
-                  backgroundColor: currentColorTheme.primary === '#ffffff' ? '#B8B8B8' : currentColorTheme.primary
-                }
-              ]}
-              onPress={toggleColorThemeModal}
-            >
-              <Text style={styles.closeButtonText}>{t('close')}</Text>
-            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -555,8 +520,17 @@ export default function SettingScreen() {
         <View style={styles.modalOverlay}>
           <View style={[styles.infoModalContent, isDarkMode && styles.darkModalContent, { flexDirection: 'column' }]}>
 
+            {/* ─── Close X button (top-right) ─── */}
+            <TouchableOpacity
+              style={styles.supporterCloseX}
+              onPress={() => setShowInfoModal(false)}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            >
+              <X size={20} color={isDarkMode ? '#AEAEB2' : '#666'} strokeWidth={2.4} />
+            </TouchableOpacity>
+
             {/* Tab Pills */}
-            <View style={[styles.infoTabBar, { backgroundColor: isDarkMode ? '#3a3a3c' : '#f0f0f5' }]}>
+            <View style={[styles.infoTabBar, { backgroundColor: isDarkMode ? '#3a3a3c' : '#f0f0f5', marginTop: 36 }]}>
               {(['help', 'privacy', 'about'] as const).map((tab) => {
                 const isActive = activeInfoTab === tab;
                 const label = tab === 'help' ? t('helpCenter') : tab === 'privacy' ? t('privacyPolicy') : t('aboutApp');
@@ -611,21 +585,9 @@ export default function SettingScreen() {
                   <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appStructure2')}</Text>
                   <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appStructure3')}</Text>
                   <Text style={[styles.aboutBullet, isDarkMode && styles.darkText]}>{t('appStructure4')}</Text>
-                  <Text style={[styles.aboutHeader, isDarkMode && styles.darkText]}>{t('appContact')}</Text>
-                  <Text style={[styles.aboutText, isDarkMode && styles.darkText]}>{t('appContactText')}</Text>
                 </View>
               )}
             </ScrollView>
-
-            <TouchableOpacity
-              style={[
-                styles.closeButton,
-                { backgroundColor: currentColorTheme.primary === '#ffffff' ? '#4872F4' : currentColorTheme.primary }
-              ]}
-              onPress={() => setShowInfoModal(false)}
-            >
-              <Text style={styles.closeButtonText}>{t('close')}</Text>
-            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -638,61 +600,119 @@ export default function SettingScreen() {
         onRequestClose={toggleContributorsModal}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.aboutModalContent, isDarkMode && styles.darkModalContent]}>
-            <Text style={[styles.modalTitle, isDarkMode && styles.darkText]}>{t('contributorsList')}</Text>
+          <View style={[
+            styles.supporterModalContent,
+            isDarkMode && styles.darkModalContent,
+            // Respect Android nav bar / tab bar so the modal never kisses the bottom edge
+            { paddingBottom: Math.max(insets.bottom, 20) + 8 },
+          ]}>
+            {/* ─── Close button (X) — absolute top-right ─── */}
+            <TouchableOpacity
+              style={styles.supporterCloseX}
+              onPress={toggleContributorsModal}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            >
+              <X size={20} color={isDarkMode ? '#AEAEB2' : '#666'} strokeWidth={2.4} />
+            </TouchableOpacity>
 
-            <ScrollView style={styles.aboutScrollView}>
-              <Text style={[styles.aboutText, isDarkMode && styles.darkText, { marginBottom: 15 }]}>
-                {t('contributorsIntro')}
+            {/* ─── Scrollable body — overflows gracefully on small screens ─── */}
+            <ScrollView
+              style={styles.supporterModalScroll}
+              contentContainerStyle={{ paddingBottom: 4, paddingTop: 28 }}
+              showsVerticalScrollIndicator={false}
+            >
+              {/* ─── Compact header: inline icon + title + count ─── */}
+              <View style={styles.supporterHero}>
+                <View style={styles.supporterHeroOrnament}>
+                  <View style={[styles.supporterHeroLine, isDarkMode && styles.darkSupporterHeroLine]} />
+                  <Heart size={11} color={isDarkMode ? '#FFB4B4' : '#FF6B6B'} fill={isDarkMode ? '#FFB4B4' : '#FF6B6B'} strokeWidth={0} />
+                  <View style={[styles.supporterHeroLine, isDarkMode && styles.darkSupporterHeroLine]} />
+                </View>
+                <Text style={[styles.supporterHeroTitle, isDarkMode && styles.darkSupporterHeroTitle]}>
+                  {t('contributorsList')}
+                </Text>
+              </View>
+
+              {/* ─── Appreciation text on top (short "Terima kasih kepada pasukan...") ─── */}
+              <Text style={[styles.supporterIntro, isDarkMode && styles.darkSupporterIntro]}>
+                {t('appContactText')}
               </Text>
 
-              <View style={{
-                backgroundColor: isDarkMode ? '#1c1c1e' : '#f2f2f7',
-                borderRadius: 16,
-                overflow: 'hidden',
-                borderWidth: 1,
-                borderColor: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
-              }}>
-                {contributorsData.map((contributor, index) => (
-                  <View key={index} style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    paddingVertical: 14,
-                    paddingHorizontal: 16,
-                    borderBottomWidth: index === contributorsData.length - 1 ? 0 : 1,
-                    borderBottomColor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)',
-                  }}>
-                    <View style={{ flex: 1 }}>
-                      <Text style={[{ color: isDarkMode ? '#fff' : '#000', fontWeight: '600', fontSize: 16, marginBottom: 2 }]}>
-                        {contributor.name}
-                      </Text>
-                      {contributor.description && (
-                        <Text style={[{ color: isDarkMode ? '#999' : '#888', fontSize: 13, lineHeight: 18 }]}>
-                          {contributor.description}
-                        </Text>
-                      )}
-                    </View>
-                    <View style={{
-                      backgroundColor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
-                      padding: 6,
-                      borderRadius: 10
-                    }}>
-                      <Heart size={16} color={currentColorTheme.primary === '#ffffff' ? (isDarkMode ? '#ffffff' : '#4872F4') : currentColorTheme.primary} />
-                    </View>
-                  </View>
-                ))}
-              </View>
-            </ScrollView>
-
-            <TouchableOpacity
+              {/* ─── Compact gold-accent glass CTA ─── */}
+<TouchableOpacity
               style={[
-                styles.closeButton,
-                { backgroundColor: currentColorTheme.primary === '#ffffff' ? '#B8B8B8' : currentColorTheme.primary }
+                styles.supporterCta,
+                isDarkMode && styles.darkSupporterCta,
               ]}
-              onPress={toggleContributorsModal}
+              onPress={async () => {
+                try {
+                  await WebBrowser.openBrowserAsync('https://sites.google.com/view/bukulagukatolik?usp=sharing');
+                } catch (error) {
+                  console.error('Failed to open web browser:', error);
+                  Linking.openURL('https://sites.google.com/view/bukulagukatolik?usp=sharing');
+                }
+              }}
+              activeOpacity={0.85}
             >
-              <Text style={styles.closeButtonText}>{t('close')}</Text>
+              <View style={styles.supporterCtaTextWrap}>
+                <View style={styles.supporterCtaRow}>
+                  <View style={[styles.supporterCtaIcon, isDarkMode && styles.darkSupporterCtaIcon]}>
+                    <HandHeart size={14} color="#ffffff" strokeWidth={2.4} />
+                  </View>
+                  <Text style={[styles.supporterCtaText, isDarkMode && styles.darkSupporterCtaText]}>
+                    {t('catholicSongbookWeb')}
+                  </Text>
+                </View>
+                <Text style={[styles.supporterCtaSubtitle, isDarkMode && styles.darkSupporterCtaSubtitle]}>
+                  {currentLanguage === 'Melayu' ? 'Bantu saya, tolong tekan' : 'Help me, please tap'}
+                </Text>
+              </View>
             </TouchableOpacity>
+
+              {/* ─── Count line below CTA, above the grid ─── */}
+              <Text style={[styles.supporterCountBelowCta, isDarkMode && styles.darkSupporterCountBelowCta]}>
+                {t('contributorsCount')}
+              </Text>
+
+              {/* ─── 2-column grid (compact, no scroll) ─── */}
+              <View style={styles.supporterGrid}>
+                {contributorsData.map((contributor, index) => {
+                  // Split "Louis ( Parad )" → name="Louis", nick="Parad"
+                  const match = contributor.name.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
+                  const mainName = match ? match[1].trim() : contributor.name;
+                  const nickname = match ? match[2].trim() : null;
+                  return (
+                    <View
+                      key={index}
+                      style={[
+                        styles.supporterCell,
+                        isDarkMode && styles.darkSupporterCell,
+                      ]}
+                    >
+                      <Text
+                        style={[styles.supporterName, isDarkMode && styles.darkSupporterName]}
+                        numberOfLines={1}
+                      >
+                        {mainName}
+                      </Text>
+                      {nickname ? (
+                        <Text
+                          style={[styles.supporterNickname, isDarkMode && styles.darkSupporterNickname]}
+                          numberOfLines={1}
+                        >
+                          {nickname}
+                        </Text>
+                      ) : null}
+                    </View>
+                  );
+                })}
+              </View>
+
+              {/* ─── Contributor intro on bottom (full long "Tanpa mereka, app ini tidak akan dipublish...") ─── */}
+              <Text style={[styles.supporterFooterText, isDarkMode && styles.darkSupporterFooterText]}>
+                {t('contributorsIntro')}
+              </Text>
+            </ScrollView>
           </View>
         </View>
       </Modal>
@@ -738,29 +758,26 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   section: {
-    marginVertical: 10,
+    marginVertical: 6,
     backgroundColor: 'white',
-    borderRadius: 20,
-    marginHorizontal: 16,
+    borderRadius: 16,
+    marginHorizontal: 14,
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.06)',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 2,
   },
   darkSection: {
     backgroundColor: '#1C1C1E',
     borderColor: 'rgba(255,255,255,0.08)',
   },
   sectionTitle: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '700',
     color: '#8E8E93',
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 10,
     textTransform: 'uppercase',
     letterSpacing: 0.6,
   },
@@ -768,8 +785,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 14,
-    paddingHorizontal: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
     borderTopWidth: 1,
     borderTopColor: 'rgba(0,0,0,0.04)',
   },
@@ -781,8 +798,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   rowText: {
-    fontSize: 16,
-    marginLeft: 14,
+    fontSize: 15,
+    marginLeft: 12,
     color: '#333',
     fontWeight: '500',
   },
@@ -791,19 +808,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   selectedOption: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#999',
     marginRight: 8,
   },
   sectionHeader: {
-    paddingHorizontal: 20,
-    paddingTop: 18,
-    paddingBottom: 8,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 4,
   },
   iconContainer: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
+    width: 28,
+    height: 28,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -817,55 +834,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#666',
     fontWeight: '600',
-  },
-  // Support card (Sokong Pembangun) — gradient, prominent
-  supportCard: {
-    margin: 16,
-    marginTop: 4,
-    marginBottom: 4,
-    borderRadius: 16,
-    padding: 2,
-    backgroundColor: '#4872F4',
-    shadowColor: '#4872F4',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.28,
-    shadowRadius: 12,
-    elevation: 6,
-  },
-  darkSupportCard: {
-    backgroundColor: '#3a5fd8',
-    shadowColor: '#000',
-    shadowOpacity: 0.45,
-  },
-  supportCardInner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 14,
-    borderRadius: 14,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-  },
-  supportIconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.22)',
-    marginRight: 12,
-  },
-  darkSupportIconWrap: {
-    backgroundColor: 'rgba(255,255,255,0.14)',
-  },
-  supportTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#fff',
-  },
-  supportSubtitle: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.85)',
-    marginTop: 2,
   },
   // Language picker modal
   languageModalContent: {
@@ -931,6 +899,222 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // ─── Supporter modal (compact, scrollable, sticky close) ───
+  supporterModalContent: {
+    width: '88%',
+    maxHeight: '88%',
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 18,
+    paddingBottom: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.25,
+    shadowRadius: 15,
+    elevation: 8,
+  },
+  supporterModalScroll: {
+    flexGrow: 0,
+    flexShrink: 1,
+  },
+  // ─── Compact editorial header (centered, ornament + title + count) ───
+  supporterHero: {
+    alignItems: 'center',
+    paddingTop: 2,
+    paddingBottom: 10,
+  },
+  supporterHeroOrnament: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  supporterHeroLine: {
+    width: 22,
+    height: 1,
+    backgroundColor: '#D4AF37',
+    opacity: 0.6,
+    marginHorizontal: 6,
+  },
+  darkSupporterHeroLine: {
+    backgroundColor: '#8B7355',
+  },
+  supporterHeroTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1a1a1a',
+    letterSpacing: 0.3,
+    textAlign: 'center',
+  },
+  darkSupporterHeroTitle: {
+    color: '#F2F2F7',
+  },
+  supporterHeroCount: {
+    fontSize: 10,
+    color: '#888',
+    fontWeight: '600',
+    marginTop: 3,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+  },
+  darkSupporterHeroCount: {
+    color: '#8E8E93',
+  },
+  // ─── Count label below CTA, above the grid ───
+  supporterCountBelowCta: {
+    fontSize: 12,
+    color: '#666',
+    fontWeight: '500',
+    fontStyle: 'italic',
+    textAlign: 'center',
+    marginTop: 4,
+    marginBottom: 12,
+  },
+  darkSupporterCountBelowCta: {
+    color: '#AEAEB2',
+  },
+  // ─── Appreciation text on top (short "Terima kasih kepada pasukan...") ───
+  supporterIntro: {
+    fontSize: 13,
+    color: '#444',
+    lineHeight: 19,
+    textAlign: 'center',
+    fontWeight: '500',
+    paddingHorizontal: 12,
+    marginBottom: 14,
+  },
+  darkSupporterIntro: {
+    color: '#D1D1D6',
+  },
+  // ─── Solid blue filled CTA (proper action button, compact + centered) ───
+  supporterCta: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 24,
+    marginBottom: 14,
+    borderRadius: 16,
+    backgroundColor: '#4872F4',
+    shadowColor: '#4872F4',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.5,
+    shadowRadius: 14,
+    elevation: 8,
+    minWidth: 240,
+  },
+  darkSupporterCta: {
+    backgroundColor: '#0A84FF',
+    shadowColor: '#0A84FF',
+    shadowOpacity: 0.6,
+  },
+  supporterCtaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+  },
+  supporterCtaIcon: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: 'rgba(255,255,255,0.22)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+  darkSupporterCtaIcon: {
+    backgroundColor: 'rgba(255,255,255,0.22)',
+  },
+  supporterCtaTextWrap: {
+    alignItems: 'center',
+    alignSelf: 'stretch',
+  },
+  supporterCtaText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#ffffff',
+    letterSpacing: 0.3,
+    textAlign: 'center',
+    lineHeight: 20,
+    includeFontPadding: false,
+  },
+  darkSupporterCtaText: {
+    color: '#ffffff',
+  },
+  supporterCtaSubtitle: {
+    fontSize: 10.5,
+    color: 'rgba(255,255,255,0.85)',
+    fontWeight: '500',
+    marginTop: 2,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    lineHeight: 14,
+    includeFontPadding: false,
+  },
+  darkSupporterCtaSubtitle: {
+    color: 'rgba(255,255,255,0.85)',
+  },
+  // ─── 2-column compact grid (no scroll) ───
+  supporterGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginHorizontal: -4,
+  },
+  supporterCell: {
+    width: '50%',
+    paddingHorizontal: 4,
+    paddingBottom: 6,
+  },
+  darkSupporterCell: {},
+  supporterName: {
+    fontSize: 13,
+    color: '#1a1a1a',
+    fontWeight: '700',
+    textAlign: 'center',
+    letterSpacing: 0.1,
+  },
+  darkSupporterName: {
+    color: '#F2F2F7',
+  },
+  supporterNickname: {
+    fontSize: 10,
+    color: '#888',
+    fontStyle: 'italic',
+    textAlign: 'center',
+    marginTop: 1,
+    fontWeight: '500',
+  },
+  darkSupporterNickname: {
+    color: '#8E8E93',
+  },
+  // ─── Contributor intro on bottom (long "Tanpa mereka, app ini tidak akan dipublish...") ───
+  supporterFooterText: {
+    fontSize: 12,
+    color: '#555',
+    fontWeight: '500',
+    textAlign: 'center',
+    lineHeight: 17,
+    paddingHorizontal: 12,
+    paddingTop: 10,
+    paddingBottom: 4,
+  },
+  darkSupporterFooterText: {
+    color: '#AEAEB2',
+  },
+  // ─── Close X button (absolute top-right of modal) ───
+  supporterCloseX: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    zIndex: 10,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(0,0,0,0.06)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -962,26 +1146,6 @@ const styles = StyleSheet.create({
   languageText: {
     fontSize: 16,
     color: '#333',
-  },
-  closeButton: {
-    marginTop: 25,
-    width: 160,
-    alignSelf: 'center',
-    backgroundColor: '#4872F4',
-    paddingVertical: 14,
-    borderRadius: 14,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 4,
-  },
-  closeButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
-    letterSpacing: 0.5,
   },
   colorPreview: {
     width: 16,

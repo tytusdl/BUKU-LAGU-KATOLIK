@@ -154,22 +154,6 @@ export default function ContactModal({
               <ChevronRight size={20} color={isDarkMode ? '#666' : '#999'} />
             </TouchableOpacity>
           )}
-
-          {/* Cancel button */}
-          <TouchableOpacity
-            style={[
-              styles.cancelButton,
-              { backgroundColor: isDarkMode ? '#333' : '#e0e0e0' }
-            ]}
-            onPress={onClose}
-          >
-            <Text style={[
-              styles.cancelButtonText,
-              { color: isDarkMode ? '#fff' : '#333' }
-            ]}>
-              {t('cancel')}
-            </Text>
-          </TouchableOpacity>
         </View>
       </View>
     </Modal>
@@ -254,17 +238,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#888',
     lineHeight: 16,
-  },
-  cancelButton: {
-    marginTop: 6,
-    paddingVertical: 13,
-    borderRadius: 14,
-    alignItems: 'center',
-    backgroundColor: '#e0e0e0',
-  },
-  cancelButtonText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#333',
   },
 });

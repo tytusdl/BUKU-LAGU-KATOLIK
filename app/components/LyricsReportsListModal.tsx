@@ -225,17 +225,6 @@ export default function LyricsReportsListModal({
               })
             )}
           </ScrollView>
-
-          {/* Footer */}
-          <TouchableOpacity
-            style={[
-              styles.footerButton,
-              { backgroundColor: currentColorTheme.primary === '#ffffff' ? '#4872F4' : currentColorTheme.primary }
-            ]}
-            onPress={onClose}
-          >
-            <Text style={styles.footerButtonText}>{t('close')}</Text>
-          </TouchableOpacity>
         </View>
       </View>
     </Modal>
@@ -368,17 +357,5 @@ const styles = StyleSheet.create({
   deleteButton: {
     padding: 4,
     marginLeft: 8,
-  },
-  footerButton: {
-    paddingVertical: 14,
-    borderRadius: 14,
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  footerButtonText: {
-    color: '#fff',
-    fontSize: 15,
-    fontWeight: '700',
-    letterSpacing: 0.5,
   },
 });
