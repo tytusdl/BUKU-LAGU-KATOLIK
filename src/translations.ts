@@ -353,6 +353,15 @@ export const translations = {
     saveButton: 'Simpan',
     saveAsTitle: 'Simpan lagu ini?',
     lyricsEmpty: 'Sila masukkan lirik lagu',
+
+    // Rate this app — in-app review prompt (v.x.x)
+    rateAppTitle: 'Suka Buku Lagu Katolik?',
+    rateAppMessage: 'Jika aplikasi ini membantu ibadah anda, luangkan masa sebentar untuk berikan rating di App Store. Sokongan anda sangat bermakna!',
+    rateAppRate: 'Rate Sekarang',
+    rateAppLater: 'Nanti',
+    rateAppNever: 'Jangan Tanya Lagi',
+    rateAppSettingsTitle: 'Beri Rating Aplikasi',
+    rateAppSettingsDesc: 'Buka halaman rating di App Store / Play Store',
   },
   'English': {
     searchPlaceholder: 'Search songs by title or number',
@@ -708,5 +717,14 @@ export const translations = {
     saveButton: 'Save',
     saveAsTitle: 'Save this song?',
     lyricsEmpty: 'Please enter the song lyrics',
+
+    // Rate this app — in-app review prompt (v.x.x)
+    rateAppTitle: 'Enjoying Buku Lagu Katolik?',
+    rateAppMessage: 'If this app helps your worship, please take a moment to rate it on the App Store. Your support means a lot!',
+    rateAppRate: 'Rate Now',
+    rateAppLater: 'Later',
+    rateAppNever: 'Don\u2019t Ask Again',
+    rateAppSettingsTitle: 'Rate This App',
+    rateAppSettingsDesc: 'Open the rating page on the App Store / Play Store',
   }
 };

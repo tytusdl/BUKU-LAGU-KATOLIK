@@ -16,6 +16,41 @@ export interface ChangelogEntry {
 // Add new versions at the top of the list
 export const changelogData: ChangelogEntry[] = [
     {
+        version: "1.9.1",
+        changes: [
+            {
+                text: {
+                    Melayu: "Ciri Baru - Rating Aplikasi: Suka aplikasi ini? Selepas beberapa lama menggunakan, anda akan digesa untuk memberi rating di App Store atau Google Play. Sokongan anda sangat membantu pembangun.",
+                    English: "New Feature - Rate the App: Enjoying the app? After using it for a while, you'll be invited to rate it on the App Store or Google Play. Your support means a lot to the developer."
+                }
+            },
+            {
+                text: {
+                    Melayu: "Butang 'Beri Rating' di Tetapan: Anda boleh membuka halaman rating secara manual bila-bila masa dari menu Tetapan.",
+                    English: "'Rate This App' Button in Settings: You can open the rating page manually at any time from the Settings menu."
+                }
+            },
+            {
+                text: {
+                    Melayu: "Gesaan Bijak: Aplikasi tidak akan mengganggu anda — gesaan hanya muncul selepas beberapa lagu dibuka, dengan jeda 60 hari antara gesaan, dan boleh dimatikan terus dari notis.",
+                    English: "Smart Prompts: The app won't pester you — the prompt only appears after several songs have been opened, with a 60-day cooldown between prompts, and can be dismissed permanently from the notification itself."
+                }
+            },
+            {
+                text: {
+                    Melayu: "Pembaikan & Kestabilan: Beberapa pepijat kecil dibaiki untuk pengalaman yang lebih lancar.",
+                    English: "Fixes & Stability: Several minor bugs were fixed for a smoother experience."
+                }
+            },
+            {
+                text: {
+                    Melayu: "Memperbaiki lirik lagu A17 (percobaan → pencobaan), R351 (Tuban → Tuhan), M25 (kasibi → kasihi), dan R225 (lirik tidak lengkap).",
+                    English: "Fixed lyrics for A17 (percobaan → pencobaan), R351 (Tuban → Tuhan), M25 (kasibi → kasihi), and R225 (incomplete lyrics)."
+                }
+            }
+        ]
+    },
+    {
         version: "1.9.0",
         changes: [
             {

@@ -4906,7 +4906,26 @@ Ah... ah.. ah... ah
 T'rimalah persembahan kami
 
 Ya Tuhan terimalah kami
-Yang datang dengan rendah hati`,
+Yang datang dengan rendah hati
+Dan menyesali dosa kami
+T'rimalah persembahan kami
+
+Korus:
+Ku angkat tanganku ya Tuhan
+T'rimalah persembahan kami
+Ku serah dan memuji namaMu
+ya Tuhan
+T'rimalah demi kemuliaanMu
+
+Ku tahu dan percaya
+RahimMu tak terhingganya
+Ya TuhanKu yang maha tinggi
+T'rimalah persembahan kami
+
+Kuduslah hidupku Tuhan
+Untuk menjadi persembahan
+Agar menjadi milikMu semua
+T'rimalah persembahan kami`,
     songNumber: 'R'
   },
   {
@@ -8147,7 +8166,7 @@ dalam segala kelimpahan.
 CintakasihMu tak terbatas
 Mengasihi segenap manusia
 Sedarlah wahai umat semua
-Tuban sumber kehidupan
+Tuhan sumber kehidupan
 Kehidupan.....`,
     songNumber: 'R'
   },

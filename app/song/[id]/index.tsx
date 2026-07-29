@@ -11,6 +11,7 @@ import { useFavorites } from '../../context/FavoritesContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useMySongs, UserSong } from '../../context/MySongsContext';
 import { useMass } from '../../context/MassContext';
+import { useReview } from '../../context/ReviewContext';
 import { StatusBar } from 'expo-status-bar';
 import * as Clipboard from 'expo-clipboard';
 import * as Sharing from 'expo-sharing';
@@ -32,6 +33,7 @@ export default function SongDetail() {
 
   const { mySongs, removeMySong, editMySong } = useMySongs();
   const { favorites } = useFavorites();
+  const { trackSongOpened } = useReview();
 
   const [fontSize, setFontSize] = useState(18);
   const { isFavorite, addToFavorites, removeFromFavorites } = useFavorites();
@@ -193,6 +195,20 @@ export default function SongDetail() {
       setNextSongId(null);
     }
   }, [song, isUserSong, mySongs, allSongs, fromFavorites, favorites, fromMass, massSelection]);
+
+  // Count this as a "song opened" for the in-app review prompt. Only fires
+  // when `song` is truthy, so "song not found" navigations don't bump the
+  // counter. Wrapped in a delay so the actual `requestReview` dialog
+  // (triggered inside ReviewContext) doesn't pop while the song page is
+  // still mounting.
+  useEffect(() => {
+    if (!id || !song) return;
+    const t = setTimeout(() => {
+      trackSongOpened().catch(() => {});
+    }, 1500);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   if (!song) {
     return (

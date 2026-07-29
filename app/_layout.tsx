@@ -8,6 +8,7 @@ import ThemeProvider, { useTheme } from './context/ThemeContext';
 import { MySongsProvider, useMySongs, UserSong } from './context/MySongsContext';
 import { MassProvider } from './context/MassContext';
 import { LyricsReportProvider } from './context/LyricsReportContext';
+import { ReviewProvider } from './context/ReviewContext';
 
 import { Asset } from 'expo-asset';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -445,18 +446,20 @@ export default function RootLayout() {
             <MySongsProvider>
               <MassProvider>
                 <LyricsReportProvider>
-                  <ThemedApp appIsReady={appIsReady} />
-                  {/* Splash overlays the app until its exit animation
-                      completes. Reanimated's `exiting={FadeOut.duration(800)}`
-                      handles the fade; we keep it mounted for the duration
-                      so React doesn't reconcile a brand-new tree exactly
-                      when the user sees the swap. Once the fade would have
-                      visibly ended, we unmount for memory. */}
-                  {!splashDone && (
-                    <AnimatedSplash
-                      onAnimationFinish={() => setSplashAnimationFinished(true)}
-                    />
-                  )}
+                  <ReviewProvider>
+                    <ThemedApp appIsReady={appIsReady} />
+                    {/* Splash overlays the app until its exit animation
+                        completes. Reanimated's `exiting={FadeOut.duration(800)}`
+                        handles the fade; we keep it mounted for the duration
+                        so React doesn't reconcile a brand-new tree exactly
+                        when the user sees the swap. Once the fade would have
+                        visibly ended, we unmount for memory. */}
+                    {!splashDone && (
+                      <AnimatedSplash
+                        onAnimationFinish={() => setSplashAnimationFinished(true)}
+                      />
+                    )}
+                  </ReviewProvider>
                 </LyricsReportProvider>
               </MassProvider>
             </MySongsProvider>

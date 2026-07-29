@@ -459,7 +459,7 @@ Do ngaavi tanak Nu`,
     title: 'KAMI DATANG BERSERU-SERU',
     lyrics: `Tuhan ku yang maha pengasih
 Selalu bersamaku
-Dalam godaan dan percobaan
+Dalam godaan dan pencobaan
 Ku dipimpinNya s'lalu
 
 Kor:  Kami datang berseru-seru,
@@ -6118,7 +6118,7 @@ Ke langit yang tertinggi
 Jiwaku berseru:
 
 Dend: Segala manusia
-Kasibi Allahku
+Kasihi Allahku
 Kepada Hati Yesus
 Berilah hatimu
 Kepada Hati Yesus

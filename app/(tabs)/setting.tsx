@@ -2,7 +2,7 @@ import { useFocusEffect } from 'expo-router';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, StyleSheet, Switch, ScrollView, TouchableOpacity, Modal, Alert, Linking, Animated } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { ChevronRight, Moon, Globe, HelpCircle, Check, Palette, Heart, ChevronUp, Sparkles, Mail, HandHeart, X } from 'lucide-react-native';
+import { ChevronRight, Moon, Globe, HelpCircle, Check, Palette, Heart, ChevronUp, Sparkles, Mail, HandHeart, X, Star } from 'lucide-react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme, colorThemes, darkColorThemes } from '../context/ThemeContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -18,6 +18,7 @@ import { useLyricsReports } from '../context/LyricsReportContext';
 import LyricsReportsListModal from '../components/LyricsReportsListModal';
 import ContactModal from '../components/ContactModal';
 import PageHeader from '../components/PageHeader';
+import { useReview } from '../context/ReviewContext';
 
 export default function SettingScreen() {
   const { isDarkMode, toggleTheme, currentColorTheme, colorThemeId, setColorTheme } = useTheme();
@@ -36,6 +37,17 @@ export default function SettingScreen() {
   const scrollY = useRef(new Animated.Value(0)).current;
   const { reports: lyricsReports } = useLyricsReports();
   const insets = useSafeAreaInsets();
+  const { requestReview, openStorePage, isAvailable } = useReview();
+
+  // Manually trigger the in-app review dialog from Settings. Falls back to
+  // the store page if the OS doesn't support in-app review (e.g. iOS simulator
+  // or some Android flavours).
+  const handleRateApp = async () => {
+    const ok = await requestReview();
+    if (!ok) {
+      await openStorePage();
+    }
+  };
 
   // Auto-collapse changelog when leaving the screen
   useFocusEffect(
@@ -329,6 +341,23 @@ export default function SettingScreen() {
                 <Mail size={17} color={isDarkMode ? "#5DD879" : "#34C759"} strokeWidth={2.2} />
               </View>
               <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('helpContact')}</Text>
+            </View>
+            <ChevronRight size={18} color={isDarkMode ? "#666" : "#999"} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.row, isDarkMode && styles.darkRow]}
+            onPress={handleRateApp}
+            activeOpacity={0.7}
+          >
+            <View style={styles.rowContent}>
+              <View style={[styles.iconContainer, { backgroundColor: isDarkMode ? 'rgba(255,159,10,0.18)' : 'rgba(255,159,10,0.12)' }]}>
+                <Star size={17} color={isDarkMode ? "#FFCB6B" : "#FF9F0A"} strokeWidth={2.2} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('rateAppSettingsTitle')}</Text>
+                <Text style={[styles.rowSubText, isDarkMode && styles.darkSubText]}>{t('rateAppSettingsDesc')}</Text>
+              </View>
             </View>
             <ChevronRight size={18} color={isDarkMode ? "#666" : "#999"} />
           </TouchableOpacity>
@@ -802,6 +831,16 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     color: '#333',
     fontWeight: '500',
+  },
+  rowSubText: {
+    fontSize: 12,
+    marginLeft: 12,
+    marginTop: 2,
+    color: '#888',
+    fontWeight: '400',
+  },
+  darkSubText: {
+    color: '#888',
   },
   rowRight: {
     flexDirection: 'row',
