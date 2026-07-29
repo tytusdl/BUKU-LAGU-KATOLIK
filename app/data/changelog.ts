@@ -44,8 +44,8 @@ export const changelogData: ChangelogEntry[] = [
             },
             {
                 text: {
-                    Melayu: "Memperbaiki lirik lagu A17 (percobaan → pencobaan), R351 (Tuban → Tuhan), M25 (kasibi → kasihi), R225 (lirik tidak lengkap), R274 (Tingallah → Tinggallah, di dalamNya → di dalam-Nya), dan R445 (kounisikaan → kounsikaan).",
-                    English: "Fixed lyrics for A17 (percobaan → pencobaan), R351 (Tuban → Tuhan), M25 (kasibi → kasihi), R225 (incomplete lyrics), R274 (Tingallah → Tinggallah, di dalamNya → di dalam-Nya), and R445 (kounisikaan → kounsikaan)."
+                    Melayu: "Memperbaiki lirik lagu A17 (percobaan → pencobaan), R351 (Tuban → Tuhan), M25 (kasibi → kasihi), R225 (lirik tidak lengkap), R274 (perubahan dan pembaikan lirik), dan R445 (kounisikaan → kounsikaan).",
+                    English: "Fixed lyrics for A17 (percobaan → pencobaan), R351 (Tuban → Tuhan), M25 (kasibi → kasihi), R225 (incomplete lyrics), R274 (lyrics changes and fixes), and R445 (kounisikaan → kounsikaan)."
                 }
             }
         ]
