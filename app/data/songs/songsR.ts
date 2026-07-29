@@ -10512,7 +10512,7 @@ Palungan tempatnya`,
 P : Ih pohubukon za kumaa doid diau
 L :Miampai koginavaan
 P :Om id pibabasan
-L&P:Pataakon za Diau miampai kounisikaan
+L&P:Pataakon za Diau miampai kounsikaan
 
 Korus : Toimoo no, toimoo no
 Iti ngaavi titaak za
