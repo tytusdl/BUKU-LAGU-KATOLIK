@@ -6145,12 +6145,11 @@ Kau berikan hidup abadi`,
     id: 'R274',
     title: 'YESUS POKOK DAN KITA CABANGNYA',
     lyrics: `Yesus pokok dan kita cabangnya
-Tinggallah di dalam-Nya (3×)
-Pastilah Kau akan berbuah...
+Tinggallah di dalam-Nya
+Pastilah kau akan berbuah (2x)
 
-Yesus cintaku...
-Ku cinta kau...
-Kau cinta Dia... (2×)`,
+Yesus cintaku, ku cinta kau
+Kau cinta Dia (2x)`,
     songNumber: 'R'
   },
   {
