@@ -194,7 +194,15 @@ export const ReviewProvider = ({ children }: ReviewProviderProps) => {
     try {
       // iOS uses the App Store review action URL; Android uses the package id.
       // StoreReview.storeUrl() picks the right one for the current platform.
-      const url = await StoreReview.storeUrl();
+      let url = await StoreReview.storeUrl();
+      // Manifest-based URL can be empty in some dev builds — fall back to the
+      // known store listings so the button still does something.
+      if (!url) {
+        url =
+          Platform.OS === 'ios'
+            ? 'https://apps.apple.com/app/buku-lagu-katolik/id6479187123'
+            : 'https://play.google.com/store/apps/details?id=com.tytusdl.lagu_pozoo';
+      }
       if (url) {
         await Linking.openURL(url);
       }

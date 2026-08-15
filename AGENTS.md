@@ -207,6 +207,23 @@ in this repo.
 - **Bilingual alerts**: `Alert.alert` copy in `_layout.tsx` already
   branches on `currentLanguage`. Re-use that pattern instead of writing
   English-only `Alert`s in new code.
+- **Settings row chevron alignment when adding subtitle text**: rows
+  in `app/(tabs)/setting.tsx` use `styles.row` (default
+  `alignItems: 'center'`). When you add a second-line subtitle
+  (`rowSubText` inside a `flex: 1` View between the icon and the
+  text), the row height grows but the bare `ChevronRight` sibling
+  stays centered on the WHOLE row height — so it visually shifts
+  upward relative to the title line, looking misaligned. Two safe
+  patterns: (a) keep row single-line (no subtitle), like all the
+  other rows in this screen; (b) if a subtitle is required, replace
+  the bare `ChevronRight` with a wrapper View that aligns to the
+  first text line, e.g. wrap title+subtitle in the column View
+  and place the chevron at `marginTop` matching the title line's
+  vertical center (~icon center = (28 - 18) / 2 = 5px in this
+  project). Don't use `alignItems: 'flex-start'` on both outer
+  and inner row — it pulls the chevron to the row top while the
+  text content sits below, making the misalignment worse. Reference
+  bug: "Beri Rating Aplikasi" row in 1.9.1.
 - **Update modal**: store check (raw `version.json`) runs first, then OTA
   via `expo-updates`. Set `DEBUG_FORCE_SHOW_UPDATE` to preview locally.
 - **`version.json` fetch silently fails if the repo is private.** The

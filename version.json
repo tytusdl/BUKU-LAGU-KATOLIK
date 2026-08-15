@@ -5,16 +5,10 @@
   "iosUrl": "https://apps.apple.com/app/buku-lagu-katolik/id6479187123",
   "releaseNotes": {
     "Melayu": [
-      "Ciri Baru - Rating Aplikasi: Suka aplikasi ini? Selepas beberapa lama menggunakan, anda akan digesa untuk memberi rating di App Store atau Google Play.",
-      "Butang 'Beri Rating' di Tetapan: Buka halaman rating secara manual dari menu Tetapan.",
-      "Gesaan Bijak: Aplikasi tidak mengganggu — gesaan hanya muncul selepas beberapa lagu dibuka, dengan jeda 60 hari, dan boleh dimatikan terus.",
       "Pembaikan & Kestabilan: Beberapa pepijat kecil dibaiki.",
       "Memperbaiki lirik lagu A17 (percobaan → pencobaan) dan R351 (Tuban → Tuhan)."
     ],
     "English": [
-      "New Feature - Rate the App: Enjoying the app? After using it for a while, you'll be invited to rate it on the App Store or Google Play.",
-      "'Rate This App' Button in Settings: Open the rating page manually from the Settings menu.",
-      "Smart Prompts: The app won't pester you — prompt only appears after several songs have been opened, with a 60-day cooldown, and can be dismissed permanently.",
       "Fixes & Stability: Several minor bugs were fixed.",
       "Fixed lyrics for A17 (percobaan → pencobaan) and R351 (Tuban → Tuhan)."
     ]

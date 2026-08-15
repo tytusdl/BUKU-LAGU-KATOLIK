@@ -43,9 +43,13 @@ export default function SettingScreen() {
   // the store page if the OS doesn't support in-app review (e.g. iOS simulator
   // or some Android flavours).
   const handleRateApp = async () => {
-    const ok = await requestReview();
-    if (!ok) {
-      await openStorePage();
+    try {
+      const ok = await requestReview();
+      if (!ok) {
+        await openStorePage();
+      }
+    } catch (err) {
+      console.warn('[RateApp] handler error:', err);
     }
   };
 
@@ -354,10 +358,7 @@ export default function SettingScreen() {
               <View style={[styles.iconContainer, { backgroundColor: isDarkMode ? 'rgba(255,159,10,0.18)' : 'rgba(255,159,10,0.12)' }]}>
                 <Star size={17} color={isDarkMode ? "#FFCB6B" : "#FF9F0A"} strokeWidth={2.2} />
               </View>
-              <View style={{ flex: 1 }}>
-                <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('rateAppSettingsTitle')}</Text>
-                <Text style={[styles.rowSubText, isDarkMode && styles.darkSubText]}>{t('rateAppSettingsDesc')}</Text>
-              </View>
+              <Text style={[styles.rowText, isDarkMode && styles.darkText]}>{t('rateAppSettingsTitle')}</Text>
             </View>
             <ChevronRight size={18} color={isDarkMode ? "#666" : "#999"} />
           </TouchableOpacity>

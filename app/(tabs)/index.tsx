@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, FlatList, TouchableOpacity, Image, BackHandler, Platform, Alert, Modal, ActivityIndicator, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, FlatList, TouchableOpacity, Image, BackHandler, Platform, Alert, Modal, ActivityIndicator, useWindowDimensions, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Bell, Search, Heart, CheckCircle, ArrowLeft } from 'lucide-react-native';
+import { Bell, Search, Heart, CheckCircle, ArrowLeft, HandHeart } from 'lucide-react-native';
 import { router, useFocusEffect, useNavigation } from 'expo-router';
 import { songs as allSongs } from '../data/songs';
 import { useTheme } from '../context/ThemeContext';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Updates from 'expo-updates';
+import * as WebBrowser from 'expo-web-browser';
 import { translations } from '../../src/translations'; // Updated import path
 import { useFavorites } from '../context/FavoritesContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -591,6 +592,34 @@ export default function HomeScreen() {
             >Pozoo No Kinoingan</Text>
           </View>
         </View>
+
+        {/* ─── Sokongan Pembangunan icon (top-right, no label) — HIDDEN for now ─── */}
+        {false && (
+        <TouchableOpacity
+          style={[
+            styles.supporterIconButton,
+            isDarkMode && { backgroundColor: 'rgba(255,69,58,0.25)', borderWidth: 1, borderColor: 'rgba(255,122,107,0.4)' },
+            !isDarkMode && currentColorTheme.id === 'white' && { backgroundColor: 'rgba(255,69,58,0.14)', borderWidth: 1, borderColor: 'rgba(255,69,58,0.25)' },
+            !isDarkMode && currentColorTheme.id !== 'white' && { backgroundColor: 'rgba(255,255,255,0.22)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)' },
+          ]}
+          onPress={async () => {
+            try {
+              await WebBrowser.openBrowserAsync('https://sites.google.com/view/bukulagukatolik?usp=sharing');
+            } catch (error) {
+              console.error('Failed to open web browser:', error);
+              Linking.openURL('https://sites.google.com/view/bukulagukatolik?usp=sharing');
+            }
+          }}
+          activeOpacity={0.7}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <HandHeart
+            size={22}
+            color={isDarkMode ? '#FF7A6B' : (currentColorTheme.id === 'white' ? '#FF453A' : '#ffffff')}
+            strokeWidth={2.4}
+          />
+        </TouchableOpacity>
+        )}
       </View>
 
       <View style={styles.searchContainer}>
@@ -761,6 +790,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
+  },
+  // ─── Top-right supporter icon button (Sokongan Pembangunan, icon only) — hidden for now ───
+  supporterIconButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 8,
+    flexShrink: 0,
   },
   logoContainer: {
     flexDirection: 'row',

@@ -361,7 +361,6 @@ export const translations = {
     rateAppLater: 'Nanti',
     rateAppNever: 'Jangan Tanya Lagi',
     rateAppSettingsTitle: 'Beri Rating Aplikasi',
-    rateAppSettingsDesc: 'Buka halaman rating di App Store / Play Store',
   },
   'English': {
     searchPlaceholder: 'Search songs by title or number',
@@ -725,6 +724,5 @@ export const translations = {
     rateAppLater: 'Later',
     rateAppNever: 'Don\u2019t Ask Again',
     rateAppSettingsTitle: 'Rate This App',
-    rateAppSettingsDesc: 'Open the rating page on the App Store / Play Store',
   }
 };

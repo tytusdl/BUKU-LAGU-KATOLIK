@@ -47,6 +47,7 @@
     "owner": "tytusdl",
     "android": {
       "package": "com.tytusdl.lagu_pozoo",
+      "playStoreUrl": "https://play.google.com/store/apps/details?id=com.tytusdl.lagu_pozoo",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#2B5937"
@@ -89,6 +90,7 @@
       "name": "Buku Lagu Katolik",
       "supportsTablet": true,
       "bundleIdentifier": "com.tytusdl.lagu-pozoo",
+      "appStoreUrl": "https://apps.apple.com/app/buku-lagu-katolik/id6479187123",
       "buildNumber": "1.9.1",
       "jsEngine": "hermes",
       "infoPlist": {
