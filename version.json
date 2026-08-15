@@ -5,12 +5,14 @@
   "iosUrl": "https://apps.apple.com/app/buku-lagu-katolik/id6479187123",
   "releaseNotes": {
     "Melayu": [
-      "Pembaikan & Kestabilan: Beberapa pepijat kecil dibaiki.",
-      "Memperbaiki lirik lagu A17 (percobaan → pencobaan) dan R351 (Tuban → Tuhan)."
+      "Pembaikan & Kestabilan: Beberapa pepijat kecil dibaiki untuk pengalaman yang lebih lancar.",
+      "Memperbaiki lirik lagu A17 (percobaan → pencoboan), R351 (Tuban → Tuhan), M25 (kasibi → kasihi), R225 (lirik tidak lengkap), R274 (perubahan dan pembaikan lirik), dan R445 (kounisikaan → kounsikaan).",
+      "Membaiki: 40 lagu (R160–R199) tak boleh disimpan dalam senarai Misa. Kini semua lagu boleh ditambah ke mana-mana bahagian Misa."
     ],
     "English": [
-      "Fixes & Stability: Several minor bugs were fixed.",
-      "Fixed lyrics for A17 (percobaan → pencobaan) and R351 (Tuban → Tuhan)."
+      "Fixes & Stability: Several minor bugs were fixed for a smoother experience.",
+      "Fixed lyrics for A17 (percobaan → pencobaan), R351 (Tuban → Tuhan), M25 (kasibi → kasihi), R225 (incomplete lyrics), R274 (lyrics changes and fixes), and R445 (kounisikaan → kounsikaan).",
+      "Fixed: 40 songs (R160–R199) couldn't be saved to the Mass list. Now every song can be added to any Mass part."
     ]
   },
   "forceUpdate": false
