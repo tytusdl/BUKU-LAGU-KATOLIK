@@ -234,8 +234,11 @@ in this repo.
   skipped or failed` and falls through. **Users on older versions never
   see the update modal** until the repo is public again — Play Store's
   own update nag is gradual and misses many users. Always verify the URL
-  is reachable (HTTP 200) after any repo visibility / branch rename,
-  otherwise the in-app update prompt silently dies.
+   is reachable (HTTP 200) after any repo visibility / branch rename,
+   otherwise the in-app update prompt silently dies.
+- **Setiap ada versi baru: WAJIB push `version.json` ke GitHub (`master`).**
+   Ringkasan peraturan dalam HARD RULE di bahagian "Release flow" di atas —
+   jangan skip walau release kecil, kalau tak prompt update dalam-app mati.
 - **.bak files**: `*.bak.tsx` are excluded from `tsconfig`; leave them
   alone unless you are actively restoring from one.
 - **Song DB size**: `songs.ts` is ~6.5k lines because lyrics are inlined.
