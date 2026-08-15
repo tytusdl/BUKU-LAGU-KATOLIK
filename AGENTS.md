@@ -267,18 +267,38 @@ in this repo.
 
 1. Bump `version` in `package.json` and `app.json` (and `ios.buildNumber`).
 2. Edit `app/data/changelog.ts` — add a new entry at the top of
-   `changelogData` with bilingual `text` per change.
+   `changelogData` with bilingual `text` per change. The first
+   release-note bullet SHOULD be the in-app modal copy (2–3 short
+   lines), the same set of bullets gets mirrored into the in-app
+   "Apa Yang Baharu" changelog.
 3. Edit the root `version.json` (used by the store-version check):
    bump `version`, add `releaseNotes` in both languages, decide
    `forceUpdate` and `minVersion`.
-4. Run `npx tsc --noEmit` and `npm run lint`; both must pass.
-5. **Commit AND push `version.json` to `master` on the public repo.**
+4. **`version.json` releaseNotes MUST mirror `app/data/changelog.ts` for
+   the same version.** The store-version modal reads from
+   `version.json` on GitHub; the in-app "Apa Yang Baharu" tab reads
+   from `app/data/changelog.ts`. If the two diverge, users see one
+   set of notes in the update prompt and a different set in the
+   in-app changelog — looks like the dev forgot half the work.
+   Copy the `changes` array from `changelogData` into
+   `version.json:releaseNotes` (only the `text` field; the `note`
+   credit line is fine to drop if too long). Do NOT hand-write a
+   shorter summary — that's how 1.9.1 shipped with only 2 bullets
+   in the modal while the in-app changelog had 3.
+5. Run `npx tsc --noEmit` and `npm run lint`; both must pass.
+6. **Commit AND push `version.json` to `master` on the public repo.**
    This is what the in-app updater reads on launch — a missed push
    means every user still on the previous build will never see the
    update prompt. After pushing, sanity-check
    `https://raw.githubusercontent.com/tytusdl/BUKU-LAGU-KATOLIK/master/version.json`
-   returns the new version (not 404, not the old version).
-6. Commit on a branch, push, then `eas build --profile preview` (or
+   returns the new version (not 404, not the old version) AND that
+   `releaseNotes` contains every bullet from the in-app changelog
+   (count and content). `raw.githubusercontent.com` has a ~5 min
+   cache on the `master` ref — pin to a commit SHA
+   (`raw.githubusercontent.com/<owner>/<repo>/<sha>/version.json`)
+   to verify immediately, or wait 5 min for the branch ref to
+   refresh.
+7. Commit on a branch, push, then `eas build --profile preview` (or
    `production` for store).
 
 ## Build flow (EAS Build)
