@@ -35,6 +35,12 @@ export const changelogData: ChangelogEntry[] = [
                     Melayu: "Membaiki: 40 lagu (R160–R199) tak boleh disimpan dalam senarai Misa. Kini semua lagu boleh ditambah ke mana-mana bahagian Misa.",
                     English: "Fixed: 40 songs (R160–R199) couldn't be saved to the Mass list. Now every song can be added to any Mass part."
                 }
+            },
+            {
+                text: {
+                    Melayu: "Pengguna iOS: update mungkin ambil masa 1–3 hari untuk diluluskan Apple. Sila semak App Store selepas itu untuk kemas kini.",
+                    English: "iOS users: the update may take 1–3 days for Apple to approve. Please check the App Store afterwards for the update."
+                }
             }
         ]
     },
