@@ -35,6 +35,12 @@ export const changelogData: ChangelogEntry[] = [
                     Melayu: "Membaiki: 40 lagu (R160–R199) tak boleh disimpan dalam senarai Misa. Kini semua lagu boleh ditambah ke mana-mana bahagian Misa.",
                     English: "Fixed: 40 songs (R160–R199) couldn't be saved to the Mass list. Now every song can be added to any Mass part."
                 }
+            },
+            {
+                text: {
+                    Melayu: "Info iOS: Update untuk iOS mungkin ambil masa 1–3 hari untuk diluluskan oleh Apple. Android biasanya lebih cepat (beberapa jam hingga sehari).",
+                    English: "iOS Note: The iOS update may take 1–3 days to be approved by Apple. Android updates are usually faster (a few hours to one day)."
+                }
             }
         ]
     },
