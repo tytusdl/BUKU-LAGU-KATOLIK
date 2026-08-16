@@ -285,6 +285,17 @@ in this repo.
    credit line is fine to drop if too long). Do NOT hand-write a
    shorter summary — that's how 1.9.1 shipped with only 2 bullets
    in the modal while the in-app changelog had 3.
+   **Add an iOS App Store review note** as the last bullet in BOTH
+   `changelog.ts` and `version.json` (bilingual). The modal copy
+   lives in `src/translations.ts:updateAppMessage` (read by
+   `UpdateModal.tsx`) and is shipped with the app bundle, so it
+   only reaches users on the next EAS build. Putting the same
+   note in `version.json` makes it visible to users on the
+   *current* build the moment the cache refreshes on the GitHub
+   ref (~5 min after the push), so iOS users who haven't
+   installed the new build yet still see the explanation. Use the
+   established bilingual template (Melayu / English) and include
+   the "Sila semak App Store selepas itu" tip.
 5. Run `npx tsc --noEmit` and `npm run lint`; both must pass.
 6. **Commit AND push `version.json` to `master` on the public repo.**
    This is what the in-app updater reads on launch — a missed push
