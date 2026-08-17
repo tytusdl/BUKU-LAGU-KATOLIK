@@ -1,0 +1,101 @@
+# Dependabot configuration for Buku Lagu Katolik
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+
+# Pin to a single ecosystem. The project is pure React Native (Expo) — no
+# bundler, docker, or github-actions deps that Dependabot needs to track
+# separately. If we ever add GitHub Actions, drop in a second `updates:` block.
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      # Weekly on Monday morning MYT. Low-traffic; we're a small repo.
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Kuala_Lumpur"
+    # Group noisy minor/patch bumps so we get one PR per category instead of
+    # 20. Major bumps and security patches always surface individually.
+    groups:
+      expo-stack:
+        applies-to: version-updates
+        patterns:
+          - "expo*"
+          - "@expo/*"
+          - "react-native*"
+          - "@react-native/*"
+          - "react-native-reanimated"
+          - "react-native-worklets"
+          - "react-native-screens"
+          - "react-native-gesture-handler"
+          - "react-native-safe-area-context"
+          - "react-native-svg"
+          - "react-native-view-shot"
+          - "lucide-react-native"
+      build-tooling:
+        applies-to: version-updates
+        patterns:
+          - "metro*"
+          - "@babel/*"
+          - "typescript"
+          - "eslint"
+          - "eslint-config-expo"
+          - "sharp-cli"
+          - "babel-plugin-transform-remove-console"
+    # All PRs need explicit review — this is a production app on the
+    # Play Store + App Store. Dependabot PRs go straight to "dependency"
+    # label and the original author for review.
+    labels:
+      - "dependencies"
+    # Open at most 5 PRs at a time. Otherwise Dependabot queues everything
+    # and the queue gets stale.
+    open-pull-requests-limit: 5
+    # Rebase existing PRs to keep them conflict-free with the base branch.
+    rebase-strategy: "auto"
+
+    # ------------------------------------------------------------------
+    # SECURITY ALERT SUPPRESSION
+    # ------------------------------------------------------------------
+    # 10 transitive Dependabot security alerts (Aug 2026) live entirely
+    # inside the Metro / Expo / React Native build-time stack and cannot
+    # be fixed without an SDK major-version migration:
+    #
+    #   - image-size (DoS via JXL/HEIF/ICNS parsers) — fixed in Metro 0.83+
+    #     which ships with Expo SDK 55+. SDK 54 bundles Metro 0.82.
+    #   - @expo/cli, @expo/metro, @expo/metro-config — same root cause
+    #   - metro, metro-config, metro-transform-worker — same root cause
+    #   - @react-native/community-cli-plugin, react-native — same root cause
+    #   - expo (umbrella) — same root cause
+    #
+    # These packages execute ONLY at build time (`expo export` / dev
+    # server). They are NOT bundled into the shipped iOS/Android binary,
+    # so they have no user-facing attack surface. The build is run in
+    # ephemeral EAS Build containers with no untrusted input, so the
+    # practical risk to end users is nil.
+    #
+    # Planned fix: Expo SDK 54 → SDK 55 migration (RN 0.81 → 0.82,
+    # expo-router 6 → 7, reanimated 4.x → 4.3+/5.x, etc.). Tracked in
+    # the SDK 55 upgrade ticket.
+    #
+    # The matching 10 alerts in the GitHub Security tab must be
+    # dismissed MANUALLY in the GitHub UI (Dependabot.yml cannot
+    # dismiss existing alerts). Use dismiss reason:
+    #   "Won't fix — no shipped attack surface, blocked on SDK 55
+    #    migration (see dependabot.yml)."
+    # ------------------------------------------------------------------
+    ignore:
+      - dependency-name: "image-size"
+        # GHSA-w3rx-r6r6-pgpr, GHSA-5p2g-fcmc-qvqq
+      - dependency-name: "metro"
+      - dependency-name: "metro-config"
+      - dependency-name: "metro-transform-worker"
+      - dependency-name: "@expo/cli"
+      - dependency-name: "@expo/metro"
+      - dependency-name: "@expo/metro-config"
+      - dependency-name: "@react-native/community-cli-plugin"
+      # react-native is a direct dep — ignore rule is the same: blocked
+      # on SDK 55 bump. Once we move to SDK 55 this entry can be deleted.
+      - dependency-name: "react-native"
+      # expo is a direct dep umbrella — same blocking reason.
+      - dependency-name: "expo"
