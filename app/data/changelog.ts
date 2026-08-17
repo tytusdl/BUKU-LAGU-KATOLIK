@@ -16,6 +16,23 @@ export interface ChangelogEntry {
 // Add new versions at the top of the list
 export const changelogData: ChangelogEntry[] = [
     {
+        version: "1.9.2",
+        changes: [
+            {
+                text: {
+                    Melayu: "Pembaikan & Kestabilan: Beberapa pepijat kecil dibaiki untuk pengalaman yang lebih lancar.",
+                    English: "Fixes & Stability: Several minor bugs were fixed for a smoother experience."
+                }
+            },
+            {
+                text: {
+                    Melayu: "Memperbaiki lirik lagu D13 (bidup → hidup).",
+                    English: "Fixed lyrics for D13 (bidup → hidup)."
+                }
+            }
+        ]
+    },
+    {
         version: "1.9.1",
         changes: [
             {
