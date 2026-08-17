@@ -2448,7 +2448,7 @@ Senang hati ku
 Bersamamu, oh-oh-oh Tuhan
 
 Engkaulah sumber
-Pada bidup ku
+Pada hidup ku
 Kasih pada ku
 Aku berlindung
 Pada mu Tuhan
