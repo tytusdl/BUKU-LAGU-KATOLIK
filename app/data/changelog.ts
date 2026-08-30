@@ -20,14 +20,20 @@ export const changelogData: ChangelogEntry[] = [
         changes: [
             {
                 text: {
-                    Melayu: "Pembaikan & Kestabilan: Beberapa pepijat kecil dibaiki untuk pengalaman yang lebih lancar.",
-                    English: "Fixes & Stability: Several minor bugs were fixed for a smoother experience."
+                    Melayu: "Fix Kritikal iOS: Versi 1.9.1 menyebabkan app crash serta-merta apabila dibuka untuk SEMUA pengguna iOS. Versi 1.9.2 memulihkan kestabilan — jika anda masih di 1.9.1 dan app tidak boleh dibuka, sila kemas kini dari App Store SEGERA.",
+                    English: "Critical iOS Fix: Version 1.9.1 caused the app to crash immediately on launch for ALL iOS users. Version 1.9.2 restores stability — if you are still on 1.9.1 and the app won't open, please update from the App Store IMMEDIATELY."
                 }
             },
             {
                 text: {
                     Melayu: "Memperbaiki lirik lagu D13 (bidup → hidup).",
                     English: "Fixed lyrics for D13 (bidup → hidup)."
+                }
+            },
+            {
+                text: {
+                    Melayu: "Pengguna iOS: update mungkin ambil masa 1–3 hari untuk diluluskan Apple. Sila semak App Store selepas itu untuk kemas kini.",
+                    English: "iOS users: the update may take 1–3 days for Apple to approve. Please check the App Store afterwards for the update."
                 }
             }
         ]

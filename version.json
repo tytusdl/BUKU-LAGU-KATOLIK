@@ -1,21 +1,19 @@
 {
-  "version": "1.9.1",
+  "version": "1.9.2",
   "minVersion": "1.7.0",
   "url": "https://play.google.com/store/apps/details?id=com.tytusdl.lagu_pozoo",
   "iosUrl": "https://apps.apple.com/app/buku-lagu-katolik/id6479187123",
   "releaseNotes": {
     "Melayu": [
-      "Pembaikan & Kestabilan: Beberapa pepijat kecil dibaiki untuk pengalaman yang lebih lancar.",
-      "Memperbaiki lirik lagu A17 (percobaan → pencobaan), R351 (Tuban → Tuhan), M25 (kasibi → kasihi), R225 (lirik tidak lengkap), R274 (perubahan dan pembaikan lirik), dan R445 (kounisikaan → kounsikaan).",
-      "Membaiki: 40 lagu (R160–R199) tak boleh disimpan dalam senarai Misa. Kini semua lagu boleh ditambah ke mana-mana bahagian Misa.",
+      "Fix Kritikal iOS: Versi 1.9.1 menyebabkan app crash serta-merta apabila dibuka untuk SEMUA pengguna iOS. Versi 1.9.2 memulihkan kestabilan — jika anda masih di 1.9.1 dan app tidak boleh dibuka, sila kemas kini dari App Store SEGERA.",
+      "Memperbaiki lirik lagu D13 (bidup → hidup).",
       "Pengguna iOS: update mungkin ambil masa 1–3 hari untuk diluluskan Apple. Sila semak App Store selepas itu untuk kemas kini."
     ],
     "English": [
-      "Fixes & Stability: Several minor bugs were fixed for a smoother experience.",
-      "Fixed lyrics for A17 (percobaan → pencobaan), R351 (Tuban → Tuhan), M25 (kasibi → kasihi), R225 (incomplete lyrics), R274 (lyrics changes and fixes), and R445 (kounisikaan → kounsikaan).",
-      "Fixed: 40 songs (R160–R199) couldn't be saved to the Mass list. Now every song can be added to any Mass part.",
+      "Critical iOS Fix: Version 1.9.1 caused the app to crash immediately on launch for ALL iOS users. Version 1.9.2 restores stability — if you are still on 1.9.1 and the app won't open, please update from the App Store IMMEDIATELY.",
+      "Fixed lyrics for D13 (bidup → hidup).",
       "iOS users: the update may take 1–3 days for Apple to approve. Please check the App Store afterwards for the update."
     ]
   },
-  "forceUpdate": false
+  "forceUpdate": true
 }

@@ -2,7 +2,7 @@
   "expo": {
     "name": "Buku Lagu Katolik",
     "slug": "lagu_pozoo",
-    "version": "1.9.1",
+    "version": "1.9.2",
     "jsEngine": "hermes",
     "newArchEnabled": true,
     "scheme": "lagu-pozoo",
@@ -91,7 +91,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.tytusdl.lagu-pozoo",
       "appStoreUrl": "https://apps.apple.com/app/buku-lagu-katolik/id6479187123",
-      "buildNumber": "1.9.1",
+      "buildNumber": "1.9.2",
       "jsEngine": "hermes",
       "infoPlist": {
         "CFBundleURLTypes": [
