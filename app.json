@@ -87,7 +87,6 @@
       "policy": "sdkVersion"
     },
     "ios": {
-      "name": "Buku Lagu Katolik",
       "supportsTablet": true,
       "bundleIdentifier": "com.tytusdl.lagu-pozoo",
       "appStoreUrl": "https://apps.apple.com/app/buku-lagu-katolik/id6479187123",
