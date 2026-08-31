@@ -6,13 +6,11 @@
   "releaseNotes": {
     "Melayu": [
       "Fix Kritikal iOS: Versi 1.9.1 menyebabkan app crash serta-merta apabila dibuka untuk SEMUA pengguna iOS. Versi 1.9.2 memulihkan kestabilan — jika anda masih di 1.9.1 dan app tidak boleh dibuka, sila kemas kini dari App Store SEGERA.",
-      "Memperbaiki lirik lagu D13 (bidup → hidup).",
-      "Pengguna iOS: update mungkin ambil masa 1–3 hari untuk diluluskan Apple. Sila semak App Store selepas itu untuk kemas kini."
+      "Memperbaiki lirik lagu D13 (bidup → hidup)."
     ],
     "English": [
       "Critical iOS Fix: Version 1.9.1 caused the app to crash immediately on launch for ALL iOS users. Version 1.9.2 restores stability — if you are still on 1.9.1 and the app won't open, please update from the App Store IMMEDIATELY.",
-      "Fixed lyrics for D13 (bidup → hidup).",
-      "iOS users: the update may take 1–3 days for Apple to approve. Please check the App Store afterwards for the update."
+      "Fixed lyrics for D13 (bidup → hidup)."
     ]
   },
   "forceUpdate": false

@@ -29,12 +29,6 @@ export const changelogData: ChangelogEntry[] = [
                     Melayu: "Memperbaiki lirik lagu D13 (bidup → hidup).",
                     English: "Fixed lyrics for D13 (bidup → hidup)."
                 }
-            },
-            {
-                text: {
-                    Melayu: "Pengguna iOS: update mungkin ambil masa 1–3 hari untuk diluluskan Apple. Sila semak App Store selepas itu untuk kemas kini.",
-                    English: "iOS users: the update may take 1–3 days for Apple to approve. Please check the App Store afterwards for the update."
-                }
             }
         ]
     },
