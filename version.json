@@ -15,5 +15,5 @@
       "iOS users: the update may take 1–3 days for Apple to approve. Please check the App Store afterwards for the update."
     ]
   },
-  "forceUpdate": true
+  "forceUpdate": false
 }
