@@ -212,14 +212,17 @@ function ThemedApp({ appIsReady }: { appIsReady: boolean }) {
         if (response.ok) {
           const remoteConfig = (await response.json()) as UpdateMetadata;
           if (isNewerVersion(remoteConfig.version, localVersion)) {
-            const ignoredVersion = await AsyncStorage.getItem('ignored_version');
-            if (ignoredVersion !== remoteConfig.version || remoteConfig.forceUpdate) {
-              if (active) {
-                setUpdateMetadata(remoteConfig);
-                setUpdateVisible(true);
-              }
-              return; // If there is a store update, bypass OTA check
+            // Show the update modal on every app start as long as the user
+            // is on a version older than the remote. Tapping ABAIKAN only
+            // dismisses the modal for the current session — it will reappear
+            // on the next app launch until the user actually installs the
+            // new version. This is intentional: ensures persistent
+            // visibility of critical/blocking updates (e.g. iOS 1.9.1 crash).
+            if (active) {
+              setUpdateMetadata(remoteConfig);
+              setUpdateVisible(true);
             }
+            return; // If there is a store update, bypass OTA check
           }
         }
       } catch (error) {
