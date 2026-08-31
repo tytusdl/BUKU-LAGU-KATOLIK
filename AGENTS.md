@@ -307,12 +307,12 @@ in this repo.
 
    Reference copy (Melayu):
    ```
-   updateAppMessage: 'Versi baharu Buku Lagu Katolik telah tersedia! Versi {newVersion} kini boleh didapati (anda mempunyai {currentVersion}). Adakah anda ingin mengemaskini sekarang?\n\nPengguna iOS: update mungkin ambil masa 1–3 hari untuk diluluskan Apple. Sila semak App Store selepas itu untuk kemas kini.',
+   updateAppMessage: 'Versi baharu Buku Lagu Katolik telah tersedia! Versi {newVersion} kini boleh didapati (anda mempunyai {currentVersion}). Adakah anda ingin mengemaskini sekarang?\n\nPengguna iOS: update mungkin ambil masa 48jam untuk diluluskan Apple. Sila semak App Store selepas itu untuk kemas kini.',
    ```
 
    Reference copy (English):
    ```
-   updateAppMessage: 'A new version of Buku Lagu Katolik is available! Version {newVersion} is now available - you have {currentVersion}. Would you like to update it now?\n\niOS users: the update may take 1–3 days for Apple to approve. Please check the App Store afterwards for the update.',
+   updateAppMessage: 'A new version of Buku Lagu Katolik is available! Version {newVersion} is now available - you have {currentVersion}. Would you like to update it now?\n\niOS users: the update may take 48 hours for Apple to approve. Please check the App Store afterwards for the update.',
    ```
 5. Run `npx tsc --noEmit` and `npm run lint`; both must pass.
 6. **Commit AND push `version.json` to `master` on the public repo.**
