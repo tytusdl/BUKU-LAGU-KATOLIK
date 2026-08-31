@@ -285,29 +285,25 @@ in this repo.
    credit line is fine to drop if too long). Do NOT hand-write a
    shorter summary — that's how 1.9.1 shipped with only 2 bullets
    in the modal while the in-app changelog had 3.
-   **Add an iOS App Store review note** in BOTH places, in the same
-   release:
-   1. **As the last bullet** in `changelog.ts` and `version.json`
-      releaseNotes arrays (bilingual). This reaches users on the
-      *current* build the moment the cache refreshes on the GitHub
-      ref (~5 min after the push).
-   2. **In the modal intro** `src/translations.ts:updateAppMessage`
-      (bilingual), as a second paragraph after the "Adakah anda
-      ingin mengemaskini sekarang?" line, separated by `\n\n`.
-      This is the FIRST thing every user sees in the update prompt
-      — put it there too so the iOS delay explanation is the most
-      prominent note, not buried in a scrollable release-notes
-      list. The user reads the intro even if they don't expand
-      the release notes.
+   **Add an iOS App Store review note** in ONE place only — the modal
+   intro `src/translations.ts:updateAppMessage` (bilingual), as a
+   second paragraph after the "Adakah anda ingin mengemaskini
+   sekarang?" line, separated by `\n\n`. This is the FIRST thing
+   every user sees in the update prompt (always above the fold,
+   even if they don't expand the release notes), so the iOS delay
+   explanation is most prominent there.
 
-   Both versions must be added in the same release. The
-   `version.json` bullet reaches existing users immediately
-   (within ~5 min cache). The `updateAppMessage` modal copy is
-   shipped with the app bundle and only reaches users on the
-   *next* EAS build, so keep it in the codebase regardless of
-   whether a new build is being released this cycle. Use the
-   established bilingual template (Melayu / English) and include
-   the "Sila semak App Store selepas itu" tip in both places.
+   Do NOT add the iOS note as a separate bullet in `changelog.ts` or
+   `version.json:releaseNotes` — showing it in both the intro and
+   the release-notes list is de-dup. The intro copy is shipped with
+   the app bundle and only reaches users on the *next* EAS build,
+   so keep it in the codebase regardless of whether a new build is
+   being released this cycle. Use the established bilingual
+   template (Melayu / English) and include the "Sila semak App
+   Store selepas itu" tip. Reference commit: `f84d28d` "de-dup
+   changelog" — that change explicitly removed the iOS bullet
+   from `changelog.ts` and `version.json:releaseNotes` and put it
+   only in the modal intro.
 
    Reference copy (Melayu):
    ```
