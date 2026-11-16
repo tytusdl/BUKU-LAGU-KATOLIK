@@ -48,7 +48,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
-    "@tsconfig/react-native": "^3.0.5",
+    "@tsconfig/react-native": "^3.0.10",
     "@types/react": "~19.1.10",
     "babel-plugin-transform-remove-console": "^6.9.4",
     "eslint": "^9.0.0",
